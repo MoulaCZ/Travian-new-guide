@@ -49,17 +49,17 @@ Color coding from the original:
 | 2 | 🟩 1 Iron Mine → 2 | 1 | 100% | |
 | 3 | 🟩 Main Building → 3 | 1 | 100% | |
 | 4 | 🟩 1 Clay Pit → 2 | 3 | 93% | |
-| 5 | 🟩 Warehouse → 1 | 3 | 93% | Collect the 50 XP quest → hero levels to 1 → start raiding oases |
+| 5 | 🟩 Warehouse → 1 | 3 | 93% | 50 XP quest collection — level up hero to 1 and raid oasis |
 | 6 | 🟩 Granary → 1 | 3 | 93% | |
 | 7 | 🟩 Marketplace → 1 | 3 | 93% | |
 | 8 | 🟩 Embassy → 1 | 3 | 93% | |
 | 9 | 🟩 1 Cranny → 1 | 3 | 93% | |
 | 10 | 🟩 Barracks → 3 | 3 | 93% | |
-| 11 | 🟩 All fields → 1 | 3 | 93% | Use hero to clear oases. **Always use the simulator before sending** — click Apply Losses to check health cost. Keep uncollected quests ready to level up hero when health gets low. If crop goes negative, upgrade 1–2 croplands to 2 first |
-| 12 | 🟩 All Croplands → 2 | 3 | 93% | Hero should be level 2 by now — keep clearing oases |
-| 13 | 🟩 All Iron Mines → 2 | 3 | 93% | Steps 13–15: do in any order, but complete all of one type before moving to next |
-| 14 | 🟩 All Woodlands → 2 | 3 | 93% | |
-| 15 | 🟩 All Clay Pits → 2 | 3 | 93% | |
+| 11 | 🟩 All fields → 1 | 3 | 93% | Use the hero to clean up oases (do not forget to use the simulator before you send the hero). Click **Apply Losses** to check how much health your hero will lose. Keep always some quest to collect to level up the hero as soon as the health is too low. If crop goes negative, upgrade 1–2 croplands to 2 first |
+| 12 | 🟩 All Croplands → 2 | 3 | 93% | At this point you should have the hero at level 2 — keep cleaning oases |
+| 13 | 🟩 All Iron Mines → 2 | 3 | 93% | These steps you can do in the order you prefer, but always finish all the fields of one type before moving to the next so you can keep collecting these quests |
+| 14 | 🟩 All Woodlands → 2 | 3 | 93% | ↑ same note |
+| 15 | 🟩 All Clay Pits → 2 | 3 | 93% | ↑ same note |
 | 16 | 🟩 All Croplands → 3 | 3 | 93% | |
 | 17 | 🟩 1 Cropland → 4 | 3 | 93% | |
 | 18 | 🟩 Academy → 1 | 3 | 93% | |
@@ -67,9 +67,9 @@ Color coding from the original:
 | 20 | 🟩 1 Cranny → 3 | 5 | 86% | |
 | 21 | 🟩 Smithy → 1 | 5 | 86% | |
 | 22 | 🟩 Residence → 1 | 5 | 86% | |
-| 23 | 🟩 All Iron Mines → 3 | 5 | 86% | Steps 23–25: do in any order, but complete all of one type before moving to next |
-| 24 | 🟩 All Woodlands → 3 | 5 | 86% | |
-| 25 | 🟩 All Clay Pits → 3 | 5 | 86% | |
+| 23 | 🟩 All Iron Mines → 3 | 5 | 86% | These steps you can do in the order you prefer, but always finish all the fields of one type before moving to the next so you can keep collecting these quests |
+| 24 | 🟩 All Woodlands → 3 | 5 | 86% | ↑ same note |
+| 25 | 🟩 All Clay Pits → 3 | 5 | 86% | ↑ same note |
 | 26 | 🟩 Warehouse → 3 | 5 | 86% | |
 | 27 | 🟩 Granary → 3 | 5 | 86% | |
 | 28 | 🟩 Marketplace → 3 | 5 | 86% | |
@@ -80,31 +80,31 @@ Color coding from the original:
 | 33 | 🟩 1 Clay Pit → 4 | 7 | 80% | |
 | 34 | 🟩 1 Cranny → 10 | 7 | 80% | |
 | 35 | 🟩 6 Crannies → 6 | 7 | 80% | |
-| 36 | 🟩 All Iron Mines → 4 | 7 | 80% | Steps 36–38: do in any order, but complete all of one type before moving to next |
-| 37 | 🟩 All Woodlands → 4 | 7 | 80% | |
-| 38 | 🟩 All Clay Pits → 4 | 7 | 80% | |
+| 36 | 🟩 All Iron Mines → 4 | 7 | 80% | These steps you can do in the order you prefer, but always finish all the fields of one type before moving to the next so you can keep collecting these quests |
+| 37 | 🟩 All Woodlands → 4 | 7 | 80% | ↑ same note |
+| 38 | 🟩 All Clay Pits → 4 | 7 | 80% | ↑ same note |
 | 39 | 🟩 Smithy → 3 | 7 | 80% | |
 | 40 | 🟩 Academy → 5 | 7 | 80% | |
 | 41 | 🟩 Stable → 1 | 7 | 80% | |
 | 42 | 🟩 1 Cropland → 5 | 7 | 80% | |
 | 43 | 🟩 Grain Mill → 1 | 7 | 80% | |
-| 44 | 🟨 Academy → 10 | 7 | 80% | Alternate steps 44 and 46 depending on available resources |
-| 45 | 🟩 Workshop → 1 | 7 | 80% | |
-| 46 | 🟨 Main Building → 12 | 7 | 80% | Alternate with step 44 |
+| 44 | 🟨 Academy → 10 | 7 | 80% | You can alternate steps 44 and 46 depending on the resources you have |
+| 45 | 🟩 Workshop → 1 | 7 | 80% | 🟥 Use the Book of Wisdom to switch from Hero Strength to Resource Production (all points but 4) as soon as production will be higher than farming oases. Calculate by comparing the time you need to send your hero to oases with animals vs. the production you would have had with points on resource production for the same timeframe |
+| 46 | 🟨 Main Building → 12 | 7 | 80% | You can alternate with step 44 depending on the resources you have |
 | 47 | 🟩 Town Hall → 1 | 12 | 67% | |
 | 48 | 🟩 Warehouse → 7 | 12 | 67% | |
 | 49 | 🟩 Granary → 7 | 12 | 67% | |
 | 50 | 🟩 Warehouse → 8 | 12 | 67% | |
 | 51 | 🟩 Residence → 3 | 12 | 67% | |
 | 52 | 🟩 Embassy → 5 | 12 | 67% | |
-| 53 | 🟩 Marketplace → 7 | 12 | 67% | 🟥 Switch hero points to resource production here if the threshold is met (see Hero rules above) |
+| 53 | 🟩 Marketplace → 7 | 12 | 67% | |
 | 54 | 🟥 **Queue first Party** | 12 | 67% | See Party rules below |
-| 55 | 🟩 All Iron Mines → 5 | 12 | 67% | Steps 55–58: do in any order, but complete all of one type before moving to next |
-| 56 | 🟩 All Woodlands → 5 | 12 | 67% | |
-| 57 | 🟩 All Clay Pits → 5 | 12 | 67% | |
-| 58 | 🟩 All Croplands → 5 | 12 | 67% | |
-| 59 | 🟨 Marketplace → 12 | 12 | 67% | Alternate steps 59 and 60 depending on available resources |
-| 60 | 🟨 Embassy → 8 | 12 | 67% | Alternate with step 59 |
+| 55 | 🟩 All Iron Mines → 5 | 12 | 67% | These steps you can do in the order you prefer, but always finish all the fields of one type before moving to the next so you can keep collecting these quests |
+| 56 | 🟩 All Woodlands → 5 | 12 | 67% | ↑ same note |
+| 57 | 🟩 All Clay Pits → 5 | 12 | 67% | ↑ same note |
+| 58 | 🟩 All Croplands → 5 | 12 | 67% | ↑ same note |
+| 59 | 🟨 Marketplace → 12 | 12 | 67% | You can alternate steps 59 and 60 depending on the resources you have |
+| 60 | 🟨 Embassy → 8 | 12 | 67% | ↑ same note |
 | 61 | 🟩 Party | 12 | 67% | |
 | 62 | 🟩 Residence → 9 | 12 | 67% | |
 | 63 | 🟩 Party | 12 | 67% | |

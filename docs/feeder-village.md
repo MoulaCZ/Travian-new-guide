@@ -15,7 +15,7 @@ Don't default to a standard **4-4-4-6** valley. By this stage you know your bott
 
 **Location priorities:**
 1. Close to your existing villages (shorter merchant travel time)
-2. Has **oases matching your 6-field resource** — a 25% or 50% oasis on your strongest resource type compounds significantly
+2. Has **oases matching your 5-field resource** — a 25% or 50% oasis on your strongest resource type compounds significantly
 3. [Official guide on resource village development](https://support.travian.com/en/support/solutions/articles/7000094130-developing-resource-villages)
 
 ---

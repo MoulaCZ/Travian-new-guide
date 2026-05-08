@@ -1,133 +1,147 @@
-# First Village
+# First Village — 3-Party Settler Guide
 
-## Hero — General Rules
-
-> ⚠️ **NEVER let your hero die.**
-
-- Put all hero points into **combat strength**
-- Use quest rewards to help the hero level up early (until level 3) — hold uncollected quests and collect them right when hero health is low, so the level-up heal kicks in
-- Switch to **resource production** (keep 4 points on strength) only when resource production from points beats what you earn farming oases — calculate it: compare oasis raid income vs. production gain over the same timeframe
-- Use the **Book of Wisdom** (found on adventure #6) to respec when the time comes — don't use it before
+> Strategy: send settlers using exactly 3 parties. Based on Caim's 3P-Sim.
 
 ---
 
-## Main Building — Speed Reference
+## Hero
 
-Each MB level reduces the build time of **all buildings** by this amount:
+> ⚠️ **NEVER let your hero die.** Collect quests right when health is low — a level-up heals to full.
 
-| MB level | Build time | Speed vs. MB 1 |
-|----------|-----------|----------------|
-| 1 | 0:33:20 to build | 100% (baseline) |
-| 2 | 0:43:40 | 96% |
-| 3 | 0:55:40 | 93% |
-| 4 | 1:09:30 | 90% |
-| 5 | 1:25:40 | 86% |
-| 6 | 1:44:20 | 83% |
-| 7 | 2:06:10 | 80% |
-| 8 | 2:31:20 | 77% |
-| 9 | 3:00:30 | 75% |
-| 10 | 3:34:20 | 72% |
-| 11 | 4:13:40 | 69% |
-| 12 | 4:59:10 | 67% |
+**How many points in Strength** depends on how many oases you can reach:
+- 0 oases: max 2 points in Strength, rest in Resource Production
+- 1–5 oases: 8–12 points in Strength
+- 6+ oases: 12+ points in Strength
 
-> "Build time" in this column = how long it takes to upgrade the MB **to that level** (e.g. MB 1→2 takes 0:43:40 at MB level 1). All other buildings get faster by the % shown.
+**Raiding phases:**
+1. Send hero on **adventure 1** (get the horse). Start raiding oases immediately.
+2. When walking time hits **1h+** — do adventure 2 (resource reward, ~2,300 res) right before hero levels up to heal.
+3. When walking time hits **2h+** — use the **Book of Wisdom** (adventure 6, usually within 24h of server start) to respec almost all points into Resource Production.
+
+> 🟥 **Activate the 25% resource production bonus** as soon as the server starts — it's free and permanent.
 
 ---
 
 ## Build Order
 
-Color coding from the original:
-- 🟩 Required step — do in order
-- 🟨 Flexible — can alternate with adjacent steps depending on resources
-- 🟥 Critical note
+> 🎯 **Goals:** Step 43 in **≤ 2h** · Step 50 in **≤ 12h** · Party 1 queued by step 74 in **≤ 72h**
 
-**Steps within a group** (e.g. "all fields to level X") can be done in any order within the group, but **always finish all fields of one type before collecting the quest** — the quest requires completion of the full set.
+**Legend:** ⭐ Quest milestone | 🎉 Party | 🎯 Time goal | Reward = quest reward resources
 
-> **Starting state:** Main Building L1, Rally Point L1, 1 Woodland L2, 1 Cropland L2, 1 Clay Pit L1. Everything else at L0 / unbuilt.
-
-> ⏱ **Step time** = total build time for that step (all fields × all level upgrades, with MB speed + 25% ad boost). Formula: `base × MB% × 0.75`. **Residence** has no ad boost: `base × MB%` only. **Cumul.** = running total of all build time queued (single slot, sequential).
-
-| # | What | MB | Speed | ⏱ Step time | ⏱ Cumul. | Step Notes |
-|---|------|----|-------|-------------|----------|------------|
-| 1 | 🟩 Go to nearest adventure — get the horse | 1 | 100% | — | — | Take the **2nd adventure** (resource reward) right before hero reaches level 3 and is at low health — the level-up heals the hero |
-| 2 | 🟩 1 Iron Mine → 2 | 1 | 100% | 17m | ~17m | |
-| 3 | 🟩 Main Building → 3 | 1 | 100% | ~1h 13m | ~1h 30m | |
-| 4 | 🟩 1 Clay Pit → 2 | 3 | 93% | 6m | ~1h 36m | |
-| 5 | 🟩 Warehouse → 1 | 3 | 93% | 23m | ~1h 59m | 50 XP quest collection — level up hero to 1 and raid oasis |
-| 6 | 🟩 Granary → 1 | 3 | 93% | 18m | ~2h 17m | |
-| 7 | 🟩 Marketplace → 1 | 3 | 93% | 21m | ~2h 38m | |
-| 8 | 🟩 Embassy → 1 | 3 | 93% | 23m | ~3h 01m | |
-| 9 | 🟩 1 Cranny → 1 | 3 | 93% | 3m | ~3h 04m | |
-| 10 | 🟩 Barracks → 3 | 3 | 93% | ~1h 32m | ~4h 36m | |
-| 11 | 🟩 All fields → 1 | 3 | 93% | ~41m | ~5h 17m | 14 fields (Woodland #1 and Cropland #1 already at L2, Clay Pit #1 at L1, Iron Mine #1 will be at L2 after step 2). Use the hero to clean up oases. Click **Apply Losses** before each attack. Keep uncollected quests ready to heal via level-up. If crop goes negative, upgrade 1–2 croplands to 2 first |
-| 12 | 🟩 All Croplands → 2 | 3 | 93% | ~26m | ~5h 43m | 5 croplands (1 already at L2 from start). At this point you should have the hero at level 2 — keep cleaning oases |
-| 13 | 🟩 All Iron Mines → 2 | 3 | 93% | ~32m | ~6h 15m | 3 mines (1 already at L2 from step 2). These steps you can do in the order you prefer, but always finish all the fields of one type before moving to the next so you can keep collecting these quests |
-| 14 | 🟩 All Woodlands → 2 | 3 | 93% | ~22m | ~6h 37m | 3 woodlands (1 already at L2 from start). ↑ same note |
-| 15 | 🟩 All Clay Pits → 2 | 3 | 93% | ~19m | ~6h 56m | 3 clay pits (1 already at L2 from step 4). ↑ same note |
-| 16 | 🟩 All Croplands → 3 | 3 | 93% | ~1h 03m | ~7h 59m | |
-| 17 | 🟩 1 Cropland → 4 | 3 | 93% | 19m | ~8h 18m | |
-| 18 | 🟩 Academy → 1 | 3 | 93% | 23m | ~8h 41m | |
-| 19 | 🟩 Main Building → 5 | 3 | 93% | ~1h 38m | ~10h 19m | |
-| 20 | 🟩 1 Cranny → 3 | 5 | 86% | ~17m | ~10h 36m | |
-| 21 | 🟩 Smithy → 1 | 5 | 86% | 21m | ~10h 57m | |
-| 22 | 🟩 Residence → 1 | 5 | 86% | 28m | ~11h 25m | *(no ad boost)* |
-| 23 | 🟩 All Iron Mines → 3 | 5 | 86% | ~1h 12m | ~12h 37m | These steps you can do in the order you prefer, but always finish all the fields of one type before moving to the next so you can keep collecting these quests |
-| 24 | 🟩 All Woodlands → 3 | 5 | 86% | ~51m | ~13h 28m | ↑ same note |
-| 25 | 🟩 All Clay Pits → 3 | 5 | 86% | ~46m | ~14h 14m | ↑ same note |
-| 26 | 🟩 Warehouse → 3 | 5 | 86% | ~1h 03m | ~15h 17m | |
-| 27 | 🟩 Granary → 3 | 5 | 86% | ~53m | ~16h 10m | |
-| 28 | 🟩 Marketplace → 3 | 5 | 86% | ~58m | ~17h 08m | |
-| 29 | 🟩 Walls → 3 | 5 | 86% | ~1h 25m | ~18h 33m | |
-| 30 | 🟩 Main Building → 7 | 5 | 86% | ~2h 06m | ~20h 39m | |
-| 31 | 🟩 1 Woodland → 4 | 7 | 80% | 21m | ~21h 00m | |
-| 32 | 🟩 1 Iron Mine → 4 | 7 | 80% | 29m | ~21h 29m | |
-| 33 | 🟩 1 Clay Pit → 4 | 7 | 80% | 19m | ~21h 48m | |
-| 34 | 🟩 1 Cranny → 10 | 7 | 80% | ~4h 14m | ~26h 02m | |
-| 35 | 🟩 6 Crannies → 6 | 7 | 80% | ~8h 06m | ~34h 08m | ~1h 21m per cranny built from scratch |
-| 36 | 🟩 All Iron Mines → 4 | 7 | 80% | ~1h 55m | ~36h 03m | These steps you can do in the order you prefer, but always finish all the fields of one type before moving to the next so you can keep collecting these quests |
-| 37 | 🟩 All Woodlands → 4 | 7 | 80% | ~1h 24m | ~37h 27m | ↑ same note |
-| 38 | 🟩 All Clay Pits → 4 | 7 | 80% | ~1h 17m | ~38h 44m | ↑ same note |
-| 39 | 🟩 Smithy → 3 | 7 | 80% | ~59m | ~39h 43m | |
-| 40 | 🟩 Academy → 5 | 7 | 80% | ~2h 31m | ~42h 14m | |
-| 41 | 🟩 Stable → 1 | 7 | 80% | 22m | ~42h 36m | |
-| 42 | 🟩 1 Cropland → 5 | 7 | 80% | 28m | ~43h 04m | |
-| 43 | 🟩 Grain Mill → 1 | 7 | 80% | 18m | ~43h 22m | |
-| 44 | 🟨 Academy → 10 | 7 | 80% | ~7h 45m | ~51h 07m | You can alternate steps 44 and 46 depending on the resources you have |
-| 45 | 🟩 Workshop → 1 | 7 | 80% | 30m | ~51h 37m | 🟥 Use the Book of Wisdom to switch from Hero Strength to Resource Production (all points but 4) as soon as production will be higher than farming oases. Calculate by comparing the time you need to send your hero to oases with animals vs. the production you would have had with points on resource production for the same timeframe |
-| 46 | 🟨 Main Building → 12 | 7 | 80% | ~8h 05m | ~59h 42m | You can alternate with step 44 depending on the resources you have |
-| 47 | 🟩 Town Hall → 1 | 12 | 67% | ~1h 45m | ~61h 27m | |
-| 48 | 🟩 Warehouse → 7 | 12 | 67% | ~3h 13m | ~64h 40m | |
-| 49 | 🟩 Granary → 7 | 12 | 67% | ~2h 46m | ~67h 26m | |
-| 50 | 🟩 Warehouse → 8 | 12 | 67% | ~1h 16m | ~68h 42m | |
-| 51 | 🟩 Residence → 3 | 12 | 67% | ~1h 06m | ~69h 48m | *(no ad boost)* |
-| 52 | 🟩 Embassy → 5 | 12 | 67% | ~2h 07m | ~71h 55m | |
-| 53 | 🟩 Marketplace → 7 | 12 | 67% | ~3h 00m | ~74h 55m | |
-| 54 | 🟥 **Queue first Party** | 12 | 67% | — | ~74h 55m | See Party rules below |
-| 55 | 🟩 All Iron Mines → 5 | 12 | 67% | ~2h 41m | ~77h 36m | These steps you can do in the order you prefer, but always finish all the fields of one type before moving to the next so you can keep collecting these quests |
-| 56 | 🟩 All Woodlands → 5 | 12 | 67% | ~1h 59m | ~79h 35m | ↑ same note |
-| 57 | 🟩 All Clay Pits → 5 | 12 | 67% | ~1h 50m | ~81h 25m | ↑ same note |
-| 58 | 🟩 All Croplands → 5 | 12 | 67% | ~2h 22m | ~83h 47m | ↑ same note |
-| 59 | 🟨 Marketplace → 12 | 12 | 67% | ~8h 39m | ~92h 26m | You can alternate steps 59 and 60 depending on the resources you have |
-| 60 | 🟨 Embassy → 8 | 12 | 67% | ~3h 12m | ~95h 38m | ↑ same note |
-| 61 | 🟩 Party | 12 | 67% | — | ~95h 38m | |
-| 62 | 🟩 Residence → 9 | 12 | 67% | ~7h 59m | ~103h 37m | *(no ad boost)* |
-| 63 | 🟩 Party | 12 | 67% | — | ~103h 37m | |
-| 64 | 🟩 Residence → 10 | 12 | 67% | ~2h 23m | ~106h 00m | *(no ad boost)* |
-| 65 | 🟩 Train 3 Settlers | 12 | 67% | — | ~106h 00m | |
-| 66 | 🟩 Party | 12 | 67% | — | ~106h 00m | |
-| 67 | 🟩 Send Settlers | 12 | 67% | — | ~106h 00m | |
+| # | What | Tier | Cost | Reward | +CP | Total CP | Notes |
+|---|------|------|------|--------|-----|----------|-------|
+| 1 | Main Building → 1 | 1 | — | 600 | 2 | 2 | |
+| 2 | 1× Woodcutter → 2 | 1 | — | 600 | 1 | 3 | |
+| 3 | 1× Cropland → 2 | 1 | — | 600 | 1 | 4 | |
+| 4 | Rally Point → 1 | 1 | — | 600 | 1 | 5 | |
+| 5 | 1× Clay Pit → 2 | 1 | 420 | 600 | 1 | 6 | |
+| 6 | 1× Iron Mine → 2 | 1 | 720 | 600 | 1 | 7 | |
+| 7 | ⭐ Even growth — 1× of each → 2 | 1 | — | 300 | — | 7 | Quest: complete 1 upgrade of every resource field type |
+| 8 | Granary → 1 | 1 | 270 | 300 | 1 | 8 | |
+| 9 | Warehouse → 1 | 1 | 420 | 300 | 1 | 9 | |
+| 10 | Main Building → 3 | 2 | 555 | 1,200 | 1 | 10 | |
+| 11 | Granary → 3 | 2 | 790 | 600 | 1 | 11 | |
+| 12 | Marketplace → 1 | 2 | 340 | 600 | 4 | 15 | |
+| 13 | Marketplace → 3 | 2 | 990 | 1,200 | 1 | 16 | |
+| 14 | All Croplands → 2 | 1 | 3,325 | 900 | 5 | 21 | |
+| 15 | Embassy → 1 | 1 | 540 | 1,200 | 5 | 26 | |
+| 16 | Cranny → 1 | 1 | 130 | 300 | 1 | 27 | |
+| 17 | Cranny → 3 | 2 | 380 | 600 | 1 | 28 | |
+| 18 | Wall → 1 | 1 | 400 | 600 | 1 | 29 | |
+| 19 | Wall → 3 | 2 | 1,170 | 1,200 | 1 | 30 | |
+| 20 | All Woodcutters → 2 | 1 | 1,995 | 900 | 3 | 33 | |
+| 21 | All Clay Pits → 2 | 1 | 2,010 | 900 | 3 | 36 | |
+| 22 | All Iron Mines → 2 | 1 | 2,175 | 900 | 3 | 39 | |
+| 23 | ⭐ Complete economy — all res → 2 | 1 | — | 2,400 | — | 39 | Big quest reward — triggers when all resource fields reach L2 |
+| 24 | ⭐ Population 50 | 1 | — | 1,500 | — | 39 | |
+| 25 | Warehouse → 3 | 2 | 1,220 | 600 | 1 | 40 | |
+| 26 | Barracks → 1 | 1 | 730 | 600 | 1 | 41 | |
+| 27 | 1× Woodcutter → 4 | 2 | 1,860 | 1,200 | 1 | 42 | |
+| 28 | 1× Cropland → 4 | 2 | 1,860 | 1,200 | 1 | 43 | |
+| 29 | 1× Clay Pit → 4 | 2 | 1,870 | 1,200 | 1 | 44 | |
+| 30 | 1× Iron Mine → 4 | 2 | 2,015 | 1,200 | 1 | 45 | |
+| 31 | ⭐ Even growth — 1× of each → 4 | 2 | — | 600 | — | 45 | |
+| 32 | Cranny → 6 | 3 | 1,065 | 900 | 1 | 46 | |
+| 33 | Main Building → 7 | 3 | 2,395 | 1,800 | 4 | 50 | |
+| 34 | ⭐ CP production 50 | 1 | — | 1,500 | — | 50 | When walking time hits 2h+ use Book of Wisdom to switch to Resource Production |
+| 35 | Barracks → 3 | 2 | 2,135 | 600 | 1 | 51 | |
+| 36 | Academy → 1 | 1 | 510 | 600 | 5 | 56 | |
+| 37 | 1× Cropland → 3 | — | 695 | — | 1 | 57 | |
+| 38 | Smithy → 1 | 1 | 1,090 | 600 | 2 | 59 | |
+| 39 | All Iron Mines → 3 | 2 | 2,265 | 1,800 | 3 | 62 | |
+| 40 | ⭐ Population 100 | 2 | — | 3,000 | — | 62 | |
+| 41 | All Woodcutters → 3 | 2 | 2,085 | 1,800 | 3 | 65 | |
+| 42 | All Croplands → 3 | 2 | 2,780 | 1,800 | 4 | 69 | |
+| 43 | All Clay Pits → 3 | 2 | 2,100 | 1,800 | 3 | 72 | 🎯 **Goal: reach here within 2h** |
+| 44 | Cranny → 10 | 4 | 3,430 | 1,200 | 3 | 75 | |
+| 45 | Residence → 1 | 1 | 1,570 | 1,200 | 2 | 77 | |
+| 46 | Marketplace → 7 | 3 | 4,290 | 1,800 | 6 | 83 | |
+| 47 | 8× Crannies → 3 | — | 4,080 | — | 16 | 99 | Build 8 new crannies to level 3 |
+| 48 | Academy → 2 | — | 650 | — | 1 | 100 | |
+| 49 | ⭐ CP production 100 | 2 | — | 3,000 | — | 100 | |
+| 50 | ⭐ Complete economy — all res → 4 | 2 | 16,610 | 4,800 | — | 100 | 🎯 **Goal: reach here within 12h** |
+| 51 | Main Building → 12 | 4 | 9,310 | 2,400 | 11 | 111 | |
+| 52 | ⭐ Population 150 | 3 | — | 4,500 | — | 111 | |
+| 53 | Academy → 10 | 2 | 18,515 | 1,200 | 19 | 130 | |
+| 54 | Workshop → 1 | — | 1,895 | 2,400 | 4 | 134 | |
+| 55 | Town Hall → 1 | 1 | 4,220 | 2,400 | 6 | 140 | If you're ahead of schedule, upgrading Town Hall further shortens party duration — worth calculating |
+| 56 | Warehouse → 7 | 3 | 5,295 | 900 | 2 | 142 | |
+| 57 | ⭐ CP production 150 | 2 | — | 4,500 | — | 142 | |
+| 58 | Marketplace → 10 | — | 7,500 | — | 8 | 150 | |
+| 59 | All Croplands → 5 | 3 | 11,670 | 2,700 | — | 150 | |
+| 60 | All Clay Pits → 5 | 3 | 7,760 | 2,700 | — | 150 | |
+| 61 | All Woodcutters → 5 | 3 | 7,780 | 2,700 | — | 150 | |
+| 62 | All Iron Mines → 5 | 3 | 8,400 | 2,700 | — | 150 | |
+| 63 | Marketplace → 12 | 4 | 9,155 | 2,400 | 8 | 158 | |
+| 64 | 1× Cropland → 7 | 3 | 8,675 | 1,800 | 2 | 160 | |
+| 65 | Granary → 7 | 3 | 3,415 | 900 | 2 | 162 | |
+| 66 | 8× Crannies → 7 | — | 13,080 | — | 16 | 178 | Upgrade the 8 crannies from step 47 to level 7 |
+| 67 | Embassy → 6 | — | 6,015 | — | 7 | 185 | |
+| 68 | Embassy → 9 | — | 9,295 | — | 9 | 194 | |
+| 69 | Residence → 3 | 2 | 4,585 | 2,400 | 1 | 195 | |
+| 70 | Main Building → 14 | — | 8,380 | — | 8 | 203 | |
+| 71 | ⭐ Population 250 | 4 | — | 6,000 | — | 203 | |
+| 72 | Residence → 7 | 3 | 19,810 | 3,600 | 4 | 207 | |
+| 73 | Warehouse → 8 | — | 2,360 | — | — | 207 | |
+| 74 | 🎉 **Party 1** | — | 20,330 | — | — | 207 | 🎯 **Goal: queue within 72h** |
+| 75 | Residence → 10 | 4 | 34,635 | 4,800 | 5 | 212 | |
+| 76 | Train 1 Settler | — | 20,000 | — | — | 212 | Costs vary by tribe |
+| 77 | 🎉 Party 2 | — | 20,330 | — | — | 212 | |
+| 78 | Train 2 Settlers | — | 40,000 | — | — | 212 | |
+| 79 | 🎉 Party 3 | — | 20,330 | — | — | 212 | |
+| 80 | ⚠️ Reserve 3,000 res for launch | — | 3,000 | — | — | 212 | Don't spend this — needed to send settlers |
 
 ---
 
-## Parties (Culture Points) — Critical Rules
+## Parties — CP Rules
 
-> 🟥 The **first party must be queued within 24 hours of server start.**
+> 🟥 The **first party must be queued within 72h** of server start (step 74).
 
-If you reach step 54 well before the 24-hour mark thanks to good oasis raiding, **don't queue the party yet**. Use the extra time to increase your culture point income first, then time the queue so you'll have enough resources ready by the 24h mark.
+If you farmed well and reached Party 1 **before 48h**, you have a problem: less time means less CP generated from passive production. You need to compensate by upgrading buildings that give cheap CP.
 
-**Build these before queuing the first party (in priority order):**
+**How to calculate:** figure out how many CP you're short, then pick buildings from the table below (sorted cheapest CP per resource first) until you cover the deficit. You have 3 parties total and at least 48h of production to compensate.
 
-| Priority | What | Culture Points gained | Total resources needed |
-|----------|------|-----------------------|------------------------|
-| #1 | 6 Crannies → level 7 | +12 CP each | 1,635 per cranny |
-| #2 | Marketplace → level 12 | +16 CP | 16,655 total |
+> 💡 **Town Hall tip:** Upgrading Town Hall while no party is in queue **shortens the next party's duration** — useful if you want to unlock CP faster. A party already in queue will **not** be shortened. Upgrading CP production while a party is in queue takes effect when the next party starts.
+
+---
+
+## CP Efficiency Reference
+
+> Use this when you need to quickly boost CP production. Sorted by resource cost per 1 CP gained.
+
+| What | Cost | Res / CP | +CP | +Pop |
+|------|------|----------|-----|------|
+| Embassy → 9 | 9,295 | 1,033 | 9 | 6 |
+| Main Building → 14 | 8,380 | 1,048 | 8 | 4 |
+| Academy → 11 | 6,020 | 1,204 | 5 | 3 |
+| Main Building → 15 | 6,025 | 1,205 | 5 | 2 |
+| Embassy → 10 | 4,985 | 1,246 | 4 | 2 |
+| Marketplace → 14 | 14,995 | 1,250 | 12 | 6 |
+| Rally Point → 3 | 1,250 | 1,250 | 1 | 2 |
+| Embassy → 11 | 6,375 | 1,275 | 5 | 3 |
+| Academy → 12 | 7,710 | 1,285 | 6 | 3 |
+| Main Building → 16 | 7,710 | 1,285 | 6 | 3 |
+| Embassy → 12 | 8,160 | 1,360 | 6 | 3 |
+| All Crannies → 10 | 28,600 | 1,430 | 20 | 30 |
+| Main Building → 18 | 22,495 | 1,406 | 16 | 6 |
+| Academy → 13 | 9,865 | 1,644 | 6 | 3 |

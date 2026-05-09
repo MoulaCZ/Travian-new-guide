@@ -14,10 +14,26 @@ The most valuable free Gold source. For every friend you invite who progresses:
 
 If you have even one friend starting the server, invite them. The Gold from a single active invitee covers the Gold Club and then some.
 
-### 2. Sell Silver at the Auction House
-**200 Silver = 1 Gold**. Silver comes from hero adventures and selling unwanted items.
+> 💡 **Use the referral within your alliance.** If new members join the server through your invite link, you both benefit. Coordinate in your alliance Discord — it's free Gold for everyone who participates.
 
-> 💡 Sell consumables like Cages and Ointments **early** — prices drop once Tier 2/3 items flood the market.
+### 2. Farm Silver at the Auction House
+**200 Silver = 1 Gold**. Silver comes from hero adventures, selling items — and smart bidding.
+
+#### The low-bid hustle
+
+The goal is to accumulate enough Silver to convert to Gold and buy the Gold Club (200 Gold = 40,000 Silver). Adventures alone won't get you there fast. The auction house will.
+
+**How it works:**
+1. Browse auctions and look for items with **no bids yet** (or only the minimum starting bid)
+2. Place a small bid — just above the minimum. Example: if someone lists 5× Tablets of Law with a starting price of 5 Silver, bid **10–20**
+3. Most players respond by outbidding you by just 1 Silver (e.g. 6). When they see they lost anyway, they assume you really wanted it and will overbid aggressively next time — often far above what the item is worth
+4. You sometimes win the item at a very low price → **relist it later at market price for profit**
+
+> This works on all consumable items — Tablets of Law, Ointments, Scrolls, Cages, Bandages, Buckets. Items that become more valuable later in the game (like Tablets of Law, which spike in price once chiefing starts) are especially good targets: buy cheap now, sell high later.
+
+The logic is simple: **hustle the auction house consistently** and the Silver adds up. Convert it to Gold, buy the Gold Club, and your economy runs itself.
+
+> 💡 Sell consumables like Cages **early** — prices drop once Tier 2/3 items flood the market.
 
 ### 3. Starter Offer
 A one-time low-cost Gold pack appears a few hours after you start. It's cheap and appears only once. Worth considering even for F2P players if it fits your budget — but not required.

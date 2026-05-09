@@ -4,6 +4,17 @@
 
 ---
 
+## Main Idea
+
+Every feeder village follows the same two-phase mindset:
+
+1. **Get self-sufficient as fast as possible** — develop resource fields until the village feeds itself and produces a surplus. Raids on nearby inactive players can help speed this up early on.
+2. **Build toward the Final Build while running Large Celebrations** — once self-sufficient, expand buildings to reach ~1,000 CP/day, run Large Celebrations for maximum CP gain, and ship surplus resources to your **anvil village** (the village focused on defensive troops).
+
+The goal is never to have a feeder village idle. If it's not building fields, it's building CP infrastructure. If it has a surplus, it's sending resources to the anvil.
+
+---
+
 ## Choosing the Right Tile
 
 Don't default to a standard **4-4-4-6** valley. Find a tile that covers your bottleneck resource.

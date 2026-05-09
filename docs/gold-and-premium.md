@@ -26,7 +26,7 @@ The goal is to accumulate enough Silver to convert to Gold and buy the Gold Club
 **How it works:**
 1. Browse auctions and look for items with **no bids yet** (or only the minimum starting bid)
 2. Place a small bid — just above the minimum. Example: if someone lists 5× Tablets of Law with a starting price of 5 Silver, bid **10–20**
-3. Most players respond by outbidding you by just 1 Silver (e.g. 6). When they see they lost anyway, they assume you really wanted it and will overbid aggressively next time — often far above what the item is worth
+3. Most players respond by outbidding you by just 1 Silver (e.g. 6). When they see they lost anyway, they assume you really wanted it stop
 4. You sometimes win the item at a very low price → **relist it later at market price for profit**
 
 > This works on all consumable items — Tablets of Law, Ointments, Scrolls, Cages, Bandages, Buckets. Items that become more valuable later in the game (like Tablets of Law, which spike in price once chiefing starts) are especially good targets: buy cheap now, sell high later.

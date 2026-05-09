@@ -26,7 +26,9 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 
 ## Choosing the Right Tile
 
-> **Forget 15c.** If you need this guide, you're not yet in a position to compete for a 15c. Find a **3-3-3-9** tile instead — 9 croplands, 3 of everything else.
+> **For your very first anvil — forget 15c.** You won't be able to compete for one this early. Find a **3-3-3-9** tile instead — 9 croplands, 3 of everything else.
+>
+> **For your second anvil**, a 15c becomes realistic — but through **chiefing**, not founding. Abandoned or inactive 15c tiles appear on every server. Watch for them and plan ahead. See the [Chiefing guide](chief.md) for how to take one.
 
 **What to look for:**
 - As close to your first village as possible (fast merchant routes)

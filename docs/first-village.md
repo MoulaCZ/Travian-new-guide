@@ -107,7 +107,7 @@
 | 73 | Warehouse → 8 | — | |
 | 74 | 🎉 **Party 1** | — | |
 | 75 | Residence → 10 | 4 | |
-| 76 | Train 1 Settler | — | As soon as you start training your first settler, begin planning your second village → [Second Village guide](second-village.md) |
+| 76 | Train 1 Settler | — | As soon as you start training your first settler, begin planning your second village → [Second Village guide](second-village.md). Also start building Academy → 20 here — you'll need it later to train a chief for chiefing your second anvil or a 15c. |
 | 77 | 🎉 Party 2 | — | |
 | 78 | Train 2 Settlers | — | |
 | 79 | 🎉 Party 3 | — | |

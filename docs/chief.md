@@ -77,10 +77,23 @@ Most offensive players in your alliance keep **3 administrators trained and read
 
 ## After the Conquest
 
+Do these **immediately** — in this order:
+
+1. **Build a Residence or Palace right away.** Until you do, the village has no loyalty protection and anyone else can chief it out from under you. This is the very first thing you build.
+
+2. **Recall all your extra troops.** If you sent multiple chief waves, recall the ones you no longer need as soon as the village is taken. They are sitting in a freshly conquered, undefended village — get them home before someone attacks.
+
+3. **Ask your allies to recall their reinforcements.** If offensive players helped you clear, message them immediately. Their troops are exposed too — it's good manners and good tactics to let them know the village is taken so they can pull back.
+
+4. **Message players who were farming this village.** The previous owner likely had this village in other players' farm lists. Send a polite message letting them know you're the new owner and asking them to remove it. Most players will respect this — it's standard ettiquette.
+
+5. **Send resources and a trade route.** The village has nothing. Ship food and building materials from your other villages immediately so you can start building.
+
+6. **Send defensive reinforcements.** A freshly taken village with no troops is an easy target. Get at least a token defense there while you rebuild.
+
+Other things to know:
 - The village **resets**: academy research, smithy upgrades, walls, and tribe buildings are gone
-- Troops and reinforcements are expelled
-- Oases detach and become independent
-- Send resources and troops as soon as possible to stabilise it
+- Oases detach and become independent — you'll need to re-attach them once you have a Hero's Mansion
 
 ---
 
@@ -105,6 +118,16 @@ Why this matters:
 6. Follow the rest of the standard [Anvil build](second-village.md)
 
 > This village becomes your new capital and the engine of your account. Protect it at all costs — it cannot be chiefed while it has a Palace.
+
+### What if there's no 15c to chief when you're ready for your second anvil?
+
+No problem — don't wait indefinitely. Two options:
+
+1. **Found a standard 3339 anvil** as your second anvil now (as described in the [Second Village guide](second-village.md)), and keep watching the map. If a 15c opens up later, chief it then and convert it to your capital at that point.
+
+2. **Start a new group of villages** with the 15c as the second village in that group: settle a feeder village first (you need it for resources anyway), then chief the 15c as the anvil for that group. This requires the 15c to still be available and takes more planning — but if the tile is good, it's worth it.
+
+Founding a 15c from scratch (with settlers) is also possible but very resource-intensive and slow. Chiefing a partially developed one is almost always better if the opportunity exists.
 
 ---
 

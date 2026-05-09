@@ -80,3 +80,41 @@ A mixed wall (infantry + cavalry) is stronger than a pure one — infantry fills
 | Teutons | Spearman (75%) | Paladin (25%) | Cheapest DEF, volume wins |
 | Gauls | Phalanx (70%) | Druidrider (30%) | Fast rebuild, great all-round |
 | Romans | Praetorian (100%) | — | Slowest but strongest infantry wall |
+
+---
+
+## How Many Defensive Units Should You Have?
+
+> There is no single golden rule — but there are 3 benchmarks that together give you a clear picture. Ideally you want to meet all 3 at the same time.
+
+### 1. Population : Unit Ratio — 1 : 5
+
+For every 1 population, aim to have at least **5 defensive units**.
+
+**Example:** Account population of 2,000 → you should have at least 10,000 defensive troops.
+
+Quick daily check: open village overview, note total population, multiply by 5, compare to troop count. Below that threshold — queues need to run faster or feeders need to send more grain.
+
+### 2. Defence Rank ≤ Population Rank
+
+Open **Statistics → General → Military Strength** and switch the leaderboard to **Defence**.
+
+Your position in the **Defence ranking** should be **equal to or better than** your position in the **Population ranking**.
+
+**Example:** Ranked 80th by population → should be 80th or better in defence strength. If you're 80th in population but 200th in defence, other players your size are fielding more troops — catch up.
+
+### 3. Top 15 Within Your Alliance
+
+Aim to be within the **top 15 defenders in your alliance** at all times.
+
+> ⚠️ This isn't mathematically possible for every member — an alliance of 60 players can't all be in the top 15. That's intentional. This goal exists not as a hard target but as a **motivation to never stop growing your def**. The moment you think "I'm big enough," you've fallen behind. There is no comfortable plateau in defensive play — always train, always grow.
+
+### Quick Check Table
+
+| Benchmark | How to check |
+|-----------|-------------|
+| 1:5 ratio | Population × 5 vs. total troop count |
+| Def rank ≤ pop rank | Statistics → General → Military Strength → Defence tab |
+| Alliance top 15 | Alliance member list sorted by def strength |
+
+If you're failing one — the root cause is almost always the same: **the anvil queue isn't running non-stop**.

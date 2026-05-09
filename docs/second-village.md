@@ -31,7 +31,6 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 **What to look for:**
 - As close to your first village as possible (fast merchant routes)
 - At least **2 oases with grain bonus** — a 25%+25% or 25%+50% grain oasis pair compounds massively over the server
-- Flat terrain preferred (shorter troop travel time)
 
 > 💡 Resource fields in this village will **never exceed level 10** — there is no Palace here. That's fine. The 9 croplands at L10 with grain oases and Bakery will produce more than enough.
 

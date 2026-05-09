@@ -1,5 +1,3 @@
 #!/bin/bash
-set -e
-
-cd /app
-npm install --omit=dev
+# dist/ is pre-built and committed — nothing to install
+echo "Setup complete"

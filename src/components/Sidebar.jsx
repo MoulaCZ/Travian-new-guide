@@ -1,11 +1,11 @@
 import {
   BookOpen, MapPin, Shield, Wheat, Swords,
-  Flag, Coins, Lightbulb, X, ChevronRight,
+  Flag, Coins, Lightbulb, X, ChevronRight, Rocket,
 } from 'lucide-react'
 
 const iconMap = { BookOpen, MapPin, Shield, Wheat, Swords, Flag, Coins, Lightbulb }
 
-export default function Sidebar({ pages, currentPage, onNavigate, isOpen, onClose }) {
+export default function Sidebar({ pages, currentPage, onNavigate, isOpen, onClose, onOpenOnboarding }) {
   return (
     <aside
       className={[
@@ -74,10 +74,16 @@ export default function Sidebar({ pages, currentPage, onNavigate, isOpen, onClos
       </nav>
 
       {/* ── Footer ────────────────────────────────── */}
-      <div className="px-4 py-3 border-t border-[#30363d] flex-shrink-0">
-        <p className="text-[10px] text-gray-600 leading-relaxed">
-          Free-to-play · Defensive play<br />
-          Built for new alliance members
+      <div className="px-3 py-3 border-t border-[#30363d] flex-shrink-0 space-y-2">
+        <button
+          onClick={() => { onOpenOnboarding?.(); onClose?.() }}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-[#21262d] hover:text-amber-400 transition-colors group"
+        >
+          <Rocket className="w-4 h-4 flex-shrink-0 text-gray-600 group-hover:text-amber-400 transition-colors" />
+          <span>Getting Started</span>
+        </button>
+        <p className="text-[10px] text-gray-600 leading-relaxed px-3">
+          Free-to-play · Defensive play
         </p>
       </div>
     </aside>

@@ -3,12 +3,15 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
 import MarkdownPage from './components/MarkdownPage'
+import Onboarding, { useOnboarding } from './components/Onboarding'
+import SuggestEdit from './components/SuggestEdit'
 import { pages } from './data/pages'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('readme')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const contentRef = useRef(null)
+  const onboarding = useOnboarding()
 
   const navigate = (id) => {
     setCurrentPage(id)
@@ -37,6 +40,7 @@ export default function App() {
         onNavigate={navigate}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        onOpenOnboarding={onboarding.open}
       />
 
       {/* Main */}
@@ -47,7 +51,12 @@ export default function App() {
         />
 
         <main ref={contentRef} className="flex-1 overflow-y-auto">
-          <MarkdownPage content={page.content} onNavigate={navigate} />
+          <MarkdownPage
+            key={page.id}
+            content={page.content}
+            pageId={page.id}
+            onNavigate={navigate}
+          />
 
           {/* Prev / Next navigation */}
           <div className="max-w-4xl mx-auto px-5 md:px-10 pb-12">
@@ -85,6 +94,12 @@ export default function App() {
           </div>
         </main>
       </div>
+
+      {/* Onboarding wizard */}
+      {onboarding.show && <Onboarding onClose={onboarding.close} />}
+
+      {/* Floating suggest-edit button */}
+      <SuggestEdit currentPage={page.title} />
     </div>
   )
 }

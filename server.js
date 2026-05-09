@@ -5,20 +5,24 @@ import { dirname, join } from 'path'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
 const PORT = 3000
+const BASE = '/Travian-new-guide'
 
 // Keboola sends POST / on startup — handle it gracefully
 app.use((req, res, next) => {
-  if (req.method === 'POST' && req.path === '/') {
-    return res.sendStatus(200)
-  }
+  if (req.method === 'POST') return res.sendStatus(200)
   next()
 })
 
-// Serve Vite build output
-app.use(express.static(join(__dirname, 'dist')))
+// Redirect root to base path
+app.get('/', (req, res) => {
+  res.redirect(301, BASE + '/')
+})
 
-// SPA fallback — all other GET routes serve index.html
-app.get('*', (req, res) => {
+// Serve static Vite build at the correct base path
+app.use(BASE, express.static(join(__dirname, 'dist')))
+
+// SPA fallback for all sub-routes
+app.get(`${BASE}/*`, (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'))
 })
 

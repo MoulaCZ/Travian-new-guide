@@ -24,15 +24,12 @@ Yes — and whoever reduces loyalty to 0% first takes the village. If two admini
 **Q: Does the 25% ad speed boost apply to field upgrades too?**
 Yes. It applies to all construction — buildings and resource fields alike.
 
-**Q: Does the 25% resource production bonus stack with Gold bonuses?**
-Yes. The free ad-based production bonus (+25%) stacks with the Gold-purchased production bonus (+25%), giving +50% total on that resource type.
-
 ---
 
 ## Hero
 
 **Q: My hero died — what now?**
-Use a **Water Bucket** to revive instantly. Without one, the hero revives automatically after a cooldown (several hours). Always keep one Bucket in inventory.
+Use a **Water Bucket** to revive instantly. Without one, you can revive them via the hero portrait menu by paying resources. Revival costs decrease by 20% for each day you wait, up to 80%.
 
 **Q: When should I switch hero points from Strength to Resource Production?**
 Use the **Book of Wisdom** to respec when your hero's walking time to oases hits 2h+ (oases are no longer worth farming). Put almost all points into Resource Production from that point on.
@@ -70,7 +67,7 @@ No effect on the running party. The next party you queue will benefit from the n
 ## Buildings & Fields
 
 **Q: Why can't I build resource fields above level 10?**
-Non-capital villages are capped at level 10. Only the village with a **Palace** (your capital) can go higher. Choose your capital wisely — it's usually your main anvil or a 15c/9c cropper.
+Non-capital villages are capped at level 10. Only the capital can go higher. Choose your capital wisely — it's usually your main anvil - 15c cropper.
 
 **Q: Can I have both a Residence and a Palace?**
 No. A village can only have one administration building. The Palace makes that village your capital; the Residence does not.
@@ -79,7 +76,7 @@ No. A village can only have one administration building. The Palace makes that v
 It allows you to train catapults and rams. For a pure DEF account, a Workshop level 1 is often built just to fill a building slot — you won't actively use it.
 
 **Q: Should I demolish buildings to make room for others?**
-Avoid it — demolishing wastes time and resources. Plan your building slots before you start. 22 slots go fast.
+Good idea for crannies you biuilt in first village.
 
 **Q: Romans can build fields and buildings simultaneously — is that true?**
 Yes. Romans have a unique ability to queue one building upgrade and one resource field upgrade at the same time with a single Master Builder slot. Very efficient early game.
@@ -92,7 +89,7 @@ Yes. Romans have a unique ability to queue one building upgrade and one resource
 Sniping means landing a reinforcement wave between two enemy attack waves — specifically between the clearing wave and the chief wave — to defend at the exact right moment. It takes practice.
 
 **Q: My ally is under attack — should I send all my troops?**
-Send the closest troops that can arrive in time. Don't trickle from far away. Include crop support (merchants) if your troops will be staying for more than a few hours. Recall troops after the threat passes unless asked to stay.
+Coordiante with your alliance.
 
 **Q: Is the Hospital worth building?**
 Yes, always. Wounded troops (those that survive but are injured) return to your village instead of dying. At scale, this saves thousands of troops per battle.
@@ -101,7 +98,7 @@ Yes, always. Wounded troops (those that survive but are injured) return to your 
 No. For the same resource cost, run 3 normal Barracks across 3 villages. You triple your output and spread the risk. Great Barracks/Stables are a trap for DEF players.
 
 **Q: What is troop evasion and when should I use it?**
-Troop Evasion (Gold Club feature) lets you send all your troops away from a village just before an attack lands — they simply aren't home when it hits. Use it when you see a large incoming attack you can't defend and your troops are more valuable than the village itself.
+Troop Evasion (Gold Club feature) lets you send all your troops away from a capital village just before an attack lands — they simply aren't home when it hits. Use it when you see a large incoming attack you can't defend.
 
 ---
 
@@ -112,8 +109,7 @@ Trade Routes (Gold Club feature) automatically send merchants from one village t
 
 **Q: My Marketplace merchants are too slow — what helps?**
 - Upgrade the **Trade Office** — each level increases merchant carry capacity and speed
-- Use the **Tournament Square** in the sending village — higher level = faster merchant movement
-- Move your feeder villages closer to the anvil when choosing new tiles
+- You should built your feeder villages closer to the anvil when choosing new tiles
 
 **Q: When should I use the NPC Merchant?**
 As F2P, try to avoid it — it costs 3 Gold per use. Plan resource needs in advance and use the regular Marketplace instead. If you're stuck mid-build and absolutely need a specific resource, it's a last resort.

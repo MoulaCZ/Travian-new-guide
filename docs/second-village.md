@@ -16,6 +16,12 @@ We build villages in **groups of 4**:
 
 Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3 new feeders to support it.
 
+**Spreading across the map matters.** Villages within a group should be as close together as possible (fast trade routes). But each new group should be settled in a different part of the map — far enough to cover new territory and farm different inactive players, but not so far that coordination becomes difficult.
+
+![Village group spread](images/village-groups.svg)
+
+> The circles represent each group's farming and trade radius. They overlap slightly — groups are connected but each covers its own area of the map.
+
 ---
 
 ## Choosing the Right Tile

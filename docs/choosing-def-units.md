@@ -19,14 +19,14 @@ A mixed wall (infantry + cavalry) is stronger than a pure one — infantry fills
 
 ## Teutons
 
-**Recommended mix: 75% Spearfighter / 25% Paladin**
+**Recommended mix: 75% Spearman / 25% Paladin**
 
 | Unit | Role | Why |
 |------|------|-----|
-| Spearfighter | Anti-cavalry (infantry) | Cheap, fast to train, excellent anti-cav DEF |
-| Paladin | Anti-cavalry (cavalry) | Slow but strong; can also raid between calls |
+| Spearman | Anti-cavalry (infantry) | Cheap, fast to train, excellent anti-cav DEF |
+| Paladin | Anti-infantry (cavalry) | Slow but strong against infantry; can also raid between calls |
 
-- Spearfighters are the backbone — train them non-stop in Barracks
+- Spearmen are the backbone — train them non-stop in Barracks
 - Paladins add speed to your wall and can be used for raids when not on call
 - Teutons have one of the cheapest DEF productions in the game — volume is your strength
 
@@ -77,6 +77,6 @@ A mixed wall (infantry + cavalry) is stronger than a pure one — infantry fills
 
 | Tribe | Infantry (bulk) | Cavalry (speed) | Notes |
 |-------|----------------|-----------------|-------|
-| Teutons | Spearfighter (75%) | Paladin (25%) | Cheapest DEF, volume wins |
+| Teutons | Spearman (75%) | Paladin (25%) | Cheapest DEF, volume wins |
 | Gauls | Phalanx (70%) | Druidrider (30%) | Fast rebuild, great all-round |
 | Romans | Praetorian (100%) | — | Slowest but strongest infantry wall |

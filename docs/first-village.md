@@ -117,9 +117,7 @@
 
 ## Parties — CP Rules
 
-> 🟥 The **first party must be queued within 72h** of server start (step 74).
-
-**How to calculate:** Figure out how many CP you're short, then pick buildings from the CP Efficiency Reference table below (sorted cheapest CP per resource first) until you cover the deficit. You have 3 parties total.
+**How to calculate:** Figure out how many CP you're short, then pick buildings from the CP Efficiency Reference table below (sorted cheapest CP per resource first) until you cover the deficit. You have 3 parties total. You can see your progress in Residence tabs. In your free time go through all tabs to better understand your current status. Parties in queue are not calculated for estimated new village slot 
 
 > 💡 **Town Hall tip:** Upgrading Town Hall while no party is in queue **shortens the next party's duration** — useful if you want to unlock CP faster. A party already in queue will **not** be shortened. Upgrading CP production while a party is in queue takes effect when the next party starts.
 

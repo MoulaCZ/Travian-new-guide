@@ -2,6 +2,30 @@
 // Keys are matched case-insensitively with word boundaries in the rendered text.
 
 export const GLOSSARY = {
+  /* ── Buildings ─── */
+  'Main Building': 'Core building of every village. Higher levels speed up all construction by up to 45%.',
+  'Barracks': 'Trains infantry units. Multiple Barracks across villages = more output.',
+  'Stable': 'Trains cavalry units (Paladin, Druidrider, Equites Imperatoris, etc.).',
+  'Stables': 'Trains cavalry units (Paladin, Druidrider, Equites Imperatoris, etc.).',
+  'Warehouse': 'Stores Wood, Clay, and Iron. Upgrade to hold more resources.',
+  'Granary': 'Stores Crop. Upgrade to feed your growing army.',
+  'Rally Point': 'Required to send attacks and view incoming troop movements.',
+  'Embassy': 'Required to join or create an alliance. Also boosts alliance member cap at higher levels.',
+  'Academy': 'Research building required to unlock new unit types and upgrades.',
+  'Smithy': 'Permanently upgrades unit stats using resources. Higher levels = stronger troops.',
+  'Hospital': 'Saves a portion of wounded troops after battle instead of letting them die permanently.',
+  'Workshop': 'Required to train siege weapons — catapults and rams.',
+  'Marketplace': 'Enables trading resources between your villages using Merchants.',
+  'Trade Office': 'Increases merchant carry capacity and speed. Essential for feeder logistics.',
+  'Hero\'s Mansion': 'Required to occupy oases. Higher levels allow occupying more oases per village.',
+
+  /* ── Resource fields ─── */
+  'Woodcutter': 'Resource field producing Wood. Upgrade to increase hourly production.',
+  'Clay Pit': 'Resource field producing Clay. Upgrade to increase hourly production.',
+  'Iron Mine': 'Resource field producing Iron. Upgrade to increase hourly production.',
+  'Cropland': 'Resource field producing Crop (grain). Feeds your troops — never neglect it.',
+
+  /* ── Game terms ─── */
   'Culture Points': 'Points earned through buildings and celebrations. Required to unlock each new village slot. Abbreviated CP.',
   'CP': 'Culture Points — earned through buildings and celebrations. Required to unlock each new village slot.',
   'Residence': 'Administration building (non-capital). Protects the village from being chiefed. Holds up to 2 settler pairs.',
@@ -25,10 +49,7 @@ export const GLOSSARY = {
   'Trade Routes': 'Gold Club feature that automatically sends resources between villages on a set schedule.',
   'Gold Club': 'Premium subscription unlocking Trade Routes, Troop Evasion, and other quality-of-life features.',
   'NPC Merchant': 'Costs 3 Gold per use. Instantly converts your resources to any type at market ratios.',
-  'Hospital': 'Building that saves wounded troops after a battle rather than letting them die permanently.',
-  'Smithy': 'Building that permanently upgrades unit stats for resources. Higher levels = stronger troops.',
   'Great Barracks': 'Trains infantry at 3× speed but 3× resource cost. Rarely worth it for defensive players.',
   'Great Stables': 'Trains cavalry at 3× speed but 3× resource cost. Rarely worth it for defensive players.',
-  'Marketplace': 'Building that enables trading resources between villages using Merchants.',
   'Master Builder': 'A Roman-only mechanic allowing one building and one resource field to be queued simultaneously.',
 }

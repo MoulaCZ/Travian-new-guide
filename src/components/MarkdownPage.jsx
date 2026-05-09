@@ -62,11 +62,21 @@ function resolveInternal(href) {
 }
 
 /* ── Build-order row detection ──────────────────────────────── */
+// node is a hast element node; children may include whitespace text nodes.
 function getBuildRowNum(node) {
   try {
-    const val = node?.children?.[0]?.children?.[0]?.value?.trim() ?? ''
+    // Recursively collect all text from a hast node
+    function getText(n) {
+      if (!n) return ''
+      if (n.type === 'text') return n.value
+      if (Array.isArray(n.children)) return n.children.map(getText).join('')
+      return ''
+    }
+    // Find first element child (skip whitespace text nodes)
+    const firstCell = node?.children?.find(c => c?.type === 'element')
+    const val = getText(firstCell).trim()
     const n = parseInt(val, 10)
-    if (!isNaN(n) && String(n) === val && n > 0) return n
+    if (!isNaN(n) && String(n) === val && n > 0 && n <= 300) return n
   } catch (_) { /* ignore */ }
   return null
 }
@@ -185,7 +195,7 @@ export default function MarkdownPage({ content, pageId, onNavigate }) {
     /* Tables — with build-order checkbox rows */
     table: ({ children }) => (
       <div className="overflow-x-auto my-6 rounded-xl border border-[#30363d] shadow-lg">
-        <table className="w-full text-sm border-collapse min-w-max">{children}</table>
+        <table className="w-full text-sm border-collapse">{children}</table>
       </div>
     ),
     thead: ({ children }) => (
@@ -231,9 +241,21 @@ export default function MarkdownPage({ content, pageId, onNavigate }) {
       )
     },
 
-    td: ({ children }) => (
-      <td className="px-4 py-2.5 text-gray-300 text-sm align-top">{processChildren(children)}</td>
-    ),
+    td: ({ children, node }) => {
+      // First cell (#) and third cell (Tier) stay narrow; Notes wraps
+      const text = (() => {
+        try {
+          function t(n) { return n?.type === 'text' ? n.value : (n?.children ?? []).map(t).join('') }
+          return t(node).trim()
+        } catch { return '' }
+      })()
+      const isNum = /^\d+$/.test(text)
+      return (
+        <td className={`px-4 py-2.5 text-gray-300 text-sm align-top ${isNum ? 'whitespace-nowrap w-10 text-center' : ''}`}>
+          {isNum ? text : processChildren(children)}
+        </td>
+      )
+    },
 
     /* Code */
     code: ({ inline, className, children }) => {

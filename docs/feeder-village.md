@@ -31,7 +31,7 @@ Don't default to a standard **4-4-4-6** valley. Find a tile that covers your bot
 - Use hero inventory resources to kickstart the village
 - Queue a long build before you log off
 
-### Phase 1 — Initial Infrastructure (Not in any particular order, but focus mainly of Main Building)
+### Phase 1 — Initial Infrastructure
 
 | Step | What |
 |------|------|

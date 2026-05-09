@@ -78,14 +78,25 @@ Silver is earned from hero adventures and selling items at the Auction House.
 | **Ointments** | Heal hero after dangerous adventures or lost battles |
 | **Books of Wisdom** | Respec hero attribute points — essential when switching from Strength to Resource Production |
 
+### What to keep — never sell these
+
+Some items become significantly more valuable in later stages of the game. Hold onto them even if they look useless early on.
+
+| Item | How many to keep | Why |
+|------|-----------------|-----|
+| **Book of Wisdom** | 2× | Respec hero attributes — essential when switching from Strength to Resource Production, and again later if your role changes |
+| **Water Bucket** | 1× minimum | Instantly revives your hero if they die — always have one in case something goes wrong |
+| **Tablet of Law** | Stockpile | Becomes extremely valuable when your alliance starts **chiefing** (conquering enemy villages) — loyalty is reduced in stages and each tablet restores it instantly. Price spikes sharply once chiefing begins. |
+| **Artefact (dílo)** | All of them | Artefacts are powerful game-wide items captured from other players or NPCs in the mid-late game. Never sell — more details in a future guide. |
+| **Ointments** | Healthy stash | Heal your hero after battles and dangerous adventures. Useful throughout the entire server — be careful selling these. |
+
 ### What to sell for Silver
 
 | Item | When to sell |
 |------|-------------|
-| **Cages** | Sell early — prices drop as the server matures |
-| **Ointments (extra)** | Keep a stash of ~5, sell the rest |
+| **Cages** | Sell early — prices drop significantly as the server matures |
 | **Low-tier duplicates** | If you already have a Tier 2 helmet, sell the Tier 1 |
-| **Scrolls** | High value early, sell if you don't need them |
+| **Scrolls** | High value early, sell if you don't currently need them |
 
 > 💡 Watch auction prices before listing. Check what similar items sold for in the last 24 hours — don't undercut yourself.
 

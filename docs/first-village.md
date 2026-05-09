@@ -32,10 +32,10 @@
 
 | # | What | Tier | Notes |
 |---|------|------|-------|
-| 1 | Main Building → 1 | 1 | |
-| 2 | 1× Woodcutter → 2 | 1 | |
-| 3 | 1× Cropland → 2 | 1 | |
-| 4 | Rally Point → 1 | 1 | |
+| 1 | Main Building → 1 | 1 | Done by default |
+| 2 | 1× Woodcutter → 2 | 1 | Done by default |
+| 3 | 1× Cropland → 2 | 1 | Done by default |
+| 4 | Rally Point → 1 | 1 | Done by default |
 | 5 | 1× Clay Pit → 2 | 1 | |
 | 6 | 1× Iron Mine → 2 | 1 | |
 | 7 | ⭐ Even growth — 1× of each → 2 | 1 | Quest: complete 1 upgrade of every resource field type |

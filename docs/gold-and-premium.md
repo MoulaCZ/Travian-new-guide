@@ -72,7 +72,6 @@ Silver is earned from hero adventures and selling items at the Auction House.
 
 | Item | Why |
 |------|-----|
-| **Horse** (any tier) | Hero needs a horse to raid effectively. Get one early. |
 | **Helmet of Awareness** | +% hero XP gain — hero levels up faster, meaning more stat points and faster healing |
 | **Boots of the Warrior** (defender) | Faster hero movement = faster defensive response |
 | **Ointments** | Heal hero after dangerous adventures or lost battles |
@@ -87,8 +86,8 @@ Some items become significantly more valuable in later stages of the game. Hold 
 | **Book of Wisdom** | 2× | Respec hero attributes — essential when switching from Strength to Resource Production, and again later if your role changes |
 | **Water Bucket** | 1× minimum | Instantly revives your hero if they die — always have one in case something goes wrong |
 | **Tablet of Law** | Stockpile | Becomes extremely valuable when your alliance starts **chiefing** (conquering enemy villages) — loyalty is reduced in stages and each tablet restores it instantly. Price spikes sharply once chiefing begins. |
-| **Artefact (dílo)** | All of them | Artefacts are powerful game-wide items captured from other players or NPCs in the mid-late game. Never sell — more details in a future guide. |
-| **Ointments** | Healthy stash | Heal your hero after battles and dangerous adventures. Useful throughout the entire server — be careful selling these. |
+| **Artwork** | All of them | |
+| **Ointments** | Healthy stash | Heal your hero after/during battles and dangerous adventures. Useful throughout the entire server — be careful selling these. |
 
 ### What to sell for Silver
 

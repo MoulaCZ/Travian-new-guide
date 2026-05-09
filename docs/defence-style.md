@@ -1,4 +1,4 @@
-# Choosing Defensive Units
+# Defence Style — Choosing Your Units
 
 > This page covers **Teutons, Gauls, and Romans** only — the three classic tribes. The goal is to maximise DEF output per hour, not to collect every unit type.
 

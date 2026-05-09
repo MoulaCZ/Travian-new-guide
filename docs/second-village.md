@@ -59,7 +59,7 @@ The anvil lives or dies by its grain output. Before training a single troop, get
 
 ### Phase 2 — Military buildings
 
-Once grain is flowing, build military infrastructure. From this point on, **Barracks and Stable must run non-stop** if your unit type includes both infantry and cavalry (see [Choosing Defensive Units](choosing-def-units.md)).
+Once grain is flowing, build military infrastructure. From this point on, **Barracks and Stable must run non-stop** if your unit type includes both infantry and cavalry (see [Choosing Defensive Units](defence-style.md)).
 
 | Step | What |
 |------|------|
@@ -114,4 +114,4 @@ Once grain is flowing, build military infrastructure. From this point on, **Barr
 - **Tournament Square.** Higher level = faster troop response when a call comes in. Prioritise it.
 - **Don't build Great Barracks or Great Stables.** For the same cost, run 3 normal Barracks across 3 villages and triple your output.
 
-> Which units to train? → [Choosing Defensive Units](choosing-def-units.md)
+> Which units to train? → [Choosing Defensive Units](defence-style.md)

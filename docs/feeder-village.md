@@ -131,6 +131,10 @@ Same progression as 3rd/4th village, but you can push harder since your other vi
 
 ## Parties: Large vs. Small
 
-Before queuing parties, calculate whether **Large Celebrations** are more efficient than Small ones.
+**Small party vs. Large party:**
+- **Small Celebration** — generates CP equal to **this village's daily CP output**, capped at **500 CP**
+- **Large Celebration** — generates CP equal to **all your villages' combined daily CP output**, capped at **2,000 CP**
 
-Compare: resource cost vs. CP gained vs. time. If large parties give better CP per resource — run large parties exclusively.
+By the time you're running feeder villages you should have enough total CP production to make Large Celebrations significantly stronger than Small ones. **Always run Large Celebrations from this point on**, unless you specifically need a quick cheap boost from a single village.
+
+Compare resource cost vs. CP gained vs. duration — if Large parties give better CP per resource (they almost always do once you have 3+ villages), run Large parties exclusively.

@@ -20,10 +20,10 @@ The right moment is usually when you're **setting up your second anvil village**
 
 All of these must be true **at the moment the chief wave lands**:
 
-1. **Target is not a capital** — villages with a Palace cannot be conquered
-2. **Target has no Residence, Palace, or Command Center** — it must be destroyed (by catapults in the same attack or a prior wave) before loyalty can be reduced
+1. **Target is not a capital**
+2. **Target has no Residence or Palace** — it must be destroyed (by catapults in the same attack or a prior wave) before loyalty can be reduced
 3. **You send a normal attack** — not a raid. A chief sent as a raid does absolutely nothing to loyalty
-4. **Your administrator survives the battle** — if they die, loyalty is unaffected
+4. **Your chief survives the battle** — if they die, loyalty is unaffected
 5. **You have enough Culture Points** for an additional village — check your Residence/Palace tabs before attacking
 
 ---

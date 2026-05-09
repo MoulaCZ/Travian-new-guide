@@ -18,9 +18,6 @@ All troops in the village — including reinforcements from allies — are expel
 **Q: If I demolish my Residence, can my village be chiefed?**
 Yes. A village without a Residence, Palace, or Command Center has no loyalty protection and can be conquered. Never demolish your administration building unless you intend to replace it immediately.
 
-**Q: Do resources carry over when I found a new village?**
-No. Settlers consume resources on departure (3,000 total), and the new village starts from zero. Send a merchant caravan shortly after founding.
-
 **Q: Can two players chief the same village at the same time?**
 Yes — and whoever reduces loyalty to 0% first takes the village. If two administrator waves land at the same second, the one sent earlier wins.
 

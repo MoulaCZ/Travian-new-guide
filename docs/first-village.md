@@ -113,6 +113,8 @@
 | 79 | 🎉 Party 3 | — | |
 | 80 | ⚠️ Reserve 3,000 res for launch | — | Don't spend this — needed to send settlers |
 
+> ⚠️ **Resource fields in this village should never go above level 10.** There is no Palace here — level 10 is the cap for non-capital villages. Don't invest further; put those resources into your anvil or feeders instead.
+
 ---
 
 ## Parties — CP Rules

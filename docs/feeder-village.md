@@ -13,6 +13,8 @@ Every feeder village follows the same two-phase mindset:
 
 The goal is never to have a feeder village idle. If it's not building fields, it's building CP infrastructure. If it has a surplus, it's sending resources to the anvil.
 
+> **2 feeders vs. 3 feeders:** The standard ratio is **3 feeders per anvil**. In some situations — if your feeders are highly developed or the anvil has its own strong field base — **2 feeders can be enough**. This is a judgment call based on your grain balance and how fast the anvil is consuming resources. When in doubt, stick to 3:1.
+
 ---
 
 ## Choosing the Right Tile

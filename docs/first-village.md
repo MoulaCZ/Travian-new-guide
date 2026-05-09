@@ -65,7 +65,7 @@
 | 31 | ⭐ Even growth — 1× of each → 4 | 2 | |
 | 32 | Cranny → 6 | 3 | |
 | 33 | Main Building → 7 | 3 | |
-| 34 | ⭐ CP production 50 | 1 | When walking time hits 2h+ use Book of Wisdom to switch to Resource Production |
+| 34 | ⭐ CP production 50 | 1 |  |
 | 35 | Barracks → 3 | 2 | |
 | 36 | Academy → 1 | 1 | |
 | 37 | 1× Cropland → 3 | — | |
@@ -107,7 +107,7 @@
 | 73 | Warehouse → 8 | — | |
 | 74 | 🎉 **Party 1** | — | |
 | 75 | Residence → 10 | 4 | |
-| 76 | Train 1 Settler | — | Costs vary by tribe. As soon as you start training your first settler, begin planning your second village → [Second Village guide](second-village.md) |
+| 76 | Train 1 Settler | — | As soon as you start training your first settler, begin planning your second village → [Second Village guide](second-village.md) |
 | 77 | 🎉 Party 2 | — | |
 | 78 | Train 2 Settlers | — | |
 | 79 | 🎉 Party 3 | — | |

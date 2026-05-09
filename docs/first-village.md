@@ -22,7 +22,7 @@
 2. When walking time hits **1h+** — do adventure 2 (resource reward, ~2,300 res) right before hero levels up to heal.
 3. When walking time hits **2h+** — use the **Book of Wisdom** (adventure 6, usually within 24h of server start) to respec almost all points into Resource Production.
 
-> 🟥 **Activate the 25% resource production bonus** as soon as the server starts — it's free and permanent.
+> 🟥 **Activate the 25% resource production bonus**
 
 ---
 

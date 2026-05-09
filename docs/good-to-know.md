@@ -10,7 +10,7 @@
 No. Raiding and attacking are different actions. Chiefs/Senators/Chieftains must be sent as a **normal attack**, not a raid. A raid with a chief does nothing to loyalty.
 
 **Q: Can I conquer a capital village?**
-No. Capital villages (those with a Palace) cannot be conquered. You can only chief non-capital villages and Natar villages.
+No. Capital villages cannot be conquered. You can only chief non-capital villages and Natar villages.
 
 **Q: What happens to my troops if my village gets chiefed?**
 All troops in the village — including reinforcements from allies — are expelled. Queued units disappear. Oases detach. Research and smithy upgrades reset.

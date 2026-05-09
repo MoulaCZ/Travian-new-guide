@@ -126,3 +126,15 @@ As F2P, try to avoid it — it costs 3 Gold per use. Plan resource needs in adva
 - **Building Great Barracks/Stables** — three normal buildings across three villages is always better.
 - **Sending chief as a raid** — does nothing. Must be a normal attack.
 - **Demolishing your Residence** — leaves your village unprotected until rebuilt. Plan before doing this.
+
+---
+
+## Useful External Tools
+
+These tools are not part of Travian itself but are widely used by experienced players:
+
+**[TravcoTools](https://travcotools.com/cs/)**
+Find inactive players near your villages — useful for scouting farm lists and identifying abandoned villages worth chiefing.
+
+**[GetterTools](https://www.gettertools.com/cs/)**
+Share your troop counts with alliance leadership. Leaders can see exactly how much defence the alliance has available without asking everyone individually. Strongly recommended for all alliance members.

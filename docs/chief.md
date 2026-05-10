@@ -30,6 +30,8 @@ All of these must be true **at the moment the chief wave lands**:
 
 ## How Loyalty Works
 
+![Chiefing loyalty reduction process](images/chiefing-loyalty.svg)
+
 Every village starts at **100% loyalty**. When loyalty hits **0%**, you take the village.
 
 Each chief wave reduces loyalty by a random amount based on your tribe:

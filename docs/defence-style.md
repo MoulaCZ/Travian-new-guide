@@ -2,6 +2,8 @@
 
 > This page covers **Teutons, Gauls, and Romans** only — the three classic tribes. The goal is to maximise DEF output per hour, not to collect every unit type.
 
+![Defensive unit recommendations by tribe](images/tribe-comparison.svg)
+
 ---
 
 ## Core Principle

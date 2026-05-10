@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 320" font-family="Inter, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1510"/>
+      <stop offset="100%" style="stop-color:#0f0c09"/>
+    </linearGradient>
+    <linearGradient id="goldLine2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f0a820;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#f0a820;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#f0a820;stop-opacity:0"/>
+    </linearGradient>
+    <linearGradient id="barFull" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#22c55e"/>
+      <stop offset="100%" style="stop-color:#4ade80"/>
+    </linearGradient>
+    <linearGradient id="barMid" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#eab308"/>
+      <stop offset="100%" style="stop-color:#facc15"/>
+    </linearGradient>
+    <linearGradient id="barLow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f97316"/>
+      <stop offset="100%" style="stop-color:#fb923c"/>
+    </linearGradient>
+    <linearGradient id="barCrit" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#f87171"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="680" height="320" fill="url(#bg2)" rx="12"/>
+  <rect width="680" height="320" fill="none" stroke="#3e3226" stroke-width="1.5" rx="12"/>
+  <rect width="680" height="2" y="48" fill="url(#goldLine2)"/>
+
+  <!-- Title -->
+  <text x="340" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#f0a820" letter-spacing="3" font-family="Georgia, serif">CHIEFING — LOYALTY REDUCTION</text>
+
+  <!-- Column headers -->
+  <text x="80" y="72" text-anchor="middle" font-size="10" fill="#5a4930" letter-spacing="1" font-family="Georgia, serif">WAVE</text>
+  <text x="340" y="72" text-anchor="middle" font-size="10" fill="#5a4930" letter-spacing="1" font-family="Georgia, serif">LOYALTY BAR</text>
+  <text x="580" y="72" text-anchor="middle" font-size="10" fill="#5a4930" letter-spacing="1" font-family="Georgia, serif">RESULT</text>
+
+  <!-- Wave rows -->
+  <!-- ROW 1: 100% → 77% -->
+  <rect x="20" y="84" width="640" height="42" rx="6" fill="#1e1810" stroke="#2e2518" stroke-width="1"/>
+  <!-- Wave label -->
+  <text x="80" y="109" text-anchor="middle" font-size="12" font-weight="600" fill="#d4c4a8">Wave 1</text>
+  <text x="80" y="122" text-anchor="middle" font-size="9" fill="#7a6a55">Before: 100%</text>
+  <!-- Bar track -->
+  <rect x="160" y="97" width="360" height="14" rx="7" fill="#1a1510"/>
+  <!-- Bar fill -->
+  <rect x="160" y="97" width="277" height="14" rx="7" fill="url(#barFull)" opacity="0.5"/>
+  <rect x="160" y="97" width="277" height="14" rx="7" fill="none" stroke="#22c55e" stroke-width="1" stroke-opacity="0.3"/>
+  <!-- Reduction arrow -->
+  <text x="444" y="109" font-size="10" fill="#f87171">▶▶▶</text>
+  <!-- After -->
+  <text x="590" y="106" text-anchor="middle" font-size="13" font-weight="700" fill="#86efac">77%</text>
+  <text x="590" y="120" text-anchor="middle" font-size="9" fill="#7a6a55">−23%</text>
+
+  <!-- ROW 2: 77% → 54% -->
+  <rect x="20" y="134" width="640" height="42" rx="6" fill="#1c1610" stroke="#2e2518" stroke-width="1"/>
+  <text x="80" y="159" text-anchor="middle" font-size="12" font-weight="600" fill="#d4c4a8">Wave 2</text>
+  <text x="80" y="172" text-anchor="middle" font-size="9" fill="#7a6a55">Before: 77%</text>
+  <rect x="160" y="147" width="360" height="14" rx="7" fill="#1a1510"/>
+  <rect x="160" y="147" width="194" height="14" rx="7" fill="url(#barMid)" opacity="0.7"/>
+  <text x="444" y="159" font-size="10" fill="#f87171">▶▶▶</text>
+  <text x="590" y="156" text-anchor="middle" font-size="13" font-weight="700" fill="#facc15">54%</text>
+  <text x="590" y="170" text-anchor="middle" font-size="9" fill="#7a6a55">−23%</text>
+
+  <!-- ROW 3: 54% → 31% -->
+  <rect x="20" y="184" width="640" height="42" rx="6" fill="#1c1610" stroke="#2e2518" stroke-width="1"/>
+  <text x="80" y="209" text-anchor="middle" font-size="12" font-weight="600" fill="#d4c4a8">Wave 3</text>
+  <text x="80" y="222" text-anchor="middle" font-size="9" fill="#7a6a55">Before: 54%</text>
+  <rect x="160" y="197" width="360" height="14" rx="7" fill="#1a1510"/>
+  <rect x="160" y="197" width="112" height="14" rx="7" fill="url(#barLow)" opacity="0.8"/>
+  <text x="444" y="209" font-size="10" fill="#f87171">▶▶▶</text>
+  <text x="590" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#fb923c">31%</text>
+  <text x="590" y="220" text-anchor="middle" font-size="9" fill="#7a6a55">−23%</text>
+
+  <!-- ROW 4: 31% → 8% (with Large Celebration +5%) -->
+  <rect x="20" y="234" width="640" height="42" rx="6" fill="#201210" stroke="#3a1e18" stroke-width="1"/>
+  <text x="80" y="259" text-anchor="middle" font-size="12" font-weight="600" fill="#d4c4a8">Wave 4</text>
+  <text x="80" y="272" text-anchor="middle" font-size="9" fill="#f0a820">+ Large Celebration</text>
+  <rect x="160" y="247" width="360" height="14" rx="7" fill="#1a1510"/>
+  <rect x="160" y="247" width="29" height="14" rx="7" fill="url(#barCrit)"/>
+  <text x="444" y="259" font-size="10" fill="#f87171">▶▶▶</text>
+  <text x="590" y="256" text-anchor="middle" font-size="13" font-weight="700" fill="#f87171">8%</text>
+  <text x="590" y="270" text-anchor="middle" font-size="9" fill="#f0a820">−23% + 5%</text>
+
+  <!-- ROW 5: 8% → 0% CONQUERED -->
+  <rect x="20" y="284" width="640" height="28" rx="6" fill="#1a3020" stroke="#2a5030" stroke-width="1.5"/>
+  <text x="80" y="302" text-anchor="middle" font-size="11" font-weight="700" fill="#4ade80">Wave 5</text>
+  <text x="340" y="302" text-anchor="middle" font-size="11" fill="#86efac">Loyalty reaches 0 % — village conquered ✓</text>
+  <text x="590" y="302" text-anchor="middle" font-size="12" font-weight="700" fill="#4ade80">0%</text>
+</svg>

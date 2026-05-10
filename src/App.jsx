@@ -25,7 +25,7 @@ export default function App() {
   const next = idx < pages.length - 1 ? pages[idx + 1] : null
 
   return (
-    <div className="flex h-screen bg-[#0d1117] text-gray-100 overflow-hidden font-sans">
+    <div className="flex h-screen overflow-hidden font-sans" style={{ background: '#0f0c09', color: '#d4c4a8' }}>
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
@@ -60,18 +60,19 @@ export default function App() {
 
           {/* Prev / Next navigation */}
           <div className="max-w-4xl mx-auto px-5 md:px-10 pb-12">
-            <div className="border-t border-[#30363d] pt-8 flex items-stretch gap-4">
+            <div className="border-t pt-8 flex items-stretch gap-4" style={{ borderColor: '#3e3226' }}>
               {prev ? (
                 <button
                   onClick={() => navigate(prev.id)}
-                  className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border border-[#30363d] bg-[#161b22] hover:bg-[#21262d] hover:border-amber-500/40 transition-all duration-200 text-left group"
+                  className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 text-left group"
+                  style={{ borderColor: '#3e3226', background: '#1a1510' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#241d14'; e.currentTarget.style.borderColor = '#f0a820' + '40' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#1a1510'; e.currentTarget.style.borderColor = '#3e3226' }}
                 >
-                  <ChevronLeft className="w-4 h-4 text-gray-500 group-hover:text-amber-400 flex-shrink-0 transition-colors" />
+                  <ChevronLeft className="w-4 h-4 flex-shrink-0 transition-colors" style={{ color: '#5a4930' }} />
                   <div className="min-w-0">
-                    <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-0.5">Previous</div>
-                    <div className="text-sm font-medium text-gray-300 group-hover:text-white truncate transition-colors">
-                      {prev.title}
-                    </div>
+                    <div className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: '#5a4930', fontFamily: 'Cinzel, Georgia, serif' }}>Previous</div>
+                    <div className="text-sm font-medium truncate transition-colors" style={{ color: '#a89880' }}>{prev.title}</div>
                   </div>
                 </button>
               ) : <div className="flex-1" />}
@@ -79,15 +80,16 @@ export default function App() {
               {next ? (
                 <button
                   onClick={() => navigate(next.id)}
-                  className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border border-[#30363d] bg-[#161b22] hover:bg-[#21262d] hover:border-amber-500/40 transition-all duration-200 text-right justify-end group"
+                  className="flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-200 text-right justify-end group"
+                  style={{ borderColor: '#3e3226', background: '#1a1510' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#241d14'; e.currentTarget.style.borderColor = '#f0a820' + '40' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#1a1510'; e.currentTarget.style.borderColor = '#3e3226' }}
                 >
                   <div className="min-w-0">
-                    <div className="text-[10px] text-gray-600 uppercase tracking-wider mb-0.5">Next</div>
-                    <div className="text-sm font-medium text-gray-300 group-hover:text-white truncate transition-colors">
-                      {next.title}
-                    </div>
+                    <div className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color: '#5a4930', fontFamily: 'Cinzel, Georgia, serif' }}>Next</div>
+                    <div className="text-sm font-medium truncate transition-colors" style={{ color: '#a89880' }}>{next.title}</div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-amber-400 flex-shrink-0 transition-colors" />
+                  <ChevronRight className="w-4 h-4 flex-shrink-0 transition-colors" style={{ color: '#5a4930' }} />
                 </button>
               ) : <div className="flex-1" />}
             </div>

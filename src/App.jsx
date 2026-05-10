@@ -3,9 +3,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
 import MarkdownPage from './components/MarkdownPage'
+import BattleCalculator from './components/BattleCalculator'
 import Onboarding, { useOnboarding } from './components/Onboarding'
 import SuggestEdit from './components/SuggestEdit'
 import { pages } from './data/pages'
+
+const COMPONENTS = {
+  BattleCalculator,
+}
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('readme')
@@ -56,12 +61,17 @@ export default function App() {
         />
 
         <main ref={contentRef} className="flex-1 overflow-y-auto">
-          <MarkdownPage
-            key={page.id}
-            content={page.content}
-            pageId={page.id}
-            onNavigate={navigate}
-          />
+          {page.component && COMPONENTS[page.component]
+            ? (() => { const Comp = COMPONENTS[page.component]; return <Comp key={page.id} /> })()
+            : (
+              <MarkdownPage
+                key={page.id}
+                content={page.content}
+                pageId={page.id}
+                onNavigate={navigate}
+              />
+            )
+          }
 
           {/* Prev / Next navigation */}
           <div className="px-6 md:px-12 lg:px-16 pb-12">

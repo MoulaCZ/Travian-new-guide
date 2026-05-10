@@ -319,7 +319,8 @@ export default function MarkdownPage({ content, pageId, onNavigate }) {
           <img
             src={imgSrc}
             alt={alt}
-            className="w-full max-w-2xl mx-auto rounded-xl border border-[#30363d] block shadow-xl"
+            className="w-full rounded-xl block shadow-xl"
+            style={{ border: '1px solid #3e3226' }}
           />
           {alt && (
             <figcaption className="text-center text-xs text-gray-500 mt-2 italic">{alt}</figcaption>

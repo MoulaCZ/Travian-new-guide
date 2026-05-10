@@ -16,7 +16,7 @@ We build villages in **groups of 4**:
 
 Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3 new feeders to support it.
 
-**Spreading across the map matters.** Villages within a group should be as close together as possible (fast trade routes). But each new group should be settled in a different part of the map — far enough to cover new territory and farm different inactive players, but not so far that coordination becomes difficult.
+**Spreading across the map matters.** Villages within a group should be as close together as possible (fast trade routes). But each new group should be settled in a different part of the map — far enough to cover new territory, but not so far that coordination becomes difficult.
 
 ![Village group spread](images/village-groups.svg)
 
@@ -40,49 +40,71 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 
 ## Build Strategy
 
-### Phase 1 — Grain first
+> ⚠️ **The #1 mistake:** waiting until storage and fields are maxed before starting troops. Don't do this. Start training the moment your Barracks is up — even at level 1. Every idle hour in the queue is lost DEF capacity.
 
-The anvil lives or dies by its grain output. Before training a single troop, get your food base online.
+The phases below **overlap**. You don't finish Phase 1 completely before starting Phase 2. Read the goals of each phase and run them in parallel as resources allow.
+
+### Phase 1 — Grain base
+
+Your anvil lives or dies by grain output. The 3-3-3 fields (Wood, Clay, Iron) also need enough levels to make the village partially self-sufficient — you cannot rely entirely on feeders for every building in the early game.
+
+| Step | What | Why |
+|------|------|-----|
+| 1 | Main Building → 5 | Speed up construction |
+| 2 | All 9 Croplands → 5 | Food base online |
+| 3 | Granary × 3, Warehouse × 2 (as needed) | Don't let production overflow |
+| 4 | All 3 Wood + Clay + Iron fields → 5 | Partial self-sufficiency |
+| 5 | Bakery → 5 | +20% grain production bonus |
+| 6 | All 9 Croplands → 8 | Scale grain as army grows |
+| 7 | All 9 Croplands → 10 | Maximum — no Palace |
+
+> These steps run **in parallel** with Phase 2. You don't wait for croplands to hit 10 before building Barracks.
+
+### Phase 2 — Military (start immediately, run alongside Phase 1)
+
+**Do not wait.** Build Barracks as soon as you have a Rally Point and enough resources. Your queue should never be empty.
+
+| Step | What | Why |
+|------|------|-----|
+| 1 | Rally Point → 1 | Required to send and receive attacks |
+| 2 | Barracks → 5 | **Start training infantry NOW** |
+| 3 | Academy → enough to research your infantry | Unlocks your main unit type |
+| 4 | Barracks → 15 | Faster training per day |
+| 5 | Stable → 5 (cavalry tribes only) | Start training cavalry in parallel |
+| 6 | Smithy → enough to upgrade your units | Upgrades stats — do this early, it pays off |
+| 7 | Hospital → 10 | Start saving wounded troops (see below) |
+| 8 | Barracks → 20 | Max training speed |
+| 9 | Stable → 20 | Max cavalry production |
+| 10 | Hospital → 15 | Recover more troops per battle |
+| 11 | Tournament Square → 15 | Faster response when a call comes |
+| 12 | Workshop → 10 | Siege weapons (low priority for pure DEF) |
+
+### Phase 3 — Scale storage and support (long-term)
+
+These are long-term goals — work toward them while troops always train.
 
 | Step | What |
 |------|------|
-| 1 | Main Building → 5 |
-| 2 | All 9 Croplands → 5 |
-| 3 | Granary × 3 → enough to hold (upgrade as needed) |
-| 4 | Warehouse × 2 → enough to hold |
-| 5 | Main Building → 10 |
-| 6 | All 9 Croplands → 8 |
-| 7 | Bakery → 5 (grain production bonus) |
-| 8 | All 9 Croplands → 10 (maximum — no Palace) |
-| 9 | Main Building → 20 |
-| 10 | Granary × 3 → 20, Warehouse × 2 → 20 |
+| 1 | Main Building → 20 |
+| 2 | Granary × 3 → 20, Warehouse × 2 → 20 |
+| 3 | City Wall → 20 |
+| 4 | Marketplace → 20 |
+| 5 | Trade Office → 10 |
+| 6 | Town Hall → 10 |
+| 7 | Residence → 10 |
 
-> Use resources sent from your feeder villages. Don't wait for this village to be self-sufficient — it won't be until the fields are high.
+---
 
-### Phase 2 — Military buildings
+## The Hospital — Your Second Barracks
 
-Once grain is flowing, build military infrastructure. From this point on, **Barracks and Stable must run non-stop** if your unit type includes both infantry and cavalry (see [Choosing Defensive Units](defence-style.md)).
+The Hospital is more powerful than most players realise. Think of it this way:
 
-| Step | What |
-|------|------|
-| 1 | Barracks → 20 |
-| 2 | Stable → 20 |
-| 3 | Smithy → high enough to research your units |
-| 4 | Hospital → 15 (recover wounded troops instead of losing them) |
-| 5 | Tournament Square → 15 (speed boost for your troops when responding to calls) |
-| 6 | Workshop → 10 |
+- **Barracks** produces fresh troops
+- **Hospital** recovers wounded troops after a battle at roughly **half the resource cost** of training new ones
 
-### Phase 3 — Support & CP
+**The critical rule:** Wounded troops only stay in the Hospital for **24 hours**. After that, any unhealed troops die permanently. So after **every battle**, immediately check your Hospital and queue ALL wounded for healing. Once queued, they are safe — they won't disappear no matter how long healing takes.
 
-| Step | What |
-|------|------|
-| 1 | Rally Point → 10 |
-| 2 | City Wall → 20 (defence bonus) |
-| 3 | Marketplace → 20 |
-| 4 | Trade Office → 10 |
-| 5 | Town Hall → 10 |
-| 6 | Residence → 10 |
-| 7 | Resource buildings (non-grain) → 5 as space allows |
+The moment your healing queue fills up, it effectively becomes a second source of troops running in parallel with your Barracks. A level 15 Hospital can recover a large batch each battle, which over time saves you a significant amount of resources.
 
 ---
 
@@ -103,7 +125,7 @@ Once grain is flowing, build military infrastructure. From this point on, **Barr
 | 1 | Tournament Square | 15 |
 | 1 | Residence | 10 |
 | 1 | Town Hall | 10 |
-| 1 | Res buildings (Mill L5 + Bakery L4) | 5 |
+| 1 | Res buildings (Mill L5 + Bakery L5) | 5 |
 | 1 | City Wall | 20 |
 
 ---
@@ -112,7 +134,7 @@ Once grain is flowing, build military infrastructure. From this point on, **Barr
 
 - **Train troops non-stop.** Every idle minute in the queue is lost DEF capacity.
 - **Feeders ship resources daily.** Set up trade routes from all 3 feeders to the anvil.
-- **Hospital saves losses.** Wounded troops return — always keep the Hospital running.
+- **Hospital saves losses.** Check it after every battle — queue healing immediately, before the 24h window expires.
 - **Tournament Square.** Higher level = faster troop response when a call comes in. Prioritise it.
 - **Don't build Great Barracks or Great Stables.** For the same cost, run 3 normal Barracks across 3 villages and triple your output.
 

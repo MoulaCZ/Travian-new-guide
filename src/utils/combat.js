@@ -7,15 +7,18 @@
  * Building defense (Residence/Palace/CC): level × 40 points (level 20 = 800).
  */
 
-// Bonus per wall level (linear, applied as multiplier: 1 + level × bonus).
-// Teuton Earth Wall: confirmed from in-game — level 20 = 49% → 0.049/20 = 0.00245... wait
-// Actually: 49% total / 20 levels = 2.45% per level = 0.0245 per level.
-// Roman City Wall: ~3.64%/level (unconfirmed, from community sources).
-// Gaul Palisade:   ~2.86%/level (unconfirmed, from community sources).
+// Wall bonus: COMPOUND (multiplicative) per level — wallMult = (1 + rate)^level
+// Confirmed from in-game screenshots (Teuton Earth Wall):
+//   lv11 = 24%  → 1.02^11 = 1.2434 → 24.3% ✓
+//   lv12 = 27%  → 1.02^12 = 1.2683 → 26.8% → rounds to 27% ✓
+//   lv20 = 49%  → 1.02^20 = 1.4860 → 48.6% → rounds to 49% ✓
+// Roman City Wall and Gaul Palisade: community estimates (unverified).
+//   Roman  ~2.74%/lv compound → lv20 ≈ 73% (community: 72.8%)
+//   Gaul   ~2.27%/lv compound → lv20 ≈ 57% (community: 57.2%)
 const WALL_BONUS_PER_LEVEL = {
-  roman:  0.0364,   // City Wall   lv20 ≈ 72.8%  (community estimate, unverified)
-  teuton: 0.0245,   // Earth Wall  lv20 = 49%    (confirmed from in-game screenshot)
-  gaul:   0.0286,   // Palisade    lv20 ≈ 57.2%  (community estimate, unverified)
+  roman:  0.0274,   // City Wall   lv20 ≈ 73%   (community estimate, unverified)
+  teuton: 0.02,     // Earth Wall  lv20 = 49%   (confirmed: lv11=24%, lv12=27%, lv20=49%)
+  gaul:   0.0227,   // Palisade    lv20 ≈ 57%   (community estimate, unverified)
 }
 
 /**
@@ -114,9 +117,10 @@ export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTr
 
   const totalDefense = troopDefense + heroDefense + buildingDefensePoints(residenceLevel)
 
-  // --- 3. Apply wall bonus ---
+  // --- 3. Apply wall bonus (compound: (1+rate)^level) ---
   const bonusPerLevel = WALL_BONUS_PER_LEVEL[defenderTribe] ?? WALL_BONUS_PER_LEVEL.roman
-  const wallMult = 1 + bonusPerLevel * (wallLevel ?? 0)
+  const wl = Math.max(0, Math.min(20, wallLevel ?? 0))
+  const wallMult = wl > 0 ? (1 + bonusPerLevel) ** wl : 1
   const effectiveDefense = totalDefense * wallMult
 
   // --- 4. Determine winner & loss ratios (exponent 1.5) ---

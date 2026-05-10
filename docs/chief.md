@@ -68,12 +68,19 @@ Most offensive players in your alliance keep **3 administrators trained and read
 
 ## Step-by-Step: Chiefing a Village
 
+> As a DEF player you will typically have **1 chief** available, or up to 3 if you've built a Palace to level 20 and haven't used the expansion slots. Offensive allies cover the bulk of the chief waves — coordinate before you start.
+
 1. **Scout the target** — confirm no Residence/Palace, check troop count, check if it's a capital
 2. **Confirm you have enough CP** — open your Residence/Palace and check the expansion slots
-3. **Start a Large Celebration** — time it to be active when your attacks land
-4. **Clear the village** — send troops (including catapults targeting the Residence/Palace) as a normal attack to destroy defenses and the administration building
-5. **Send chief waves** — immediately after clearing, send 4–6 chief waves with escorts, seconds apart, all as normal attacks
-6. **Secure the village** — once taken, send defensive reinforcements and merchants with resources immediately
+3. **Ping your offensive coordinator** — tell them the target, share scout results, agree on timing
+4. **Start a Large Celebration** — time it to be active when your attacks land
+5. **Clear the village** — catapults target the Residence/Palace, troops kill the defenders, rams for the wall if it's high level. All as a normal attack.
+6. **Ally sends all their chief waves** right after the clear, seconds apart
+7. **You send your chief(s) to arrive 1–2 minutes after the ally's last wave** — this gap is intentional. Starting loyalty can be 100%, 125%, or lower — nobody knows in advance. If the ally's last wave accidentally reduces loyalty to 0 and they take the village, they have those 1–2 minutes to see it and recall their troops before your wave lands. Your wave then takes the village from them — they lose one chief, their army gets home safely.
+
+   > 💡 If this happens, ask whether you should send resources to cover that lost chief. They helped you get the village — a small thank-you is good alliance etiquette.
+
+8. **Secure the village** — once taken, build a Residence or Palace immediately and send defensive reinforcements
 
 ---
 
@@ -83,23 +90,13 @@ Do these **immediately** — in this order:
 
 1. **Build a Residence or Palace right away.** Until you do, the village has no loyalty protection and anyone else can chief it out from under you. This is the very first thing you build.
 
-2. **Recall all your extra troops.** If you sent multiple chief waves, recall the ones you no longer need as soon as the village is taken. They are sitting in a freshly conquered, undefended village — get them home before someone attacks.
+2. **Recall any extra chief waves still in flight.** If you sent more than one and the village is already taken, recall the extras immediately — they're heading toward an undefended village you already own.
 
-3. **Coordinate timing with any ally who sends chief waves.** The standard approach when an offensive ally helps:
+3. **Message players who were farming this village.** The previous owner likely had this village in other players' farm lists. Send a polite message letting them know you're the new owner and asking them to remove it. Most players will respect this — it's standard etiquette.
 
-   1. **Clear wave first** — catapults destroy the Residence/Palace (removing loyalty protection), troops kill the defenders, rams knock down the wall if needed.
-   2. **Ally sends all their chief waves** — they go in right after the clear.
-   3. **You send your chief waves to arrive 1–2 minutes after the ally's last wave** — this gap is intentional.
+4. **Send resources and a trade route.** The village has nothing. Ship food and building materials from your other villages immediately so you can start building.
 
-   **Why the gap matters:** Starting loyalty can be 100%, 125%, or lower — nobody knows in advance. If the ally's last wave happens to reduce loyalty to 0 and they accidentally conquer the village, your attack is still in the air. The 1–2 minute window gives them just enough time to see the conquest and recall their troops before your wave lands. Your wave then takes the village from them — they lose one chief, but their army makes it home safely.
-
-   > 💡 If this happens, ask whether you should send resources to cover the cost of the lost chief. They helped you get the village and took the hit for it — a small thank-you is good alliance etiquette.
-
-4. **Message players who were farming this village.** The previous owner likely had this village in other players' farm lists. Send a polite message letting them know you're the new owner and asking them to remove it. Most players will respect this — it's standard ettiquette.
-
-5. **Send resources and a trade route.** The village has nothing. Ship food and building materials from your other villages immediately so you can start building.
-
-6. **Send defensive reinforcements.** A freshly taken village with no troops is an easy target. Get at least a token defense there while you rebuild.
+5. **Send defensive reinforcements.** A freshly taken village with no troops is an easy target. Get at least a token defense there while you rebuild.
 
 Other things to know:
 - The village **resets**: academy research, smithy upgrades, walls, and tribe buildings are gone

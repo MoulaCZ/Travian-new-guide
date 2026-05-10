@@ -412,7 +412,7 @@ function ArmyPanel({
               <span style={{ color: C.muted, fontSize: '0.68rem' }}>%</span>
             </div>
             <FlatInput
-              label="Hero Síla"
+              label="Hero Strength"
               value={showWall ? heroDef : heroAtk}
               onChange={showWall ? onHeroDef : onHeroAtk}
               hint="Hero's total Strength stat (hero points + equipment). Added directly to combat as flat attack (attacker) or defense (defender)."
@@ -549,7 +549,7 @@ function CasualtyRow({ result, wins }) {
 }
 
 // ─── Results section ──────────────────────────────────────────────────────────
-function ResultsSection({ result }) {
+function ResultsSection({ result, heroAtk = 0, heroDef = 0 }) {
   const {
     attackerWins, totalAttack, totalDefense, effectiveDefense,
     wallMult, infRatio, cavRatio, attackerLossRatio, defenderLossRatio,
@@ -591,6 +591,8 @@ function ResultsSection({ result }) {
               { label: 'Inf / Cav ratio',   value: `${(infRatio*100).toFixed(0)}% / ${(cavRatio*100).toFixed(0)}%`, color: C.text },
               { label: 'Attacker losses',   value: `${(attackerLossRatio*100).toFixed(1)}%`,    color: aColor },
               { label: 'Defender losses',   value: `${(defenderLossRatio*100).toFixed(1)}%`,    color: dColor },
+              ...(heroAtk > 0 ? [{ label: 'Hero ATK (flat)',  value: heroAtk.toLocaleString(), color: C.gold }] : []),
+              ...(heroDef > 0 ? [{ label: 'Hero DEF (flat)',  value: heroDef.toLocaleString(), color: '#60a5fa' }] : []),
             ].map(({ label, value, color }) => (
               <div key={label} style={{ background: C.surface2, border: `1px solid ${C.border}`, borderRadius: 6, padding: '6px 10px' }}>
                 <div style={{ color: C.muted, fontSize: '0.65rem', marginBottom: 2 }}>{label}</div>
@@ -635,180 +637,254 @@ function ResultsSection({ result }) {
   )
 }
 
-// ─── Battle animation ─────────────────────────────────────────────────────────
-const ANIM_CSS = `
-@keyframes b-atk-in   { from { transform: translateX(-100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes b-def-in   { from { transform: translateX( 100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes b-clash    { 0% { transform:translate(-50%,-50%) scale(0.2); opacity:0; }
-                        45%{ transform:translate(-50%,-50%) scale(2.2); opacity:1; }
-                       100%{ transform:translate(-50%,-50%) scale(1.4); opacity:0; } }
-@keyframes b-shake    { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
-@keyframes b-spark    { from{transform:translate(0,0) scale(1); opacity:1;} to{transform:translate(var(--tx),var(--ty)) scale(0); opacity:0;} }
-@keyframes b-winner   { from{opacity:0; transform:translateY(8px) scale(0.9);} to{opacity:1; transform:translateY(0) scale(1);} }
-@keyframes b-loser    { to { opacity: 0.2; transform: translateY(6px) scale(0.9); } }
-@keyframes b-glow     { 0%,100%{text-shadow:0 0 4px currentColor;} 50%{text-shadow:0 0 20px currentColor, 0 0 40px currentColor;} }
-@keyframes b-ground   { from{opacity:0; transform:scaleX(0);} to{opacity:0.4; transform:scaleX(1);} }
+// ─── Battle arena animation ───────────────────────────────────────────────────
+const ARENA_CSS = `
+@keyframes dot-in-left  { from{transform:translateX(-160px);opacity:0;scale:0.4} to{transform:translateX(0);opacity:1;scale:1} }
+@keyframes dot-in-right { from{transform:translateX( 160px);opacity:0;scale:0.4} to{transform:translateX(0);opacity:1;scale:1} }
+@keyframes dot-dying    { 0%{transform:translateY(0) scale(1) rotate(0deg);opacity:1}
+                         30%{transform:translateY(-16px) scale(1.25) rotate(-20deg);opacity:0.85}
+                        100%{transform:translateY(32px) scale(0) rotate(35deg);opacity:0} }
+@keyframes arena-clash  { 0%{transform:translate(-50%,-50%) scale(0.2);opacity:0}
+                         40%{transform:translate(-50%,-50%) scale(1.8);opacity:1}
+                        100%{transform:translate(-50%,-50%) scale(4);opacity:0} }
+@keyframes arena-spark  { from{transform:translate(0,0) scale(1);opacity:1}
+                           to{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0} }
+@keyframes arena-winner { from{opacity:0;transform:translateY(8px) scale(0.88)}
+                            to{opacity:1;transform:translateY(0) scale(1)} }
+@keyframes arena-glow   { 0%,100%{text-shadow:0 0 6px currentColor}
+                              50%{text-shadow:0 0 22px currentColor, 0 0 44px currentColor} }
+@keyframes crowd-flicker{ 0%,100%{opacity:0.55} 50%{opacity:0.8} }
 `
 
-// Pre-computed spark directions (12 sparks, equal radial distribution)
-const SPARKS = Array.from({ length: 12 }, (_, i) => {
-  const angle = (i / 12) * Math.PI * 2
-  const dist  = 32 + (i % 3) * 10
+const ARENA_SPARKS = Array.from({ length: 18 }, (_, i) => {
+  const a = (i / 18) * Math.PI * 2
+  const d = 24 + (i % 4) * 10
   return {
-    tx:    `${(Math.cos(angle) * dist).toFixed(1)}px`,
-    ty:    `${(Math.sin(angle) * dist).toFixed(1)}px`,
-    delay: `${i * 25}ms`,
-    size:  i % 3 === 0 ? 5 : 3,
-    color: i % 4 === 0 ? '#fff' : C.gold,
+    tx:    `${(Math.cos(a) * d).toFixed(0)}px`,
+    ty:    `${(Math.sin(a) * d).toFixed(0)}px`,
+    delay: `${i * 18}ms`,
+    size:  i % 3 === 0 ? 6 : i % 3 === 1 ? 4 : 3,
+    color: i % 5 === 0 ? '#ffffff' : i % 3 === 0 ? C.gold : '#fbbf24',
   }
 })
 
-const SOLDIER_STAGGER = [0, 60, 30, 90, 15] // ms stagger per icon
+function ArenaUnitIcon({ type }) {
+  const p = { size: 15, strokeWidth: 2.5 }
+  if (type === 'cavalry') return <Zap  {...p} />
+  if (type === 'siege')   return <Flame {...p} />
+  if (type === 'chief')   return <Crown {...p} />
+  return <Swords {...p} />
+}
 
-function BattleAnimation({ result, animKey }) {
-  const [phase, setPhase] = useState('idle') // idle | marching | clash | done
+function buildArenaDots(results, scale, maxDots) {
+  const active = results.filter(r => r.initial > 0)
+  if (!active.length) return []
+  const dots = []
+  for (const r of active) {
+    const n       = Math.max(1, Math.round(r.initial / scale))
+    const survive = r.initial > 0 ? Math.round((r.survived / r.initial) * n) : 0
+    for (let i = 0; i < n; i++) {
+      dots.push({
+        id:          `${r.unit.id}-${i}`,
+        unitType:    r.unit.type,
+        unitName:    r.unit.name,
+        willSurvive: i < survive,
+        deathDelay:  0,
+      })
+    }
+  }
+  const clipped = dots.slice(0, maxDots)
+  const dying = clipped.filter(d => !d.willSurvive)
+  dying.forEach((d, i) => {
+    d.deathDelay = dying.length > 1 ? Math.round((i / (dying.length - 1)) * 2200) : 0
+  })
+  return clipped
+}
+
+function ArenaDot({ dot, side, enterDelay, phase }) {
+  const isAtk = side === 'atk'
+  const bdr   = isAtk ? '#ef4444' : '#60a5fa'
+  const bg    = isAtk ? '#3f0909' : '#091830'
+
+  let anim
+  if (phase === 'entering') {
+    anim = `dot-in-${isAtk ? 'left' : 'right'} 0.55s cubic-bezier(.22,1,.36,1) ${enterDelay}ms both`
+  } else if (!dot.willSurvive) {
+    anim = `dot-dying 0.7s ease-out ${dot.deathDelay}ms both`
+  } else {
+    anim = 'none'
+  }
+
+  return (
+    <div
+      title={dot.unitName}
+      style={{
+        width:          38,
+        height:         38,
+        borderRadius:   '50%',
+        background:     bg,
+        border:         `2px solid ${bdr}`,
+        display:        'flex',
+        alignItems:     'center',
+        justifyContent: 'center',
+        color:          bdr,
+        animation:      anim,
+        flexShrink:     0,
+        boxShadow:      `0 0 8px ${bdr}55, inset 0 0 6px ${bdr}22`,
+        filter:         phase === 'done' && dot.willSurvive ? `drop-shadow(0 0 5px ${bdr})` : 'none',
+        transition:     'filter 0.6s',
+      }}
+    >
+      <ArenaUnitIcon type={dot.unitType} />
+    </div>
+  )
+}
+
+function BattleArena({ result, animKey }) {
+  const [phase, setPhase]         = useState('idle')
+  const [showFlash, setShowFlash] = useState(false)
+
+  const MAX_DOTS = 10
+  const { atkDots, defDots, scaleVal } = useMemo(() => {
+    if (!result) return { atkDots: [], defDots: [], scaleVal: 1 }
+    const totalAtk = result.attackerResults.reduce((s, r) => s + r.initial, 0)
+    const totalDef = result.defenderResults.reduce((s, r) => s + r.initial, 0)
+    const sv       = Math.max(1, Math.ceil(Math.max(totalAtk, totalDef) / MAX_DOTS))
+    return {
+      atkDots:  buildArenaDots(result.attackerResults, sv, MAX_DOTS),
+      defDots:  buildArenaDots(result.defenderResults, sv, MAX_DOTS),
+      scaleVal: sv,
+    }
+  }, [result])
 
   useEffect(() => {
     if (!result) { setPhase('idle'); return }
-    setPhase('marching')
-    const t1 = setTimeout(() => setPhase('clash'),   750)
-    const t2 = setTimeout(() => setPhase('done'),   1350)
-    return () => { clearTimeout(t1); clearTimeout(t2) }
+    setPhase('entering')
+    setShowFlash(false)
+    const t1 = setTimeout(() => { setPhase('fighting'); setShowFlash(true) }, 1000)
+    const t2 = setTimeout(() => setShowFlash(false), 1650)
+    const t3 = setTimeout(() => setPhase('done'), 3400)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [animKey])
 
-  if (!result || phase === 'idle') return null
+  if (phase === 'idle' || !result) return null
 
   const { attackerWins } = result
-  const aColor  = attackerWins ? C.win  : C.lose
-  const dColor  = attackerWins ? C.lose : C.win
-
-  const icons = 5
+  const winColor   = attackerWins ? C.win : '#60a5fa'
+  const scaleNote  = scaleVal > 1 ? `1 ● ≈ ${scaleVal.toLocaleString()} units` : '1 ● = 1 unit'
+  const statusText = phase === 'entering' ? '— Forces Assembling —'
+                   : phase === 'fighting'  ? '— Battle in Progress —'
+                   : null
 
   return (
     <>
-      <style>{ANIM_CSS}</style>
-      <div style={{
-        background:    C.surface,
-        border:        `1px solid ${attackerWins ? C.win : '#60a5fa'}33`,
-        borderRadius:  8,
-        padding:       '18px 20px 14px',
-        display:       'flex',
-        flexDirection: 'column',
-        alignItems:    'center',
-        gap:           10,
-        overflow:      'hidden',
-        position:      'relative',
-        boxShadow:     `0 0 24px ${attackerWins ? C.win : '#60a5fa'}18`,
-      }}>
+      <style>{ARENA_CSS}</style>
+      <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #6b4f2a', boxShadow: '0 4px 32px #00000070' }}>
 
-        {/* ground line */}
+        {/* ── Crowd strip ── */}
         <div style={{
-          position:   'absolute',
-          bottom:     44,
-          left:       '10%',
-          right:      '10%',
-          height:     1,
-          background: C.border,
-          animation:  'b-ground 0.4s ease-out forwards',
-        }} />
-
-        {/* ── Battle scene ── */}
-        <div style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: 500, position: 'relative', height: 64, justifyContent: 'space-between' }}>
-
-          {/* Attacker soldiers */}
-          <div style={{
-            display:   'flex',
-            gap:       6,
-            alignItems:'center',
-            animation: 'b-atk-in 0.55s cubic-bezier(.22,1,.36,1) forwards',
+          height:         30,
+          background:     'repeating-linear-gradient(90deg,#160e04 0,#160e04 3px,#1f1208 3px,#1f1208 6px)',
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'center',
+          borderBottom:   '2px solid #6b4f2a',
+          overflow:       'hidden',
+        }}>
+          <span style={{
+            color:         '#7a5a28',
+            fontSize:      '0.62rem',
+            fontFamily:    'Cinzel, Georgia, serif',
+            letterSpacing: '0.22em',
+            animation:     'crowd-flicker 2s ease-in-out infinite',
           }}>
-            {Array.from({ length: icons }).map((_, i) => (
-              <div key={i} style={{
-                animation: phase === 'clash' ? `b-shake 0.35s ease ${SOLDIER_STAGGER[i]}ms both`
-                         : phase === 'done' && !attackerWins ? `b-loser 0.5s ease ${i * 40}ms forwards` : 'none',
-              }}>
-                <Swords
-                  size={i === 2 ? 26 : 20}
-                  color={aColor}
-                  strokeWidth={2}
-                  style={{ filter: phase === 'done' && attackerWins ? `drop-shadow(0 0 4px ${aColor})` : 'none', transition: 'filter 0.4s' }}
-                />
-              </div>
+            ⬤ ⬤ ⬤ ⬤ ⬤ &nbsp;·&nbsp; COLOSSEUM &nbsp;·&nbsp; ⬤ ⬤ ⬤ ⬤ ⬤
+          </span>
+        </div>
+
+        {/* ── Arena floor ── */}
+        <div style={{
+          background:     'linear-gradient(180deg,#5c3a1e 0%,#8b6330 18%,#c4984e 55%,#d4aa70 100%)',
+          padding:        '18px 14px 22px',
+          position:       'relative',
+          minHeight:      150,
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'space-between',
+          gap:            8,
+        }}>
+          {/* sand grain overlay */}
+          <div style={{ position:'absolute',inset:0,background:'repeating-linear-gradient(45deg,transparent,transparent 7px,rgba(0,0,0,0.035) 7px,rgba(0,0,0,0.035) 8px)',pointerEvents:'none' }} />
+
+          {/* Attacker side */}
+          <div style={{ display:'flex',flexWrap:'wrap',gap:6,justifyContent:'flex-end',flex:1,position:'relative',zIndex:1 }}>
+            {atkDots.map((dot, i) => (
+              <ArenaDot key={dot.id} dot={dot} side="atk" enterDelay={i * 32} phase={phase} />
             ))}
           </div>
 
-          {/* Center: explosion + sparks */}
-          <div style={{ position: 'absolute', left: '50%', top: '50%', zIndex: 10 }}>
-            {/* sparks */}
-            {phase === 'clash' && SPARKS.map((s, i) => (
-              <div key={i} style={{
-                position:     'absolute',
-                left:         0, top: 0,
-                width:        s.size,
-                height:       s.size,
-                borderRadius: '50%',
-                background:   s.color,
-                '--tx':       s.tx,
-                '--ty':       s.ty,
-                animation:    `b-spark 0.5s ease-out ${s.delay} both`,
-                pointerEvents:'none',
-              }} />
-            ))}
-            {/* flash emoji */}
-            {(phase === 'clash') && (
-              <div style={{
-                position:      'absolute',
-                left: 0, top: 0,
-                fontSize:      '2rem',
-                lineHeight:    1,
-                animation:     'b-clash 0.65s ease-out forwards',
-                pointerEvents: 'none',
-                userSelect:    'none',
-              }}>
-                ⚡
-              </div>
+          {/* Center — VS + clash */}
+          <div style={{ position:'relative',display:'flex',flexDirection:'column',alignItems:'center',zIndex:2,flexShrink:0,width:56 }}>
+            <span style={{ fontFamily:'Cinzel,serif',color:'#f0e6d0cc',fontSize:'0.8rem',fontWeight:900,letterSpacing:'0.1em',textShadow:'0 1px 4px #000' }}>VS</span>
+            {showFlash && (
+              <>
+                <div style={{ position:'absolute',top:'50%',left:'50%',fontSize:'2.2rem',lineHeight:1,animation:'arena-clash 0.75s ease-out forwards',pointerEvents:'none',zIndex:6 }}>
+                  ⚡
+                </div>
+                {ARENA_SPARKS.map((s, i) => (
+                  <div key={i} style={{
+                    position:'absolute',top:'50%',left:'50%',
+                    width:s.size,height:s.size,borderRadius:'50%',
+                    background:s.color,
+                    '--tx':s.tx,'--ty':s.ty,
+                    animation:`arena-spark 0.6s ease-out ${s.delay} both`,
+                    pointerEvents:'none',
+                  }} />
+                ))}
+              </>
             )}
           </div>
 
-          {/* Defender soldiers */}
-          <div style={{
-            display:           'flex',
-            gap:               6,
-            alignItems:        'center',
-            flexDirection:     'row-reverse',
-            animation:         'b-def-in 0.55s cubic-bezier(.22,1,.36,1) forwards',
-          }}>
-            {Array.from({ length: icons }).map((_, i) => (
-              <div key={i} style={{
-                animation: phase === 'clash' ? `b-shake 0.35s ease ${SOLDIER_STAGGER[i]}ms both`
-                         : phase === 'done' && attackerWins ? `b-loser 0.5s ease ${i * 40}ms forwards` : 'none',
-              }}>
-                <Shield
-                  size={i === 2 ? 26 : 20}
-                  color={dColor}
-                  strokeWidth={2}
-                  style={{ filter: phase === 'done' && !attackerWins ? `drop-shadow(0 0 4px ${dColor})` : 'none', transition: 'filter 0.4s' }}
-                />
-              </div>
+          {/* Defender side */}
+          <div style={{ display:'flex',flexWrap:'wrap',gap:6,justifyContent:'flex-start',flex:1,position:'relative',zIndex:1 }}>
+            {defDots.map((dot, i) => (
+              <ArenaDot key={dot.id} dot={dot} side="def" enterDelay={i * 32} phase={phase} />
             ))}
           </div>
         </div>
 
-        {/* Winner banner */}
-        {phase === 'done' && (
-          <div style={{ animation: 'b-winner 0.4s cubic-bezier(.22,1,.36,1) forwards' }}>
+        {/* ── Stone base — winner / status ── */}
+        <div style={{
+          background:     '#211408',
+          borderTop:      '2px solid #6b4f2a',
+          padding:        '10px 16px',
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'center',
+          gap:            12,
+          flexWrap:       'wrap',
+          minHeight:      42,
+        }}>
+          {phase === 'done' ? (
             <span style={{
-              fontFamily:   'Cinzel, serif',
-              fontWeight:   900,
-              fontSize:     '0.95rem',
-              color:        attackerWins ? C.win : '#60a5fa',
-              letterSpacing:'0.12em',
-              animation:    'b-glow 1.4s ease-in-out infinite',
+              fontFamily:    'Cinzel,serif',
+              fontWeight:    900,
+              fontSize:      '1rem',
+              color:         winColor,
+              letterSpacing: '0.12em',
+              animation:     'arena-winner 0.45s cubic-bezier(.22,1,.36,1) forwards, arena-glow 1.6s ease-in-out 0.5s infinite',
             }}>
               {attackerWins ? '⚔ ATTACKER WINS' : '🛡 DEFENDER WINS'}
             </span>
-          </div>
-        )}
+          ) : (
+            <span style={{ color:C.muted,fontFamily:'Cinzel,serif',fontSize:'0.72rem',letterSpacing:'0.1em',opacity:0.75 }}>
+              {statusText}
+            </span>
+          )}
+          <span style={{ color:'#5a4020',fontSize:'0.65rem',whiteSpace:'nowrap' }}>
+            {scaleNote} · <Swords size={10} style={{display:'inline',verticalAlign:'middle'}} /> inf <Zap size={10} style={{display:'inline',verticalAlign:'middle'}} /> cav <Flame size={10} style={{display:'inline',verticalAlign:'middle'}} /> siege <Crown size={10} style={{display:'inline',verticalAlign:'middle'}} /> chief
+          </span>
+        </div>
       </div>
     </>
   )
@@ -991,9 +1067,9 @@ export default function BattleCalculator() {
         </div>
       </div>
 
-      <BattleAnimation result={battleResult} animKey={animKey} />
+      <BattleArena result={battleResult} animKey={animKey} />
 
-      {battleResult && <ResultsSection result={battleResult} />}
+      {battleResult && <ResultsSection result={battleResult} heroAtk={attackerHeroAtk} heroDef={defenderHeroDef} />}
 
       {!battleResult && (
         <div style={{ textAlign: 'center', color: C.muted, fontSize: '0.8rem', padding: '20px 0', fontStyle: 'italic' }}>

@@ -64,7 +64,7 @@ export default function App() {
           />
 
           {/* Prev / Next navigation */}
-          <div className="max-w-5xl mx-auto px-5 md:px-10 pb-12">
+          <div className="px-6 md:px-12 lg:px-16 pb-12">
             <div className="border-t pt-8 flex items-stretch gap-4" style={{ borderColor: '#3e3226' }}>
               {prev ? (
                 <button

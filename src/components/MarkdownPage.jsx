@@ -331,7 +331,7 @@ export default function MarkdownPage({ content, pageId, onNavigate }) {
   }
 
   return (
-    <article className="max-w-5xl mx-auto px-5 md:px-10 py-8 md:py-12">
+    <article className="w-full px-6 md:px-12 lg:px-16 py-8 md:py-12">
       {/* Build-order progress bar */}
       {totalRows > 0 && (
         <div className="mb-8 p-4 rounded-xl border" style={{ background: '#1a1510', borderColor: '#3e3226' }}>

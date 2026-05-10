@@ -33,12 +33,12 @@
   <rect x="28" y="133" width="212" height="1" fill="#1e3020"/>
   <text x="44" y="150" font-size="10" fill="#7a6a55">DEF vs infantry</text>
   <rect x="150" y="143" width="80" height="10" rx="5" fill="#1a2a1a"/>
-  <rect x="150" y="143" width="44" height="10" rx="5" fill="#22c55e" opacity="0.7"/>
-  <text x="236" y="152" text-anchor="end" font-size="9" fill="#4ade80">55</text>
+  <rect x="150" y="143" width="32" height="10" rx="5" fill="#22c55e" opacity="0.55"/>
+  <text x="236" y="152" text-anchor="end" font-size="9" fill="#4ade80">40</text>
   <text x="44" y="170" font-size="10" fill="#7a6a55">DEF vs cavalry</text>
   <rect x="150" y="163" width="80" height="10" rx="5" fill="#1a2a1a"/>
-  <rect x="150" y="163" width="32" height="10" rx="5" fill="#22c55e" opacity="0.5"/>
-  <text x="236" y="172" text-anchor="end" font-size="9" fill="#4ade80">40</text>
+  <rect x="150" y="163" width="40" height="10" rx="5" fill="#22c55e" opacity="0.7"/>
+  <text x="236" y="172" text-anchor="end" font-size="9" fill="#4ade80">50</text>
   <text x="44" y="192" font-size="10" fill="#f0a820">⚡ cheap · fast to produce</text>
 
   <!-- Druidrider card -->
@@ -48,13 +48,13 @@
   <rect x="28" y="233" width="212" height="1" fill="#1e3020"/>
   <text x="44" y="250" font-size="10" fill="#7a6a55">DEF vs infantry</text>
   <rect x="150" y="243" width="80" height="10" rx="5" fill="#1a2a1a"/>
-  <rect x="150" y="243" width="36" height="10" rx="5" fill="#22c55e" opacity="0.5"/>
-  <text x="236" y="252" text-anchor="end" font-size="9" fill="#4ade80">45</text>
+  <rect x="150" y="243" width="80" height="10" rx="5" fill="#22c55e" opacity="0.9"/>
+  <text x="236" y="252" text-anchor="end" font-size="9" fill="#4ade80">115</text>
   <text x="44" y="270" font-size="10" fill="#7a6a55">DEF vs cavalry</text>
   <rect x="150" y="263" width="80" height="10" rx="5" fill="#1a2a1a"/>
-  <rect x="150" y="263" width="64" height="10" rx="5" fill="#22c55e" opacity="0.8"/>
-  <text x="236" y="272" text-anchor="end" font-size="9" fill="#4ade80">80</text>
-  <text x="44" y="292" font-size="10" fill="#f0a820">⚡ anti-cavalry specialist</text>
+  <rect x="150" y="263" width="44" height="10" rx="5" fill="#22c55e" opacity="0.65"/>
+  <text x="236" y="272" text-anchor="end" font-size="9" fill="#4ade80">55</text>
+  <text x="44" y="292" font-size="10" fill="#f0a820">⚡ anti-infantry specialist</text>
 
   <!-- ─── ROMANS column ─── -->
   <rect x="268" y="60" width="244" height="254" rx="8" fill="#1a0f0f" stroke="#4a2a2a" stroke-width="1.5"/>
@@ -114,11 +114,11 @@
   <rect x="540" y="233" width="212" height="1" fill="#1e1e30"/>
   <text x="556" y="250" font-size="10" fill="#7a6a55">DEF vs infantry</text>
   <rect x="662" y="243" width="72" height="10" rx="5" fill="#1a1a2a"/>
-  <rect x="662" y="243" width="47" height="10" rx="5" fill="#8b5cf6" opacity="0.9"/>
-  <text x="740" y="252" text-anchor="end" font-size="9" fill="#c4b5fd">65</text>
+  <rect x="662" y="243" width="72" height="10" rx="5" fill="#8b5cf6" opacity="0.9"/>
+  <text x="740" y="252" text-anchor="end" font-size="9" fill="#c4b5fd">100</text>
   <text x="556" y="270" font-size="10" fill="#7a6a55">DEF vs cavalry</text>
   <rect x="662" y="263" width="72" height="10" rx="5" fill="#1a1a2a"/>
-  <rect x="662" y="263" width="36" height="10" rx="5" fill="#8b5cf6" opacity="0.7"/>
-  <text x="740" y="272" text-anchor="end" font-size="9" fill="#c4b5fd">50</text>
+  <rect x="662" y="263" width="29" height="10" rx="5" fill="#8b5cf6" opacity="0.55"/>
+  <text x="740" y="272" text-anchor="end" font-size="9" fill="#c4b5fd">40</text>
   <text x="556" y="292" font-size="10" fill="#f0a820">⚡ anti-infantry specialist</text>
 </svg>

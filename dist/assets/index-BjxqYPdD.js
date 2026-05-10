@@ -1078,9 +1078,9 @@ Oases produce resources and can be raided for loot. Unlike player villages, they
 > ⚠️ **Animal respawn risk:** Even if the oasis was empty when you sent the attack, animals can spawn while your troops are in transit. A "safe" oasis that takes 30 minutes to reach may have new animals by the time your troops arrive. Oasis farming is inherently riskier than farming inactive villages — factor this in before sending infantry.
 
 **Tips:**
-- **Small animals** (rabbits, foxes, deer) — low risk for most troop types
-- **Large animals** (tigers, bears, elephants) — dangerous for infantry; use cavalry or hero first
-- Always scout an oasis before farming it the first time
+- **Check the oasis on the map before sending** — hover over it to see which animals are currently defending. No scouts needed.
+- Weaker animals are safe for most troop types; stronger ones can kill infantry fast — send hero first or use cavalry
+- Run the animals through the **Combat Simulator** before committing troops if you're unsure
 
 ---
 

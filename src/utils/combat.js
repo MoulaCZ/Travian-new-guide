@@ -13,14 +13,26 @@ const WALL_BONUS_PER_LEVEL = {
   gaul:   0.0286,
 }
 
-/** Smithy multiplier for a given upgrade level (0–20). */
+/**
+ * Smithy multiplier for a given upgrade level (0–20).
+ * Formula: base_stat × (1 + level / 5)
+ * Level  1 → ×1.20 (+20%)
+ * Level  5 → ×2.00 (+100%)
+ * Level 10 → ×3.00 (+200%)
+ * Level 20 → ×5.00 (+400%)
+ * Empirically derived: Paladin defInf 100 at L0, ~120 at L1 matches in-game data.
+ */
 export function smithyMult(level) {
-  return 1 + Math.max(0, Math.min(20, level ?? 0)) * 0.05
+  return 1 + Math.max(0, Math.min(20, level ?? 0)) / 5
 }
 
-/** Defense points from Residence/Palace/Command Center. */
-export function buildingDefensePoints(level) {
-  return Math.max(0, Math.min(20, level ?? 0)) * 40
+/**
+ * Defense points from village base + Residence/Palace/Command Center.
+ * Base: every village has 10 defense by default.
+ * Residence/Palace level N adds N × 40 (level 20 = +800, total 810).
+ */
+export function buildingDefensePoints(residenceLevel) {
+  return 10 + Math.max(0, Math.min(20, residenceLevel ?? 0)) * 40
 }
 
 /**
@@ -33,17 +45,24 @@ export function buildingDefensePoints(level) {
  * @param {number} wallLevel  0–20
  * @param {'roman'|'teuton'|'gaul'} defenderTribe
  * @param {{
- *   heroAttack?:      number,   flat attack bonus from hero
- *   heroDefense?:     number,   flat defense bonus from hero
- *   residenceLevel?:  number,   Residence/Palace level (0–20)
+ *   heroAttack?:      number,   hero's direct attack contribution (flat)
+ *   heroDefense?:     number,   hero's direct defense contribution (flat)
+ *   offBonusPct?:     number,   Off bonus % — multiplies ALL attacker troop attack (e.g. 0.4 = 0.4%)
+ *   defBonusPct?:     number,   Def bonus % — multiplies ALL defender troop defense (e.g. 2.0 = 2%)
+ *   residenceLevel?:  number,   Residence/Palace level (0–20), 0 already includes village base 10
  * }} options
  */
 export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTribe, options = {}) {
   const {
     heroAttack     = 0,
     heroDefense    = 0,
+    offBonusPct    = 0,
+    defBonusPct    = 0,
     residenceLevel = 0,
   } = options
+
+  const offMult = 1 + offBonusPct / 100
+  const defMult = 1 + defBonusPct / 100
 
   // Flatten all defender groups into one list
   const defenders = defenderGroups.flat()
@@ -55,7 +74,7 @@ export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTr
   for (const { unit, count, smithy } of attackers) {
     if (count <= 0) continue
     const mult = smithyMult(smithy)
-    const contribution = unit.attack * count * mult
+    const contribution = unit.attack * count * mult * offMult
     if (unit.type === 'cavalry') {
       cavAttack += contribution
     } else {
@@ -78,7 +97,7 @@ export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTr
   for (const { unit, count, smithy } of defenders) {
     if (count <= 0) continue
     const mult = smithyMult(smithy)
-    troopDefense += (unit.defInf * infRatio + unit.defCav * cavRatio) * count * mult
+    troopDefense += (unit.defInf * infRatio + unit.defCav * cavRatio) * count * mult * defMult
   }
 
   const totalDefense = troopDefense + heroDefense + buildingDefensePoints(residenceLevel)

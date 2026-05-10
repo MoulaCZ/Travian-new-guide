@@ -263,6 +263,8 @@ function ArmyPanel({
   // hero
   heroAtk, onHeroAtk,
   heroDef, onHeroDef,
+  // off/def bonus
+  bonusPct, onBonusPct,
   // summary
   totalAttack, totalDefense,
 }) {
@@ -379,44 +381,67 @@ function ArmyPanel({
         </button>
         {extrasOpen && (
           <div style={{ padding: '8px 10px 10px', borderTop: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {/* Off / Def bonus % from hero */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span
+                style={{ color: C.muted, fontSize: '0.72rem', flex: 1 }}
+                title={showWall
+                  ? 'Def bonus % — multiplies all defender troop defense. Found in Hero → Properties → Def bonus.'
+                  : 'Off bonus % — multiplies all attacker troop attack. Found in Hero → Properties → Off bonus.'}
+              >
+                {showWall ? 'Def bonus %' : 'Off bonus %'}
+              </span>
+              <input
+                type="number" min={0} step={0.1}
+                value={bonusPct === 0 ? '' : bonusPct}
+                placeholder="0"
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value)
+                  onBonusPct(isNaN(v) || v < 0 ? 0 : v)
+                }}
+                style={{
+                  width: 60, background: '#0f0c09',
+                  border: `1px solid ${bonusPct > 0 ? C.goldDim : C.border}`,
+                  borderRadius: 3, color: bonusPct > 0 ? C.gold : C.text,
+                  fontSize: '0.72rem', padding: '2px 5px', textAlign: 'right',
+                  outline: 'none', fontFamily: 'inherit',
+                }}
+              />
+              <span style={{ color: C.muted, fontSize: '0.68rem' }}>%</span>
+            </div>
             <FlatInput
-              label="Hero attack bonus"
-              value={heroAtk}
-              onChange={onHeroAtk}
-              hint="Hero's attack contribution (strength stat + weapon)"
+              label={showWall ? 'Hero defense bonus' : 'Hero attack bonus'}
+              value={showWall ? heroDef : heroAtk}
+              onChange={showWall ? onHeroDef : onHeroAtk}
+              hint={showWall
+                ? "Hero's direct defense contribution (shown in combat report as the extra points above troop total)"
+                : "Hero's direct attack contribution (shown in combat report as the extra points above troop total)"}
             />
             {showWall && (
-              <>
-                <FlatInput
-                  label="Hero defense bonus"
-                  value={heroDef}
-                  onChange={onHeroDef}
-                  hint="Hero's defense contribution"
-                />
-                {/* Residence / Palace slider */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <span style={{ color: C.muted, fontSize: '0.72rem' }}>
-                      Residence / Palace level
-                    </span>
-                    <span style={{ color: residenceLevel > 0 ? C.gold : C.muted, fontSize: '0.72rem', fontWeight: 700 }}>
-                      Lv {residenceLevel} → +{buildingDefensePoints(residenceLevel)} def
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input
-                      type="range" min={0} max={20} value={residenceLevel}
-                      onChange={(e) => onResidenceLevel(Number(e.target.value))}
-                      style={{ flex: 1, accentColor: C.gold, cursor: 'pointer' }}
-                    />
-                    <input
-                      type="number" min={0} max={20} value={residenceLevel}
-                      onChange={(e) => onResidenceLevel(Math.max(0, Math.min(20, parseInt(e.target.value, 10) || 0)))}
-                      style={{ width: 42, background: '#0f0c09', border: `1px solid ${C.border}`, borderRadius: 3, color: C.gold, fontSize: '0.8rem', padding: '2px 4px', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }}
-                    />
-                  </div>
+              /* Residence / Palace slider */
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ color: C.muted, fontSize: '0.72rem' }}>Residence / Palace level</span>
+                  <span style={{ color: C.gold, fontSize: '0.72rem', fontWeight: 700 }}>
+                    Lv {residenceLevel} → {buildingDefensePoints(residenceLevel)} def
+                  </span>
                 </div>
-              </>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="range" min={0} max={20} value={residenceLevel}
+                    onChange={(e) => onResidenceLevel(Number(e.target.value))}
+                    style={{ flex: 1, accentColor: C.gold, cursor: 'pointer' }}
+                  />
+                  <input
+                    type="number" min={0} max={20} value={residenceLevel}
+                    onChange={(e) => onResidenceLevel(Math.max(0, Math.min(20, parseInt(e.target.value, 10) || 0)))}
+                    style={{ width: 42, background: '#0f0c09', border: `1px solid ${C.border}`, borderRadius: 3, color: C.gold, fontSize: '0.8rem', padding: '2px 4px', textAlign: 'center', fontFamily: 'inherit', outline: 'none' }}
+                  />
+                </div>
+                <span style={{ color: C.muted, fontSize: '0.62rem' }}>
+                  Includes village base 10 · +40 per level · max lv20 = 810 total
+                </span>
+              </div>
             )}
           </div>
         )}
@@ -540,7 +565,7 @@ function ResultsSection({ result }) {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', color: C.muted, fontSize: '0.65rem' }}>
             <Info size={10} />
-            <span>Formula: (loser / winner)^1.4 · Smithy: +5% per level · Residence lv20 = +800 def · excludes morale &amp; artefacts</span>
+            <span>Formula: (loser / winner)^1.4 · Smithy: ×(1 + lv/5) · Village base 10 + Residence lv20 = 810 def · excludes morale &amp; artefacts</span>
           </div>
         </>
       )}
@@ -557,11 +582,13 @@ function emptyGroup(tribe = 'roman') {
 export default function BattleCalculator() {
   const [attackerGroups, setAttackerGroups] = useState([emptyGroup('roman')])
   const [attackerHeroAtk, setAttackerHeroAtk] = useState(0)
+  const [offBonusPct, setOffBonusPct] = useState(0)
 
   const [defenderGroups, setDefenderGroups] = useState([emptyGroup('teuton')])
   const [wallLevel, setWallLevel] = useState(0)
   const [defenderHeroDef, setDefenderHeroDef] = useState(0)
   const [defenderHeroAtk, setDefenderHeroAtk] = useState(0)
+  const [defBonusPct, setDefBonusPct] = useState(0)
   const [residenceLevel, setResidenceLevel] = useState(0)
 
   // ── Attacker mutations ─────────────────────────────────────────────────────
@@ -598,9 +625,12 @@ export default function BattleCalculator() {
   const defenderTribe = defenderGroups[0]?.tribe ?? 'roman'
 
   // ── Panel summary values ───────────────────────────────────────────────────
+  const offMult = 1 + offBonusPct / 100
+  const defMult = 1 + defBonusPct / 100
+
   const atkPanelAtk = useMemo(() =>
-    attackerArmy.reduce((s, { unit, count, smithy }) => s + unit.attack * count * smithyMult(smithy), 0) + attackerHeroAtk
-  , [attackerArmy, attackerHeroAtk])
+    attackerArmy.reduce((s, { unit, count, smithy }) => s + unit.attack * count * smithyMult(smithy) * offMult, 0) + attackerHeroAtk
+  , [attackerArmy, attackerHeroAtk, offMult])
 
   const atkPanelDef = useMemo(() =>
     attackerArmy.reduce((s, { unit, count, smithy }) => s + (unit.defInf * 0.5 + unit.defCav * 0.5) * count * smithyMult(smithy), 0)
@@ -608,10 +638,10 @@ export default function BattleCalculator() {
 
   const defPanelDef = useMemo(() => {
     const troop = defenderArmyGroups.flat().reduce(
-      (s, { unit, count, smithy }) => s + (unit.defInf * 0.5 + unit.defCav * 0.5) * count * smithyMult(smithy), 0
+      (s, { unit, count, smithy }) => s + (unit.defInf * 0.5 + unit.defCav * 0.5) * count * smithyMult(smithy) * defMult, 0
     )
     return troop + defenderHeroDef + buildingDefensePoints(residenceLevel)
-  }, [defenderArmyGroups, defenderHeroDef, residenceLevel])
+  }, [defenderArmyGroups, defenderHeroDef, residenceLevel, defMult])
 
   const defPanelAtk = useMemo(() =>
     defenderArmyGroups.flat().reduce((s, { unit, count }) => s + unit.attack * count, 0)
@@ -626,6 +656,8 @@ export default function BattleCalculator() {
     return calculateBattle(attackerArmy, defenderArmyGroups, wallLevel, defenderTribe, {
       heroAttack:     attackerHeroAtk,
       heroDefense:    defenderHeroDef,
+      offBonusPct,
+      defBonusPct,
       residenceLevel,
     })
   }, [attackerArmy, defenderArmyGroups, wallLevel, defenderTribe, attackerHeroAtk, defenderHeroDef, residenceLevel])
@@ -657,6 +689,7 @@ export default function BattleCalculator() {
             residenceLevel={0} onResidenceLevel={() => {}}
             heroAtk={attackerHeroAtk} onHeroAtk={setAttackerHeroAtk}
             heroDef={0} onHeroDef={() => {}}
+            bonusPct={offBonusPct} onBonusPct={setOffBonusPct}
             totalAttack={atkPanelAtk} totalDefense={atkPanelDef}
           />
         </div>
@@ -681,6 +714,7 @@ export default function BattleCalculator() {
             residenceLevel={residenceLevel} onResidenceLevel={setResidenceLevel}
             heroAtk={defenderHeroAtk} onHeroAtk={setDefenderHeroAtk}
             heroDef={defenderHeroDef} onHeroDef={setDefenderHeroDef}
+            bonusPct={defBonusPct} onBonusPct={setDefBonusPct}
             totalAttack={defPanelAtk} totalDefense={defPanelDef}
           />
         </div>

@@ -1,9 +1,9 @@
 import {
   BookOpen, MapPin, Shield, Wheat, Swords,
-  Flag, Coins, Lightbulb, X, ChevronRight, ChevronLeft, Rocket, MessageSquarePlus,
+  Flag, Coins, Lightbulb, X, ChevronRight, ChevronLeft, Rocket, MessageSquarePlus, Target,
 } from 'lucide-react'
 
-const iconMap = { BookOpen, MapPin, Shield, Wheat, Swords, Flag, Coins, Lightbulb }
+const iconMap = { BookOpen, MapPin, Shield, Wheat, Swords, Flag, Coins, Lightbulb, Target }
 
 export default function Sidebar({
   pages, currentPage, onNavigate,

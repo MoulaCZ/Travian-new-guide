@@ -4,6 +4,7 @@ import secondVillageMd from '../../docs/second-village.md?raw'
 import feederVillageMd from '../../docs/feeder-village.md?raw'
 import defenceStyleMd  from '../../docs/defence-style.md?raw'
 import chiefMd         from '../../docs/chief.md?raw'
+import farmingMd       from '../../docs/farming.md?raw'
 import goldPremiumMd   from '../../docs/gold-and-premium.md?raw'
 import goodToKnowMd    from '../../docs/good-to-know.md?raw'
 
@@ -14,6 +15,7 @@ export const pages = [
   { id: 'feeder-village',  title: 'Feeder Village',        icon: 'Wheat',    content: feederVillageMd },
   { id: 'defence-style',   title: 'Defence Style',         icon: 'Swords',   content: defenceStyleMd  },
   { id: 'chief',           title: 'Chiefing',              icon: 'Flag',     content: chiefMd         },
+  { id: 'farming',         title: 'Farming',               icon: 'Target',   content: farmingMd       },
   { id: 'gold-and-premium',title: 'Gold & Premium',        icon: 'Coins',    content: goldPremiumMd   },
   { id: 'good-to-know',    title: 'Good to Know',          icon: 'Lightbulb',content: goodToKnowMd    },
 ]

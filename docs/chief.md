@@ -76,7 +76,7 @@ Most offensive players in your alliance keep **3 administrators trained and read
 4. **Start a Large Celebration** — time it to be active when your attacks land
 5. **Clear the village** — catapults target the Residence/Palace, troops kill the defenders, rams for the wall if it's high level. All as a normal attack.
 6. **Ally sends all their chief waves** right after the clear, seconds apart
-7. **You send your chief(s) to arrive 1–2 minutes after the ally's last wave** — this gap is intentional. Starting loyalty can be 100%, 125%, or lower — nobody knows in advance. If the ally's last wave accidentally reduces loyalty to 0 and they take the village, they have those 1–2 minutes to see it and recall their troops before your wave lands. Your wave then takes the village from them — they lose one chief, their army gets home safely.
+7. **You send all your chiefs in one attack, timed to arrive 1–2 minutes after the ally's last wave** — this gap is intentional. Starting loyalty can be 100%, 125%, or lower — nobody knows in advance. If the ally's last wave accidentally reduces loyalty to 0 and they take the village, they have those 1–2 minutes to see it and recall their troops before your attack lands. Your attack then takes the village from them — they lose one chief, their army gets home safely.
 
    > 💡 If this happens, ask whether you should send resources to cover that lost chief. They helped you get the village — a small thank-you is good alliance etiquette.
 
@@ -90,9 +90,7 @@ Do these **immediately** — in this order:
 
 1. **Build a Residence or Palace right away.** Until you do, the village has no loyalty protection and anyone else can chief it out from under you. This is the very first thing you build.
 
-2. **Recall any extra chief waves still in flight.** If you sent more than one and the village is already taken, recall the extras immediately — they're heading toward an undefended village you already own.
-
-3. **Message players who were farming this village.** The previous owner likely had this village in other players' farm lists. Send a polite message letting them know you're the new owner and asking them to remove it. Most players will respect this — it's standard etiquette.
+2. **Message players who were farming this village.** The previous owner likely had this village in other players' farm lists. Send a polite message letting them know you're the new owner and asking them to remove it. Most players will respect this — it's standard etiquette.
 
 4. **Send resources and a trade route.** The village has nothing. Ship food and building materials from your other villages immediately so you can start building.
 

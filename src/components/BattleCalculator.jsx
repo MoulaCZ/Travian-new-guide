@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   Shield, Swords, Flame, Skull, Crown,
   ChevronUp, ChevronDown, Info, Plus, Trash2, Zap,
@@ -635,6 +635,185 @@ function ResultsSection({ result }) {
   )
 }
 
+// ─── Battle animation ─────────────────────────────────────────────────────────
+const ANIM_CSS = `
+@keyframes b-atk-in   { from { transform: translateX(-100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes b-def-in   { from { transform: translateX( 100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes b-clash    { 0% { transform:translate(-50%,-50%) scale(0.2); opacity:0; }
+                        45%{ transform:translate(-50%,-50%) scale(2.2); opacity:1; }
+                       100%{ transform:translate(-50%,-50%) scale(1.4); opacity:0; } }
+@keyframes b-shake    { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
+@keyframes b-spark    { from{transform:translate(0,0) scale(1); opacity:1;} to{transform:translate(var(--tx),var(--ty)) scale(0); opacity:0;} }
+@keyframes b-winner   { from{opacity:0; transform:translateY(8px) scale(0.9);} to{opacity:1; transform:translateY(0) scale(1);} }
+@keyframes b-loser    { to { opacity: 0.2; transform: translateY(6px) scale(0.9); } }
+@keyframes b-glow     { 0%,100%{text-shadow:0 0 4px currentColor;} 50%{text-shadow:0 0 20px currentColor, 0 0 40px currentColor;} }
+@keyframes b-ground   { from{opacity:0; transform:scaleX(0);} to{opacity:0.4; transform:scaleX(1);} }
+`
+
+// Pre-computed spark directions (12 sparks, equal radial distribution)
+const SPARKS = Array.from({ length: 12 }, (_, i) => {
+  const angle = (i / 12) * Math.PI * 2
+  const dist  = 32 + (i % 3) * 10
+  return {
+    tx:    `${(Math.cos(angle) * dist).toFixed(1)}px`,
+    ty:    `${(Math.sin(angle) * dist).toFixed(1)}px`,
+    delay: `${i * 25}ms`,
+    size:  i % 3 === 0 ? 5 : 3,
+    color: i % 4 === 0 ? '#fff' : C.gold,
+  }
+})
+
+const SOLDIER_STAGGER = [0, 60, 30, 90, 15] // ms stagger per icon
+
+function BattleAnimation({ result, animKey }) {
+  const [phase, setPhase] = useState('idle') // idle | marching | clash | done
+
+  useEffect(() => {
+    if (!result) { setPhase('idle'); return }
+    setPhase('marching')
+    const t1 = setTimeout(() => setPhase('clash'),   750)
+    const t2 = setTimeout(() => setPhase('done'),   1350)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [animKey])
+
+  if (!result || phase === 'idle') return null
+
+  const { attackerWins } = result
+  const aColor  = attackerWins ? C.win  : C.lose
+  const dColor  = attackerWins ? C.lose : C.win
+
+  const icons = 5
+
+  return (
+    <>
+      <style>{ANIM_CSS}</style>
+      <div style={{
+        background:    C.surface,
+        border:        `1px solid ${attackerWins ? C.win : '#60a5fa'}33`,
+        borderRadius:  8,
+        padding:       '18px 20px 14px',
+        display:       'flex',
+        flexDirection: 'column',
+        alignItems:    'center',
+        gap:           10,
+        overflow:      'hidden',
+        position:      'relative',
+        boxShadow:     `0 0 24px ${attackerWins ? C.win : '#60a5fa'}18`,
+      }}>
+
+        {/* ground line */}
+        <div style={{
+          position:   'absolute',
+          bottom:     44,
+          left:       '10%',
+          right:      '10%',
+          height:     1,
+          background: C.border,
+          animation:  'b-ground 0.4s ease-out forwards',
+        }} />
+
+        {/* ── Battle scene ── */}
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%', maxWidth: 500, position: 'relative', height: 64, justifyContent: 'space-between' }}>
+
+          {/* Attacker soldiers */}
+          <div style={{
+            display:   'flex',
+            gap:       6,
+            alignItems:'center',
+            animation: 'b-atk-in 0.55s cubic-bezier(.22,1,.36,1) forwards',
+          }}>
+            {Array.from({ length: icons }).map((_, i) => (
+              <div key={i} style={{
+                animation: phase === 'clash' ? `b-shake 0.35s ease ${SOLDIER_STAGGER[i]}ms both`
+                         : phase === 'done' && !attackerWins ? `b-loser 0.5s ease ${i * 40}ms forwards` : 'none',
+              }}>
+                <Swords
+                  size={i === 2 ? 26 : 20}
+                  color={aColor}
+                  strokeWidth={2}
+                  style={{ filter: phase === 'done' && attackerWins ? `drop-shadow(0 0 4px ${aColor})` : 'none', transition: 'filter 0.4s' }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Center: explosion + sparks */}
+          <div style={{ position: 'absolute', left: '50%', top: '50%', zIndex: 10 }}>
+            {/* sparks */}
+            {phase === 'clash' && SPARKS.map((s, i) => (
+              <div key={i} style={{
+                position:     'absolute',
+                left:         0, top: 0,
+                width:        s.size,
+                height:       s.size,
+                borderRadius: '50%',
+                background:   s.color,
+                '--tx':       s.tx,
+                '--ty':       s.ty,
+                animation:    `b-spark 0.5s ease-out ${s.delay} both`,
+                pointerEvents:'none',
+              }} />
+            ))}
+            {/* flash emoji */}
+            {(phase === 'clash') && (
+              <div style={{
+                position:      'absolute',
+                left: 0, top: 0,
+                fontSize:      '2rem',
+                lineHeight:    1,
+                animation:     'b-clash 0.65s ease-out forwards',
+                pointerEvents: 'none',
+                userSelect:    'none',
+              }}>
+                ⚡
+              </div>
+            )}
+          </div>
+
+          {/* Defender soldiers */}
+          <div style={{
+            display:           'flex',
+            gap:               6,
+            alignItems:        'center',
+            flexDirection:     'row-reverse',
+            animation:         'b-def-in 0.55s cubic-bezier(.22,1,.36,1) forwards',
+          }}>
+            {Array.from({ length: icons }).map((_, i) => (
+              <div key={i} style={{
+                animation: phase === 'clash' ? `b-shake 0.35s ease ${SOLDIER_STAGGER[i]}ms both`
+                         : phase === 'done' && attackerWins ? `b-loser 0.5s ease ${i * 40}ms forwards` : 'none',
+              }}>
+                <Shield
+                  size={i === 2 ? 26 : 20}
+                  color={dColor}
+                  strokeWidth={2}
+                  style={{ filter: phase === 'done' && !attackerWins ? `drop-shadow(0 0 4px ${dColor})` : 'none', transition: 'filter 0.4s' }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Winner banner */}
+        {phase === 'done' && (
+          <div style={{ animation: 'b-winner 0.4s cubic-bezier(.22,1,.36,1) forwards' }}>
+            <span style={{
+              fontFamily:   'Cinzel, serif',
+              fontWeight:   900,
+              fontSize:     '0.95rem',
+              color:        attackerWins ? C.win : '#60a5fa',
+              letterSpacing:'0.12em',
+              animation:    'b-glow 1.4s ease-in-out infinite',
+            }}>
+              {attackerWins ? '⚔ ATTACKER WINS' : '🛡 DEFENDER WINS'}
+            </span>
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
 // ─── Empty group factory ──────────────────────────────────────────────────────
 function emptyGroup(tribe = 'roman') {
   return { tribe, counts: {}, smithy: {} }
@@ -654,6 +833,7 @@ export default function BattleCalculator() {
   const [defBonusPct, setDefBonusPct] = useState(0)
   const [defenderWeapon, setDefenderWeapon] = useState({ unitId: '', bonus: 0 })
   const [residenceLevel, setResidenceLevel] = useState(0)
+  const [animKey, setAnimKey] = useState(0)
 
   // ── Attacker mutations ─────────────────────────────────────────────────────
   const setAttackerTribe = useCallback((i, tribe) =>
@@ -764,6 +944,29 @@ export default function BattleCalculator() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 4px', alignSelf: 'stretch', gap: 6 }}>
           <div style={{ width: 1, flex: 1, background: C.border }} />
           <div style={{ fontFamily: 'Cinzel, serif', color: C.gold, fontSize: '1.1rem', fontWeight: 900, letterSpacing: '0.1em' }}>VS</div>
+          <button
+            onClick={() => battleResult && setAnimKey(k => k + 1)}
+            disabled={!battleResult}
+            title={battleResult ? 'Play battle animation' : 'Add units first'}
+            style={{
+              background:    battleResult ? C.gold : C.surface2,
+              color:         battleResult ? '#0f0c09' : C.muted,
+              border:        `1px solid ${battleResult ? C.gold : C.border}`,
+              borderRadius:  6,
+              padding:       '5px 8px',
+              cursor:        battleResult ? 'pointer' : 'default',
+              fontSize:      '0.65rem',
+              fontFamily:    'Cinzel, serif',
+              fontWeight:    700,
+              letterSpacing: '0.04em',
+              transition:    'all 0.15s',
+              whiteSpace:    'nowrap',
+              writingMode:   'vertical-rl',
+              textOrientation:'mixed',
+            }}
+          >
+            ⚔ Sim
+          </button>
           <div style={{ width: 1, flex: 1, background: C.border }} />
         </div>
 
@@ -787,6 +990,8 @@ export default function BattleCalculator() {
           />
         </div>
       </div>
+
+      <BattleAnimation result={battleResult} animKey={animKey} />
 
       {battleResult && <ResultsSection result={battleResult} />}
 

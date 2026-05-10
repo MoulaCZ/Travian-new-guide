@@ -6,7 +6,7 @@
 
 ## Why Farming Matters
 
-Your resource fields grow slowly. A level 5 cropland produces maybe 100 grain per hour. An active farmer with 100 Clubswingers hitting 30–50 targets can bring in tens of thousands of resources per day — **resources that go directly into more troops, which farm more villages, which fund more troops**.
+Your resource fields grow slowly. A level 5 cropland produces under 50 grain per hour. An active farmer with 100 Clubswingers hitting 30–50 targets can bring in tens of thousands of resources per day — **resources that go directly into more troops, which farm more villages, which fund more troops**.
 
 The snowball is real. A player who starts farming in week 1 will typically have 3–5× more army than a pure builder by week 3. The army then defends better, deters attacks, and keeps the loop going.
 
@@ -54,11 +54,13 @@ Both are officially endorsed by Travian. Use them at the start of each session t
 
 Scouts reveal troop counts and whether the hero is present. If your scout dies, the village has scouts defending → active player → skip it.
 
-**Protocol:**
-1. Send 1 scout to any new potential farm
-2. Scout returns alive + 0 defenders → add to farm list
-3. Scout dies → do not raid, remove from list
-4. Use the in-game **Combat Simulator** if you see any defenders — only attack if expected losses are worth the loot
+**Scout twice before adding a new farm:**
+
+**First scout — resources and cranny.** Check what's in the warehouse and whether they've built a Cranny. A full cranny level 10 protects 8,000 resources (2,000 per type) — if the village barely produces that much, raids will return nearly empty.
+
+**Second scout — defences.** Even a village with zero troops can cause losses. A high-level wall and a Residence provide passive defence bonuses that your troops fight against. Run the result through the in-game **Combat Simulator**: enter the wall level and any buildings that contribute defence, then calculate whether your intended troop count wins with zero losses. If losses aren't worth the loot — skip it or send more troops.
+
+> ⚠️ A village can look empty from the outside but still be defended by passive bonuses. Don't assume "no troops" means "no losses".
 
 Build scouts as your second unit type (after your main raider). This is not optional.
 
@@ -112,12 +114,19 @@ The best raiding troop depends on your tribe. Key stats: **carry capacity** (res
 
 ## Oasis Farming
 
-Oases also produce resources and can be raided. Unlike player villages, they **always have animals defending** — the type and number depends on the oasis type and how long since it was last raided (animals respawn over time).
+Oases produce resources and can be raided for loot. Unlike player villages, they **always have animals defending** — type and number depend on the oasis type and how long since it was last cleared (animals respawn over time).
 
-- **Safe to farm:** oases with small animals (rabbits, foxes, deer)
-- **Dangerous:** oases with elephants, tigers, or bears — these kill infantry fast
-- Always check the oasis before farming it with cavalry (faster, more survivable)
-- Oases attached to your village via Hero's Mansion **cannot be raided by others** — only by you
+**The two-wave trick:** Your hero can clear the animals but cannot collect resources from an oasis raid. Regular troops collect loot but take animal losses if they arrive before the oasis is cleared. The solution:
+
+1. Send your **hero first** to clear all animals — arrives slightly ahead
+2. Send your **raiding troops** to arrive a minute or two after — find an empty oasis and collect all the loot with zero losses
+
+> ⚠️ **Animal respawn risk:** Even if the oasis was empty when you sent the attack, animals can spawn while your troops are in transit. A "safe" oasis that takes 30 minutes to reach may have new animals by the time your troops arrive. Oasis farming is inherently riskier than farming inactive villages — factor this in before sending infantry.
+
+**Tips:**
+- **Small animals** (rabbits, foxes, deer) — low risk for most troop types
+- **Large animals** (tigers, bears, elephants) — dangerous for infantry; use cavalry or hero first
+- Always scout an oasis before farming it the first time
 
 ---
 

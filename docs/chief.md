@@ -73,14 +73,13 @@ Most offensive players in your alliance keep **3 administrators trained and read
 1. **Scout the target** — confirm no Residence/Palace, check troop count, check if it's a capital
 2. **Confirm you have enough CP** — open your Residence/Palace and check the expansion slots
 3. **Ping your offensive coordinator** — tell them the target, share scout results, agree on timing
-4. **Start a Large Celebration** — time it to be active when your attacks land
-5. **Clear the village** — catapults target the Residence/Palace, troops kill the defenders, rams for the wall if it's high level. All as a normal attack.
-6. **Ally sends all their chief waves** right after the clear, seconds apart
-7. **You send all your chiefs in one attack, timed to arrive 1–2 minutes after the ally's last wave** — this gap is intentional. Starting loyalty can be 100%, 125%, or lower — nobody knows in advance. If the ally's last wave accidentally reduces loyalty to 0 and they take the village, they have those 1–2 minutes to see it and recall their troops before your attack lands. Your attack then takes the village from them — they lose one chief, their army gets home safely.
-
+4. **Clear the village** — catapults target the Residence/Palace, troops kill the defenders, rams for the wall if it's high level. All as a normal attack.
+5. **Ally sends all their chiefs**
+6. **You send all your chiefs in one attack, timed to arrive 1–2 minutes after the ally's attack** — this gap is intentional. Starting loyalty can be 100%, 125%, or lower — nobody knows in advance. If the ally's attack accidentally reduces loyalty to 0 and they take the village, they have those 1–2 minutes to see it and recall their troops before your attack lands. Your attack then takes the village from them — they lose one chief, their army gets home safely.
    > 💡 If this happens, ask whether you should send resources to cover that lost chief. They helped you get the village — a small thank-you is good alliance etiquette.
 
-8. **Secure the village** — see After the Conquest below
+8. **Start a Large Celebration** — time it to be active when your attacks land
+9. **Secure the village** — see After the Conquest below
 
 ---
 

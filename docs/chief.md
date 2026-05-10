@@ -85,7 +85,11 @@ Do these **immediately** — in this order:
 
 2. **Recall all your extra troops.** If you sent multiple chief waves, recall the ones you no longer need as soon as the village is taken. They are sitting in a freshly conquered, undefended village — get them home before someone attacks.
 
-3. **Ask your allies to recall their reinforcements.** If offensive players helped you clear, message them immediately. Their troops are exposed too — it's good manners and good tactics to let them know the village is taken so they can pull back.
+3. **Coordinate with any ally who sent chief waves.** When an ally helps you with e.g. 3 chief waves, the combined loyalty reduction is large — but neither of you knows the target's exact starting loyalty (it can be 125%, 100%, or lower). There's a real chance their wave lands the killing blow and they take the village instead of you.
+
+   If that happens, the typical sequence is: they immediately withdraw all their troops, and send a follow-up attack timed to arrive a few minutes before your next wave — so they can assess whether the village is still held. Your next chief wave then takes it from them. End result: you own the village, and they've lost one chief.
+
+   > 💡 In this scenario, ask whether you should send them resources to cover the cost of that chief — it's a small gesture and good alliance etiquette. They helped you get the village; a thank-you goes a long way.
 
 4. **Message players who were farming this village.** The previous owner likely had this village in other players' farm lists. Send a polite message letting them know you're the new owner and asking them to remove it. Most players will respect this — it's standard ettiquette.
 

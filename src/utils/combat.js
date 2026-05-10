@@ -7,10 +7,15 @@
  * Building defense (Residence/Palace/CC): level × 40 points (level 20 = 800).
  */
 
+// Bonus per wall level (linear, applied as multiplier: 1 + level × bonus).
+// Teuton Earth Wall: confirmed from in-game — level 20 = 49% → 0.049/20 = 0.00245... wait
+// Actually: 49% total / 20 levels = 2.45% per level = 0.0245 per level.
+// Roman City Wall: ~3.64%/level (unconfirmed, from community sources).
+// Gaul Palisade:   ~2.86%/level (unconfirmed, from community sources).
 const WALL_BONUS_PER_LEVEL = {
-  roman:  0.0364,
-  teuton: 0.0234,
-  gaul:   0.0286,
+  roman:  0.0364,   // City Wall   lv20 ≈ 72.8%  (community estimate, unverified)
+  teuton: 0.0245,   // Earth Wall  lv20 = 49%    (confirmed from in-game screenshot)
+  gaul:   0.0286,   // Palisade    lv20 ≈ 57.2%  (community estimate, unverified)
 }
 
 /**

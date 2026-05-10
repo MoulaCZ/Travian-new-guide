@@ -1169,7 +1169,7 @@ export default function BattleCalculator() {
       attackerWeapon: attackerWeapon.unitId ? attackerWeapon : null,
       defenderWeapon: defenderWeapon.unitId ? defenderWeapon : null,
     })
-  }, [attackerArmy, defenderArmyGroups, wallLevel, defenderTribe, attackerHeroAtk, defenderHeroDef, residenceLevel])
+  }, [attackerArmy, defenderArmyGroups, wallLevel, defenderTribe, attackerHeroAtk, defenderHeroDef, residenceLevel, offBonusPct, defBonusPct, attackerWeapon, defenderWeapon])
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (

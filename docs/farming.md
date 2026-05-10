@@ -130,6 +130,21 @@ Oases produce resources and can be raided for loot. Unlike player villages, they
 
 ---
 
+## Raiding Natar Villages
+
+Natar villages are former player villages — the original owner quit and Natars took over. They behave like inactive villages and can be farmed freely.
+
+**What makes them different:**
+- Natars **do not train troops** — no defenders to worry about
+- But occasionally they **build a Residence or a Wall** on their own. It's not common, but it happens
+- A wall or Residence adds passive defence that causes losses on your otherwise clean farm runs
+
+**The tell:** If a farm that previously returned zero losses suddenly starts costing you units, check it — Natars likely built something defensive since your last visit.
+
+**The fix:** Keep a small stock of **rams** (destroy walls) and **catapults** (destroy buildings) among your units. Send one attack with them to knock down the offending building, then resume normal farming. You don't need many — a handful is enough to handle anything a Natar village builds.
+
+---
+
 ## Common Mistakes
 
 | Mistake | Why it hurts |

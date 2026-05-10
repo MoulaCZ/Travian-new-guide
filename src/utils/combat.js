@@ -94,12 +94,17 @@ export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTr
   let attackerLossRatio
   let defenderLossRatio
 
+  // Exponent 1.4 — empirically derived from in-game reports.
+  // Example: 10k Legionnaires (400k atk) vs 10k Paladins (1M defInf):
+  //   (400k/1000k)^1.4 = 0.2774 → 2774 losses (in-game: 2778, diff = hero rounding).
+  const EXPONENT = 1.4
+
   if (attackerWins) {
-    attackerLossRatio = effectiveDefense > 0 ? (effectiveDefense / totalAttack) ** 1.5 : 0
+    attackerLossRatio = effectiveDefense > 0 ? (effectiveDefense / totalAttack) ** EXPONENT : 0
     defenderLossRatio = 1.0
   } else {
     attackerLossRatio = 1.0
-    defenderLossRatio = totalAttack > 0 ? (totalAttack / effectiveDefense) ** 1.5 : 0
+    defenderLossRatio = totalAttack > 0 ? (totalAttack / effectiveDefense) ** EXPONENT : 0
   }
 
   // --- 5. Build per-unit results ---

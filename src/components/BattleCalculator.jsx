@@ -540,7 +540,7 @@ function ResultsSection({ result }) {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', color: C.muted, fontSize: '0.65rem' }}>
             <Info size={10} />
-            <span>Formula: (loser / winner)^1.5 · Smithy: +5% per level · Residence lv20 = +800 def · excludes morale &amp; artefacts</span>
+            <span>Formula: (loser / winner)^1.4 · Smithy: +5% per level · Residence lv20 = +800 def · excludes morale &amp; artefacts</span>
           </div>
         </>
       )}

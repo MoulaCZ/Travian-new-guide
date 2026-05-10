@@ -50,7 +50,7 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 
 | # | What | Tier | Notes |
 |---|------|------|-------|
-| 1 | All 18 fields → 1 | 1 | Base production — all 9 croplands + 3×3 other fields |
+| 1 | All 3-3-3 fields → 1 | 1 | Wood, clay, iron first — croplands se upgradují operativně podle grain rule |
 | 2 | Main Building → 3 | 1 | Prerequisite for Barracks |
 | 3 | Granary → 3 | 1 | Prevent early overflow |
 | 4 | Warehouse → 2 | 1 | |

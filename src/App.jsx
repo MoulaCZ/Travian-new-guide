@@ -9,7 +9,9 @@ import { pages } from './data/pages'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('readme')
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)       // mobile drawer
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false) // desktop collapse
+  const [suggestOpen, setSuggestOpen] = useState(false)
   const contentRef = useRef(null)
   const onboarding = useOnboarding()
 
@@ -41,6 +43,9 @@ export default function App() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onOpenOnboarding={onboarding.open}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(c => !c)}
+        onSuggest={() => setSuggestOpen(true)}
       />
 
       {/* Main */}
@@ -59,7 +64,7 @@ export default function App() {
           />
 
           {/* Prev / Next navigation */}
-          <div className="max-w-4xl mx-auto px-5 md:px-10 pb-12">
+          <div className="max-w-5xl mx-auto px-5 md:px-10 pb-12">
             <div className="border-t pt-8 flex items-stretch gap-4" style={{ borderColor: '#3e3226' }}>
               {prev ? (
                 <button
@@ -100,8 +105,12 @@ export default function App() {
       {/* Onboarding wizard */}
       {onboarding.show && <Onboarding onClose={onboarding.close} />}
 
-      {/* Floating suggest-edit button */}
-      <SuggestEdit currentPage={page.title} />
+      {/* Suggest Edit modal (controlled by sidebar button) */}
+      <SuggestEdit
+        open={suggestOpen}
+        onClose={() => setSuggestOpen(false)}
+        currentPage={page.title}
+      />
     </div>
   )
 }

@@ -57,8 +57,8 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 | 5 | ⚔ Barracks → 5 | 1 | **Start training infantry now — don't wait** |
 | 6 | Academy → 3 | 1 | Research your main infantry unit |
 | 7 | All 3-3-3 fields → 3 | 1 | Wood/clay/iron for building costs — you need these more than crop early |
-| 8 | Granary → 5 | 1 | |
-| 9 | Warehouse → 3 | 1 | |
+| 8 | Granary → 2 | 1 | Upgrade to higher levels when necessary |
+| 9 | Warehouse → 3 | 1 | Upgrade to higher levels when necessary |
 | 10 | Main Building → 5 | 1 | |
 | 11 | Barracks → 10 | 2 | Faster training |
 | 12 | Residence → 5 | 2 | Culture Points start accumulating; begin working toward settlers |

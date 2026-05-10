@@ -45,20 +45,24 @@ export function buildingDefensePoints(residenceLevel) {
  * @param {number} wallLevel  0–20
  * @param {'roman'|'teuton'|'gaul'} defenderTribe
  * @param {{
- *   heroAttack?:      number,   hero's direct attack contribution (flat)
- *   heroDefense?:     number,   hero's direct defense contribution (flat)
- *   offBonusPct?:     number,   Off bonus % — multiplies ALL attacker troop attack (e.g. 0.4 = 0.4%)
- *   defBonusPct?:     number,   Def bonus % — multiplies ALL defender troop defense (e.g. 2.0 = 2%)
- *   residenceLevel?:  number,   Residence/Palace level (0–20), 0 already includes village base 10
+ *   heroAttack?:      number,   Hero Síla — direct flat attack contribution
+ *   heroDefense?:     number,   Hero Síla — direct flat defense contribution
+ *   offBonusPct?:     number,   Off bonus % — multiplies ALL attacker troop attack
+ *   defBonusPct?:     number,   Def bonus % — multiplies ALL defender troop defense
+ *   residenceLevel?:  number,   Residence/Palace level (0–20)
+ *   attackerWeapon?:  { unitId: string, bonus: number }  weapon adds flat to attack of that unit type
+ *   defenderWeapon?:  { unitId: string, bonus: number }  weapon adds flat to defInf+defCav of that unit type
  * }} options
  */
 export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTribe, options = {}) {
   const {
-    heroAttack     = 0,
-    heroDefense    = 0,
-    offBonusPct    = 0,
-    defBonusPct    = 0,
-    residenceLevel = 0,
+    heroAttack      = 0,
+    heroDefense     = 0,
+    offBonusPct     = 0,
+    defBonusPct     = 0,
+    residenceLevel  = 0,
+    attackerWeapon  = null,
+    defenderWeapon  = null,
   } = options
 
   const offMult = 1 + offBonusPct / 100
@@ -73,8 +77,9 @@ export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTr
 
   for (const { unit, count, smithy } of attackers) {
     if (count <= 0) continue
-    const mult = smithyMult(smithy)
-    const contribution = unit.attack * count * mult * offMult
+    const weaponAdd = (attackerWeapon?.unitId === unit.id) ? (attackerWeapon.bonus || 0) : 0
+    const effectiveAtk = unit.attack * smithyMult(smithy) + weaponAdd
+    const contribution = effectiveAtk * count * offMult
     if (unit.type === 'cavalry') {
       cavAttack += contribution
     } else {
@@ -96,8 +101,10 @@ export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTr
   let troopDefense = 0
   for (const { unit, count, smithy } of defenders) {
     if (count <= 0) continue
-    const mult = smithyMult(smithy)
-    troopDefense += (unit.defInf * infRatio + unit.defCav * cavRatio) * count * mult * defMult
+    const weaponAdd = (defenderWeapon?.unitId === unit.id) ? (defenderWeapon.bonus || 0) : 0
+    const effectiveDefInf = unit.defInf * smithyMult(smithy) + weaponAdd
+    const effectiveDefCav = unit.defCav * smithyMult(smithy) + weaponAdd
+    troopDefense += (effectiveDefInf * infRatio + effectiveDefCav * cavRatio) * count * defMult
   }
 
   const totalDefense = troopDefense + heroDefense + buildingDefensePoints(residenceLevel)

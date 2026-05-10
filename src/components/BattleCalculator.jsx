@@ -265,6 +265,8 @@ function ArmyPanel({
   heroDef, onHeroDef,
   // off/def bonus
   bonusPct, onBonusPct,
+  // weapon
+  weapon, onWeapon,
   // summary
   totalAttack, totalDefense,
 }) {
@@ -410,13 +412,73 @@ function ArmyPanel({
               <span style={{ color: C.muted, fontSize: '0.68rem' }}>%</span>
             </div>
             <FlatInput
-              label={showWall ? 'Hero defense bonus' : 'Hero attack bonus'}
+              label="Hero Síla"
               value={showWall ? heroDef : heroAtk}
               onChange={showWall ? onHeroDef : onHeroAtk}
-              hint={showWall
-                ? "Hero's direct defense contribution (shown in combat report as the extra points above troop total)"
-                : "Hero's direct attack contribution (shown in combat report as the extra points above troop total)"}
+              hint="Hero's total Strength stat (hero points + equipment). Added directly to combat as flat attack (attacker) or defense (defender)."
             />
+            {/* Weapon bonus */}
+            {(() => {
+              const tribeUnits = UNITS[groups[0]?.tribe] ?? []
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <span style={{ color: C.muted, fontSize: '0.72rem' }}
+                    title="Weapon bonus applies a flat value to attack (attacker) or defInf+defCav (defender) of a specific unit type. E.g. +6 to each Paladin.">
+                    Weapon bonus (unit)
+                  </span>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <select
+                      value={weapon?.unitId ?? ''}
+                      onChange={(e) => onWeapon({ unitId: e.target.value, bonus: weapon?.bonus ?? 0 })}
+                      style={{
+                        flex: 1,
+                        background: '#0f0c09',
+                        border: `1px solid ${weapon?.unitId ? C.goldDim : C.border}`,
+                        borderRadius: 3,
+                        color: weapon?.unitId ? C.gold : C.muted,
+                        fontSize: '0.7rem',
+                        padding: '3px 5px',
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <option value="">— no weapon —</option>
+                      {tribeUnits.map(u => (
+                        <option key={u.id} value={u.id}>{u.name}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="0"
+                      value={weapon?.bonus === 0 ? '' : (weapon?.bonus ?? '')}
+                      onChange={(e) => {
+                        const v = parseInt(e.target.value, 10)
+                        onWeapon({ unitId: weapon?.unitId ?? '', bonus: isNaN(v) || v < 0 ? 0 : v })
+                      }}
+                      disabled={!weapon?.unitId}
+                      style={{
+                        width: 52,
+                        background: '#0f0c09',
+                        border: `1px solid ${weapon?.bonus > 0 ? C.goldDim : C.border}`,
+                        borderRadius: 3,
+                        color: weapon?.bonus > 0 ? C.gold : C.muted,
+                        fontSize: '0.72rem',
+                        padding: '2px 5px',
+                        textAlign: 'right',
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                        opacity: weapon?.unitId ? 1 : 0.4,
+                      }}
+                    />
+                    <span style={{ color: C.muted, fontSize: '0.65rem', whiteSpace: 'nowrap' }}>
+                      {showWall ? 'def+def' : 'atk'}
+                    </span>
+                  </div>
+                </div>
+              )
+            })()}
             {showWall && (
               /* Residence / Palace slider */
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -583,12 +645,14 @@ export default function BattleCalculator() {
   const [attackerGroups, setAttackerGroups] = useState([emptyGroup('roman')])
   const [attackerHeroAtk, setAttackerHeroAtk] = useState(0)
   const [offBonusPct, setOffBonusPct] = useState(0)
+  const [attackerWeapon, setAttackerWeapon] = useState({ unitId: '', bonus: 0 })
 
   const [defenderGroups, setDefenderGroups] = useState([emptyGroup('teuton')])
   const [wallLevel, setWallLevel] = useState(0)
   const [defenderHeroDef, setDefenderHeroDef] = useState(0)
   const [defenderHeroAtk, setDefenderHeroAtk] = useState(0)
   const [defBonusPct, setDefBonusPct] = useState(0)
+  const [defenderWeapon, setDefenderWeapon] = useState({ unitId: '', bonus: 0 })
   const [residenceLevel, setResidenceLevel] = useState(0)
 
   // ── Attacker mutations ─────────────────────────────────────────────────────
@@ -659,6 +723,8 @@ export default function BattleCalculator() {
       offBonusPct,
       defBonusPct,
       residenceLevel,
+      attackerWeapon: attackerWeapon.unitId ? attackerWeapon : null,
+      defenderWeapon: defenderWeapon.unitId ? defenderWeapon : null,
     })
   }, [attackerArmy, defenderArmyGroups, wallLevel, defenderTribe, attackerHeroAtk, defenderHeroDef, residenceLevel])
 
@@ -690,6 +756,7 @@ export default function BattleCalculator() {
             heroAtk={attackerHeroAtk} onHeroAtk={setAttackerHeroAtk}
             heroDef={0} onHeroDef={() => {}}
             bonusPct={offBonusPct} onBonusPct={setOffBonusPct}
+            weapon={attackerWeapon} onWeapon={setAttackerWeapon}
             totalAttack={atkPanelAtk} totalDefense={atkPanelDef}
           />
         </div>
@@ -715,6 +782,7 @@ export default function BattleCalculator() {
             heroAtk={defenderHeroAtk} onHeroAtk={setDefenderHeroAtk}
             heroDef={defenderHeroDef} onHeroDef={setDefenderHeroDef}
             bonusPct={defBonusPct} onBonusPct={setDefBonusPct}
+            weapon={defenderWeapon} onWeapon={setDefenderWeapon}
             totalAttack={defPanelAtk} totalDefense={defPanelDef}
           />
         </div>

@@ -8,17 +8,14 @@
  */
 
 // Wall bonus: COMPOUND (multiplicative) per level — wallMult = (1 + rate)^level
-// Confirmed from in-game screenshots (Teuton Earth Wall):
-//   lv11 = 24%  → 1.02^11 = 1.2434 → 24.3% ✓
-//   lv12 = 27%  → 1.02^12 = 1.2683 → 26.8% → rounds to 27% ✓
-//   lv20 = 49%  → 1.02^20 = 1.4860 → 48.6% → rounds to 49% ✓
-// Roman City Wall and Gaul Palisade: community estimates (unverified).
-//   Roman  ~2.74%/lv compound → lv20 ≈ 73% (community: 72.8%)
-//   Gaul   ~2.27%/lv compound → lv20 ≈ 57% (community: 57.2%)
+// ALL values confirmed from in-game building tables (full level 1-20 data):
+//   Teuton Earth Wall 2%/lv:  1.02^20 = 1.486  → 49%  ✓ (lv11=24%, lv12=27% ✓)
+//   Roman  City Wall  3%/lv:  1.03^20 = 1.806  → 81%  ✓ (every level matches)
+//   Gaul   Palisade  2.5%/lv: 1.025^20 = 1.639 → 64%  ✓ (every level matches)
 const WALL_BONUS_PER_LEVEL = {
-  roman:  0.0274,   // City Wall   lv20 ≈ 73%   (community estimate, unverified)
-  teuton: 0.02,     // Earth Wall  lv20 = 49%   (confirmed: lv11=24%, lv12=27%, lv20=49%)
-  gaul:   0.0227,   // Palisade    lv20 ≈ 57%   (community estimate, unverified)
+  roman:  0.03,    // City Wall  lv20 = 81%  (confirmed from in-game table)
+  teuton: 0.02,    // Earth Wall lv20 = 49%  (confirmed from in-game table)
+  gaul:   0.025,   // Palisade   lv20 = 64%  (confirmed from in-game table)
 }
 
 /**

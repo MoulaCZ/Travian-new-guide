@@ -52,7 +52,7 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 |---|------|------|-------|
 | 1 | All 3-3-3 fields → 1 | 1 | Wood, clay, iron first — croplands se upgradují operativně podle grain rule |
 | 2 | Main Building → 3 | 1 | Prerequisite for Barracks |
-| 3 | Granary → 3 | 1 | Prevent early overflow |
+| 3 | Granary → 1 | 1 | Prevent early overflow |
 | 4 | Warehouse → 2 | 1 | |
 | 5 | ⚔ Barracks → 5 | 1 | **Start training infantry now — don't wait** |
 | 6 | Academy → 3 | 1 | Research your main infantry unit |

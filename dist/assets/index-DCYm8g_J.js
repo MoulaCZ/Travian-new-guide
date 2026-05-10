@@ -433,7 +433,7 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 |---|------|------|-------|\r
 | 1 | All 3-3-3 fields → 1 | 1 | Wood, clay, iron first — croplands se upgradují operativně podle grain rule |\r
 | 2 | Main Building → 3 | 1 | Prerequisite for Barracks |\r
-| 3 | Granary → 3 | 1 | Prevent early overflow |\r
+| 3 | Granary → 1 | 1 | Prevent early overflow |\r
 | 4 | Warehouse → 2 | 1 | |\r
 | 5 | ⚔ Barracks → 5 | 1 | **Start training infantry now — don't wait** |\r
 | 6 | Academy → 3 | 1 | Research your main infantry unit |\r
@@ -872,11 +872,15 @@ Do these **immediately** — in this order:\r
 \r
 2. **Recall all your extra troops.** If you sent multiple chief waves, recall the ones you no longer need as soon as the village is taken. They are sitting in a freshly conquered, undefended village — get them home before someone attacks.\r
 \r
-3. **Coordinate with any ally who sent chief waves.** When an ally helps you with e.g. 3 chief waves, the combined loyalty reduction is large — but neither of you knows the target's exact starting loyalty (it can be 125%, 100%, or lower). There's a real chance their wave lands the killing blow and they take the village instead of you.\r
+3. **Coordinate timing with any ally who sends chief waves.** The standard approach when an offensive ally helps:\r
 \r
-   If that happens, the typical sequence is: they immediately withdraw all their troops, and send a follow-up attack timed to arrive a few minutes before your next wave — so they can assess whether the village is still held. Your next chief wave then takes it from them. End result: you own the village, and they've lost one chief.\r
+   1. **Clear wave first** — catapults destroy the Residence/Palace (removing loyalty protection), troops kill the defenders, rams knock down the wall if needed.\r
+   2. **Ally sends all their chief waves** — they go in right after the clear.\r
+   3. **You send your chief waves to arrive 1–2 minutes after the ally's last wave** — this gap is intentional.\r
 \r
-   > 💡 In this scenario, ask whether you should send them resources to cover the cost of that chief — it's a small gesture and good alliance etiquette. They helped you get the village; a thank-you goes a long way.\r
+   **Why the gap matters:** Starting loyalty can be 100%, 125%, or lower — nobody knows in advance. If the ally's last wave happens to reduce loyalty to 0 and they accidentally conquer the village, your attack is still in the air. The 1–2 minute window gives them just enough time to see the conquest and recall their troops before your wave lands. Your wave then takes the village from them — they lose one chief, but their army makes it home safely.\r
+\r
+   > 💡 If this happens, ask whether you should send resources to cover the cost of the lost chief. They helped you get the village and took the hit for it — a small thank-you is good alliance etiquette.\r
 \r
 4. **Message players who were farming this village.** The previous owner likely had this village in other players' farm lists. Send a polite message letting them know you're the new owner and asking them to remove it. Most players will respect this — it's standard ettiquette.\r
 \r

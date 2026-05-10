@@ -44,57 +44,54 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 
 > 🟨 **Watch the ad** before every build for the free 25% speed boost.
 
+> 💡 **Operative grain rule:** Early on you won't run short of grain — hero inventory can cover it. Focus on wood, clay, and iron first. When free grain drops below **+20/h**, upgrade one cropland and continue. There is no fixed schedule — react to demand as it grows.
+
 **Legend:** ⚔ Start training troops here | ★ Prerequisite unlocked
 
 | # | What | Tier | Notes |
 |---|------|------|-------|
-| 1 | All 9 Croplands → 1 | 1 | Grain is your #1 resource — build all 9 first |
-| 2 | All 3 Woodcutters → 1 | 1 | |
-| 3 | All 3 Clay Pits → 1 | 1 | |
-| 4 | All 3 Iron Mines → 1 | 1 | |
-| 5 | Main Building → 3 | 1 | Prerequisite for Barracks |
-| 6 | All 9 Croplands → 2 | 1 | Grain priority — always upgrade crop before other fields |
-| 7 | All 3 Woodcutters → 2 | 1 | |
-| 8 | All 3 Clay Pits → 2 | 1 | |
-| 9 | All 3 Iron Mines → 2 | 1 | |
-| 10 | Granary → 3 | 1 | Don't let crop overflow |
-| 11 | Warehouse → 2 | 1 | |
-| 12 | All 9 Croplands → 3 | 2 | |
-| 13 | All 3 Woodcutters → 3 | 2 | |
-| 14 | All 3 Clay Pits → 3 | 2 | 3-3-3 fields to L3 = partial self-sufficiency |
-| 15 | All 3 Iron Mines → 3 | 2 | |
-| 16 | Granary → 5 | 2 | |
-| 17 | Warehouse → 3 | 2 | |
-| 18 | Main Building → 5 | 2 | |
-| 19 | All 9 Croplands → 4 | 2 | |
-| 20 | ⚔ Barracks → 5 | 2 | **Start training infantry now — don't wait** |
-| 21 | Academy → 3 | 2 | Research your main infantry unit |
-| 22 | All 9 Croplands → 5 | 2 | ★ Unlocks Mill (requires 1 Cropland at L5) |
-| 23 | Mill → 1 | 2 | Build immediately once unlocked |
-| 24 | All 3-3-3 fields → 4 | 2 | |
-| 25 | Barracks → 10 | 2 | Faster training |
-| 26 | Stable → 5 | 2 | Cavalry tribes only (skip for Romans) |
-| 27 | Smithy → 1 | 3 | Start upgrading your units early — stats compound |
-| 28 | All 9 Croplands → 7 | 3 | |
-| 29 | Mill → 5 | 3 | ★ Prerequisite for Bakery |
-| 30 | All 3-3-3 fields → 5 | 3 | |
-| 31 | Barracks → 15 | 3 | |
-| 32 | Hospital → 5 | 3 | Start recovering wounded troops (24h window — see below) |
-| 33 | Stable → 10 | 3 | Cavalry tribes |
-| 34 | All 9 Croplands → 10 | 3 | Maximum — ★ Prerequisite for Bakery |
-| 35 | Bakery → 5 | 3 | Requires Mill L5 + one Cropland L10 — +20% grain output |
-| 36 | Barracks → 20 | 3 | |
-| 37 | Stable → 20 | 3 | Cavalry tribes |
-| 38 | Hospital → 15 | 3 | |
-| 39 | Tournament Square → 15 | 3 | Faster troop response to calls |
-| 40 | City Wall → 20 | 4 | DEF bonus on home village |
-| 41 | Main Building → 20 | 4 | |
-| 42 | Granary × 3 → 20 | 4 | |
-| 43 | Warehouse × 2 → 20 | 4 | |
-| 44 | Marketplace → 20 | 4 | |
-| 45 | Trade Office → 10 | 4 | |
-| 46 | Town Hall → 10 | 4 | |
-| 47 | Residence → 10 | 4 | |
+| 1 | All 18 fields → 1 | 1 | Base production — all 9 croplands + 3×3 other fields |
+| 2 | Main Building → 3 | 1 | Prerequisite for Barracks |
+| 3 | Granary → 3 | 1 | Prevent early overflow |
+| 4 | Warehouse → 2 | 1 | |
+| 5 | ⚔ Barracks → 5 | 1 | **Start training infantry now — don't wait** |
+| 6 | Academy → 3 | 1 | Research your main infantry unit |
+| 7 | All 3-3-3 fields → 3 | 1 | Wood/clay/iron for building costs — you need these more than crop early |
+| 8 | Granary → 5 | 1 | |
+| 9 | Warehouse → 3 | 1 | |
+| 10 | Main Building → 5 | 1 | |
+| 11 | Barracks → 10 | 2 | Faster training |
+| 12 | Residence → 5 | 2 | Culture Points start accumulating; begin working toward settlers |
+| 13 | Stable → 5 | 2 | Cavalry tribes only (skip for Romans) |
+| 14 | All 3-3-3 fields → 5 | 2 | Solid non-crop production for sustained building |
+| 15 | Residence → 10 | 2 | ★ Train settlers here → found your feeder villages |
+| 16 | Smithy → 1 | 2 | Start upgrading your units — stats compound over time |
+| 17 | Barracks → 15 | 2 | |
+| 18 | Stable → 10 | 2 | Cavalry tribes |
+| 19 | Hospital → 5 | 2 | Recover wounded troops (24h window — see below) |
+| 20 | Barracks → 20 | 3 | |
+| 21 | Stable → 20 | 3 | Cavalry tribes |
+| 22 | Hospital → 15 | 3 | |
+| 23 | Tournament Square → 15 | 3 | Faster troop response to calls |
+| 24 | All 9 Croplands → 10 | 3 | Max level without Palace — ★ Prerequisite for Mill + Bakery |
+| 25 | Mill → 5 | 3 | Requires 1 Cropland at L10 — ★ Prerequisite for Bakery |
+| 26 | Bakery → 5 | 3 | Requires Mill L5 + Cropland L10 — **+20% grain output** |
+| 27 | City Wall → 20 | 3 | DEF bonus on this village |
+
+---
+
+## Long-term Goals
+
+> These are not sequential steps — work toward them **gradually and in parallel**, interleaving based on what you need most. More troops → more Granaries. Active trade routes → Marketplace. Planning Large Celebrations → Town Hall.
+
+| Building | Target Level | When to prioritise |
+|----------|--------------|--------------------|
+| Main Building | 20 | Speeds up everything else — upgrade when you have spare resources |
+| Granary (×3) | 20 | Build extra Granaries when grain storage fills before merchants arrive |
+| Warehouse (×2) | 20 | When your feeder shipments overflow |
+| Marketplace | 20 | When trade route capacity limits how much feeders can send |
+| Trade Office | 10 | After Marketplace — boosts merchant capacity further |
+| Town Hall | 10 | When your alliance runs coordinated celebrations |
 
 ---
 
@@ -128,7 +125,8 @@ The moment your healing queue fills up, it effectively becomes a second source o
 | 1 | Tournament Square | 15 |
 | 1 | Residence | 10 |
 | 1 | Town Hall | 10 |
-| 1 | Res buildings (Mill L5 + Bakery L5) | 5 |
+| 1 | Mill | 5 |
+| 1 | Bakery | 5 |
 | 1 | City Wall | 20 |
 
 ---

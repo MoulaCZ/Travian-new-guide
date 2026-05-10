@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 390" font-family="Inter, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bgH" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1510"/>
+      <stop offset="100%" style="stop-color:#0f0c09"/>
+    </linearGradient>
+    <linearGradient id="hpG" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#16a34a"/>
+      <stop offset="100%" style="stop-color:#4ade80"/>
+    </linearGradient>
+    <linearGradient id="hpY" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ca8a04"/>
+      <stop offset="100%" style="stop-color:#fde047"/>
+    </linearGradient>
+    <linearGradient id="hpO" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c2410c"/>
+      <stop offset="100%" style="stop-color:#fb923c"/>
+    </linearGradient>
+    <linearGradient id="hpR" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#b91c1c"/>
+      <stop offset="100%" style="stop-color:#f87171"/>
+    </linearGradient>
+    <linearGradient id="gLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f0a820;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#f0a820;stop-opacity:0.5"/>
+      <stop offset="100%" style="stop-color:#f0a820;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="760" height="390" fill="url(#bgH)" rx="12"/>
+  <rect width="760" height="390" fill="none" stroke="#3e3226" stroke-width="1.5" rx="12"/>
+  <rect x="0" y="46" width="760" height="1.5" fill="url(#gLine)"/>
+
+  <!-- Title -->
+  <text x="380" y="29" text-anchor="middle" font-size="12" font-weight="700" fill="#f0a820" letter-spacing="3" font-family="Georgia, serif">HERBAL MEDICINES — BATTLE ROUND MECHANICS</text>
+
+  <!-- Vertical divider -->
+  <line x1="380" y1="52" x2="380" y2="382" stroke="#3e3226" stroke-width="1.5"/>
+
+  <!-- ═══════════════ LEFT PANEL ═══════════════ -->
+  <rect x="20" y="54" width="350" height="26" rx="5" fill="#2d1212"/>
+  <text x="195" y="71" text-anchor="middle" font-size="11" font-weight="700" fill="#f87171" letter-spacing="2" font-family="Georgia, serif">✕  WITHOUT MEDICINES</text>
+
+  <!-- Round 1 — 65% remaining after −35% -->
+  <rect x="20" y="87" width="350" height="37" rx="5" fill="#1c1510" stroke="#2a1e14" stroke-width="1"/>
+  <text x="60" y="109" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 1</text>
+  <rect x="98" y="100" width="190" height="11" rx="5" fill="#0f0c09"/>
+  <rect x="98" y="100" width="123" height="11" rx="5" fill="url(#hpG)" opacity="0.85"/>
+  <text x="297" y="110" font-size="11" font-weight="700" fill="#4ade80">65%</text>
+  <text x="333" y="110" font-size="10" fill="#f87171">−35%</text>
+
+  <!-- Round 2 — 38% remaining after −27% -->
+  <rect x="20" y="131" width="350" height="37" rx="5" fill="#1c1510" stroke="#2a1e14" stroke-width="1"/>
+  <text x="60" y="153" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 2</text>
+  <rect x="98" y="144" width="190" height="11" rx="5" fill="#0f0c09"/>
+  <rect x="98" y="144" width="72" height="11" rx="5" fill="url(#hpY)" opacity="0.9"/>
+  <text x="297" y="153" font-size="11" font-weight="700" fill="#fde047">38%</text>
+  <text x="333" y="153" font-size="10" fill="#f87171">−27%</text>
+
+  <!-- Round 3 — 16% remaining after −22% -->
+  <rect x="20" y="175" width="350" height="37" rx="5" fill="#1c1510" stroke="#2a1e14" stroke-width="1"/>
+  <text x="60" y="197" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 3</text>
+  <rect x="98" y="188" width="190" height="11" rx="5" fill="#0f0c09"/>
+  <rect x="98" y="188" width="30" height="11" rx="5" fill="url(#hpO)" opacity="0.95"/>
+  <text x="297" y="197" font-size="11" font-weight="700" fill="#fb923c">16%</text>
+  <text x="333" y="197" font-size="10" fill="#f87171">−22%</text>
+
+  <!-- Round 4 — 4% remaining after −12% -->
+  <rect x="20" y="219" width="350" height="37" rx="5" fill="#1c1510" stroke="#2a1e14" stroke-width="1"/>
+  <text x="60" y="241" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 4</text>
+  <rect x="98" y="232" width="190" height="11" rx="5" fill="#0f0c09"/>
+  <rect x="98" y="232" width="8" height="11" rx="5" fill="url(#hpR)"/>
+  <text x="297" y="241" font-size="11" font-weight="700" fill="#f87171">4%</text>
+  <text x="333" y="241" font-size="10" fill="#f87171">−4%</text>
+
+  <!-- Round 5 — DEAD -->
+  <rect x="20" y="263" width="350" height="37" rx="5" fill="#2a0d0d" stroke="#7a2020" stroke-width="1.5"/>
+  <text x="60" y="285" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 5</text>
+  <rect x="98" y="276" width="190" height="11" rx="5" fill="#0f0c09"/>
+  <text x="195" y="285" text-anchor="middle" font-size="13" font-weight="800" fill="#f87171">☠  HERO DIES</text>
+
+  <!-- Cumulative note -->
+  <text x="195" y="318" text-anchor="middle" font-size="10" fill="#7a6a55" font-style="italic">35 + 27 + 22 + 12 + 4 = 100 — cumulative damage kills</text>
+
+  <!-- Exception box -->
+  <rect x="20" y="330" width="350" height="48" rx="6" fill="#1e0a0a" stroke="#7a2020" stroke-width="1"/>
+  <text x="195" y="349" text-anchor="middle" font-size="10" font-weight="700" fill="#f87171">⚠  Medicines won't save the hero if...</text>
+  <text x="195" y="364" text-anchor="middle" font-size="10" fill="#c49090">a single round deals ≥ 100% HP damage.</text>
+  <text x="195" y="377" text-anchor="middle" font-size="10" fill="#c49090">They protect against attrition, not one-shot kills.</text>
+
+  <!-- ═══════════════ RIGHT PANEL ═══════════════ -->
+  <rect x="390" y="54" width="350" height="26" rx="5" fill="#0d2010"/>
+  <text x="565" y="71" text-anchor="middle" font-size="11" font-weight="700" fill="#4ade80" letter-spacing="2" font-family="Georgia, serif">✓  WITH MEDICINES EQUIPPED</text>
+
+  <!-- Round 1 — hit −35%, refill to 100% -->
+  <rect x="390" y="87" width="350" height="37" rx="5" fill="#1c1510" stroke="#2a1e14" stroke-width="1"/>
+  <text x="430" y="109" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 1</text>
+  <text x="472" y="110" font-size="10" fill="#f87171">−35%</text>
+  <text x="508" y="112" font-size="14" fill="#f0a820">↺</text>
+  <rect x="526" y="100" width="170" height="11" rx="5" fill="#0f0c09"/>
+  <rect x="526" y="100" width="170" height="11" rx="5" fill="url(#hpG)" opacity="0.85"/>
+  <text x="703" y="110" font-size="11" font-weight="700" fill="#4ade80">100%</text>
+
+  <!-- Round 2 -->
+  <rect x="390" y="131" width="350" height="37" rx="5" fill="#1c1510" stroke="#2a1e14" stroke-width="1"/>
+  <text x="430" y="153" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 2</text>
+  <text x="472" y="154" font-size="10" fill="#f87171">−27%</text>
+  <text x="508" y="156" font-size="14" fill="#f0a820">↺</text>
+  <rect x="526" y="144" width="170" height="11" rx="5" fill="#0f0c09"/>
+  <rect x="526" y="144" width="170" height="11" rx="5" fill="url(#hpG)" opacity="0.85"/>
+  <text x="703" y="153" font-size="11" font-weight="700" fill="#4ade80">100%</text>
+
+  <!-- Round 3 -->
+  <rect x="390" y="175" width="350" height="37" rx="5" fill="#1c1510" stroke="#2a1e14" stroke-width="1"/>
+  <text x="430" y="197" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 3</text>
+  <text x="472" y="198" font-size="10" fill="#f87171">−22%</text>
+  <text x="508" y="200" font-size="14" fill="#f0a820">↺</text>
+  <rect x="526" y="188" width="170" height="11" rx="5" fill="#0f0c09"/>
+  <rect x="526" y="188" width="170" height="11" rx="5" fill="url(#hpG)" opacity="0.85"/>
+  <text x="703" y="197" font-size="11" font-weight="700" fill="#4ade80">100%</text>
+
+  <!-- Round 4 -->
+  <rect x="390" y="219" width="350" height="37" rx="5" fill="#1c1510" stroke="#2a1e14" stroke-width="1"/>
+  <text x="430" y="241" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 4</text>
+  <text x="472" y="242" font-size="10" fill="#f87171">−12%</text>
+  <text x="508" y="244" font-size="14" fill="#f0a820">↺</text>
+  <rect x="526" y="232" width="170" height="11" rx="5" fill="#0f0c09"/>
+  <rect x="526" y="232" width="170" height="11" rx="5" fill="url(#hpG)" opacity="0.85"/>
+  <text x="703" y="241" font-size="11" font-weight="700" fill="#4ade80">100%</text>
+
+  <!-- Round 5 — SURVIVES -->
+  <rect x="390" y="263" width="350" height="37" rx="5" fill="#0d2010" stroke="#2a5530" stroke-width="1.5"/>
+  <text x="430" y="285" text-anchor="middle" font-size="11" font-weight="600" fill="#a89880">Round 5</text>
+  <text x="472" y="286" font-size="10" fill="#f87171">−4%</text>
+  <text x="508" y="288" font-size="14" fill="#f0a820">↺</text>
+  <text x="620" y="286" text-anchor="middle" font-size="13" font-weight="800" fill="#4ade80">✓  HERO SURVIVES</text>
+
+  <!-- Heal note -->
+  <text x="565" y="318" text-anchor="middle" font-size="10" fill="#4a7a4a" font-style="italic">Hero restored to full HP after every round automatically</text>
+
+  <!-- Tip box -->
+  <rect x="390" y="330" width="350" height="48" rx="6" fill="#0a1a0a" stroke="#2a5030" stroke-width="1"/>
+  <text x="565" y="349" text-anchor="middle" font-size="10" font-weight="700" fill="#4ade80">💡  How to equip before battle</text>
+  <text x="565" y="364" text-anchor="middle" font-size="10" fill="#90c090">Hero → Inventory → drag Ointments</text>
+  <text x="565" y="377" text-anchor="middle" font-size="10" fill="#90c090">into the equipment slot before sending the hero.</text>
+</svg>

@@ -43,6 +43,17 @@ Yes. Check the difficulty rating before sending. Early adventures are safe; hard
 **Q: Does the Gladiator Helmet actually do anything useful?**
 Yes — it generates CP passively while the hero sits home. Switch to it during peacetime when the hero isn't raiding or adventuring.
 
+**Q: How do Herbal Medicines (Ointments) actually work — aren't they just a health potion?**
+They're much more than that. Their real power is **healing between battle rounds**.
+
+Travian battles don't resolve in one instant — they run in **rounds**. Each round, both sides deal damage: attackers lose troops, the hero loses a percentage of HP. Without medicines, that damage stacks up across rounds until the hero dies. With medicines equipped, the hero is **restored to full HP after every round** — turning a slow death into a survival.
+
+![Herbal medicines battle mechanics](images/herbal-medicines.svg)
+
+> 🟥 **One exception:** if a single round deals damage equal to or greater than the hero's full HP, the hero dies instantly regardless of medicines. Ointments protect against accumulated attrition — not a one-shot kill.
+
+To make use of this, **equip ointments before sending the hero** (Hero → Inventory → drag into the equipment slot). Ointments sitting in inventory do nothing during a fight.
+
 ---
 
 ## Culture Points & Parties

@@ -7,15 +7,13 @@
  * Building defense (Residence/Palace/CC): level × 40 points (level 20 = 800).
  */
 
-// Wall bonus: COMPOUND (multiplicative) per level — wallMult = (1 + rate)^level
-// ALL values confirmed from in-game building tables (full level 1-20 data):
-//   Teuton Earth Wall 2%/lv:  1.02^20 = 1.486  → 49%  ✓ (lv11=24%, lv12=27% ✓)
-//   Roman  City Wall  3%/lv:  1.03^20 = 1.806  → 81%  ✓ (every level matches)
-//   Gaul   Palisade  2.5%/lv: 1.025^20 = 1.639 → 64%  ✓ (every level matches)
-const WALL_BONUS_PER_LEVEL = {
-  roman:  0.03,    // City Wall  lv20 = 81%  (confirmed from in-game table)
-  teuton: 0.02,    // Earth Wall lv20 = 49%  (confirmed from in-game table)
-  gaul:   0.025,   // Palisade   lv20 = 64%  (confirmed from in-game table)
+// Wall defense bonus lookup tables — exact values from in-game building screens.
+// Index = wall level (0 = no wall). All three tribes confirmed from in-game data.
+const WALL_BONUS_TABLE = {
+  //        lv0  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20
+  teuton: [  0,  2,  4,  6,  8, 10, 13, 15, 17, 20, 22, 24, 27, 29, 32, 35, 37, 40, 43, 46, 49],
+  roman:  [  0,  3,  6,  9, 13, 16, 19, 23, 27, 30, 34, 38, 43, 47, 51, 56, 60, 65, 70, 75, 81],
+  gaul:   [  0,  3,  5,  8, 10, 13, 16, 19, 22, 25, 28, 31, 34, 38, 41, 45, 48, 52, 56, 60, 64],
 }
 
 /**
@@ -114,10 +112,10 @@ export function calculateBattle(attackers, defenderGroups, wallLevel, defenderTr
 
   const totalDefense = troopDefense + heroDefense + buildingDefensePoints(residenceLevel)
 
-  // --- 3. Apply wall bonus (compound: (1+rate)^level) ---
-  const bonusPerLevel = WALL_BONUS_PER_LEVEL[defenderTribe] ?? WALL_BONUS_PER_LEVEL.roman
+  // --- 3. Apply wall bonus (exact per-level lookup table) ---
   const wl = Math.max(0, Math.min(20, wallLevel ?? 0))
-  const wallMult = wl > 0 ? (1 + bonusPerLevel) ** wl : 1
+  const table = WALL_BONUS_TABLE[defenderTribe] ?? WALL_BONUS_TABLE.roman
+  const wallMult = 1 + (table[wl] ?? 0) / 100
   const effectiveDefense = totalDefense * wallMult
 
   // --- 4. Determine winner & loss ratios (exponent 1.5) ---

@@ -52,15 +52,15 @@ function TribeSelector({ selected, onChange }) {
 }
 
 // ─── Unit type icon ───────────────────────────────────────────────────────────
-function UnitTypeIcon({ type }) {
-  const p = { size: 10, strokeWidth: 2 }
+function UnitTypeIcon({ type, size = 16 }) {
+  const p = { size, strokeWidth: 2 }
   if (type === 'cavalry') return <span title="Cavalry" style={{ color: C.goldDim }}><Swords {...p} /></span>
   if (type === 'siege')   return <span title="Siege"   style={{ color: '#a78bfa' }}><Flame {...p} /></span>
   if (type === 'chief')   return <span title="Chief"   style={{ color: C.gold }}><Crown {...p} /></span>
   return <span title="Infantry" style={{ color: '#60a5fa' }}><Shield {...p} /></span>
 }
 
-// ─── Unit card — count + per-unit smithy level ────────────────────────────────
+// ─── Unit card — horizontal row layout ───────────────────────────────────────
 function UnitCard({ unit, count, smithy, onCount, onSmithy }) {
   const active = count > 0
   const effectiveMult = smithyMult(smithy)
@@ -72,21 +72,22 @@ function UnitCard({ unit, count, smithy, onCount, onSmithy }) {
         background:   active ? C.surface2 : C.surface,
         border:       `1px solid ${active ? C.gold : C.border}`,
         borderRadius: 6,
-        padding:      '6px 7px',
+        padding:      '5px 8px',
         display:      'flex',
-        flexDirection:'column',
-        gap:          4,
+        flexDirection: 'row',
+        alignItems:   'center',
+        gap:          8,
         transition:   'border-color 0.15s, background 0.15s',
         minWidth:     0,
       }}
     >
-      {/* Name */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-        <UnitTypeIcon type={unit.type} />
+      {/* Left: icon + name */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 150, flexShrink: 0 }}>
+        <UnitTypeIcon type={unit.type} size={16} />
         <span
           style={{
             color:        active ? C.gold : C.text,
-            fontSize:     '0.65rem',
+            fontSize:     '0.88rem',
             fontFamily:   'Cinzel, serif',
             fontWeight:   active ? 600 : 400,
             lineHeight:   1.2,
@@ -100,69 +101,89 @@ function UnitCard({ unit, count, smithy, onCount, onSmithy }) {
         </span>
       </div>
 
-      {/* Base stats */}
-      <div style={{ display: 'flex', gap: 5, fontSize: '0.58rem', color: C.muted, lineHeight: 1, flexWrap: 'wrap' }}>
-        <span title="Attack">⚔ {showSmithyEffect ? <span style={{ color: C.gold }}>{Math.round(unit.attack * effectiveMult)}</span> : unit.attack}</span>
-        <span title="Def vs Infantry">🛡 {showSmithyEffect ? <span style={{ color: C.gold }}>{Math.round(unit.defInf * effectiveMult)}</span> : unit.defInf}</span>
-        <span title="Def vs Cavalry">🐴 {showSmithyEffect ? <span style={{ color: C.gold }}>{Math.round(unit.defCav * effectiveMult)}</span> : unit.defCav}</span>
+      {/* Middle: stats */}
+      <div style={{ display: 'flex', gap: 8, fontSize: '0.78rem', color: C.muted, lineHeight: 1, flex: 1, alignItems: 'center' }}>
+        <span title="Attack">
+          ⚔{' '}
+          {showSmithyEffect
+            ? <span style={{ color: C.gold }}>{Math.round(unit.attack * effectiveMult)}</span>
+            : unit.attack}
+        </span>
+        <span title="Def vs Infantry">
+          🛡{' '}
+          {showSmithyEffect
+            ? <span style={{ color: C.gold }}>{Math.round(unit.defInf * effectiveMult)}</span>
+            : unit.defInf}
+        </span>
+        <span title="Def vs Cavalry">
+          🐴{' '}
+          {showSmithyEffect
+            ? <span style={{ color: C.gold }}>{Math.round(unit.defCav * effectiveMult)}</span>
+            : unit.defCav}
+        </span>
       </div>
 
-      {/* Count */}
-      <input
-        type="number"
-        min={0}
-        value={count === 0 ? '' : count}
-        placeholder="Count"
-        onChange={(e) => {
-          const v = parseInt(e.target.value, 10)
-          onCount(unit.id, isNaN(v) || v < 0 ? 0 : v)
-        }}
-        style={{
-          width:        '100%',
-          background:   '#0f0c09',
-          border:       `1px solid ${active ? C.goldDim : C.border}`,
-          borderRadius: 3,
-          color:        active ? C.gold : C.text,
-          fontSize:     '0.72rem',
-          padding:      '2px 4px',
-          textAlign:    'right',
-          outline:      'none',
-          fontFamily:   'inherit',
-        }}
-      />
-
-      {/* Smithy level */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-        <span style={{ color: C.muted, fontSize: '0.58rem', flex: 1 }}>
-          Upg
-          {showSmithyEffect && (
-            <span style={{ color: C.gold, marginLeft: 3 }}>+{(smithy * 5)}%</span>
-          )}
-        </span>
+      {/* Right: count input + smithy */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+        {/* Count */}
         <input
           type="number"
           min={0}
-          max={20}
-          value={smithy === 0 ? '' : smithy}
-          placeholder="0"
+          value={count === 0 ? '' : count}
+          placeholder="Count"
           onChange={(e) => {
             const v = parseInt(e.target.value, 10)
-            onSmithy(unit.id, isNaN(v) || v < 0 ? 0 : Math.min(20, v))
+            onCount(unit.id, isNaN(v) || v < 0 ? 0 : v)
           }}
           style={{
-            width:        38,
+            width:        90,
             background:   '#0f0c09',
-            border:       `1px solid ${smithy > 0 ? C.goldDim : C.border}`,
+            border:       `1px solid ${active ? C.goldDim : C.border}`,
             borderRadius: 3,
-            color:        smithy > 0 ? C.gold : C.muted,
-            fontSize:     '0.68rem',
-            padding:      '1px 3px',
+            color:        active ? C.gold : C.text,
+            fontSize:     '0.9rem',
+            padding:      '3px 5px',
             textAlign:    'right',
             outline:      'none',
             fontFamily:   'inherit',
           }}
         />
-        <span style={{ color: C.muted, fontSize: '0.58rem' }}>/20</span>
+
+        {/* Smithy */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+          <span style={{ color: C.muted, fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+            Upg
+          </span>
+          <input
+            type="number"
+            min={0}
+            max={20}
+            value={smithy === 0 ? '' : smithy}
+            placeholder="0"
+            onChange={(e) => {
+              const v = parseInt(e.target.value, 10)
+              onSmithy(unit.id, isNaN(v) || v < 0 ? 0 : Math.min(20, v))
+            }}
+            style={{
+              width:        48,
+              background:   '#0f0c09',
+              border:       `1px solid ${smithy > 0 ? C.goldDim : C.border}`,
+              borderRadius: 3,
+              color:        smithy > 0 ? C.gold : C.muted,
+              fontSize:     '0.82rem',
+              padding:      '2px 3px',
+              textAlign:    'right',
+              outline:      'none',
+              fontFamily:   'inherit',
+            }}
+          />
+          <span style={{ color: C.muted, fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
+            /20
+            {showSmithyEffect && (
+              <span style={{ color: C.gold, marginLeft: 3 }}>+{smithy * 5}%</span>
+            )}
+          </span>
+        </div>
       </div>
     </div>
   )
@@ -199,7 +220,7 @@ function FlatInput({ label, value, onChange, hint }) {
   )
 }
 
-// ─── Army group (tribe + unit grid) ───────────────────────────────────────────
+// ─── Army group (tribe + unit list) ───────────────────────────────────────────
 function ArmyGroup({ group, groupIdx, groupLabel, onTribeChange, onCount, onSmithy, onRemove }) {
   const units = UNITS[group.tribe]
   return (
@@ -230,13 +251,7 @@ function ArmyGroup({ group, groupIdx, groupLabel, onTribeChange, onCount, onSmit
           {groupLabel}
         </div>
       )}
-      <div
-        style={{
-          display:             'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(115px, 1fr))',
-          gap:                 6,
-        }}
-      >
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         {units.map((unit) => (
           <UnitCard
             key={unit.id}
@@ -263,6 +278,8 @@ function ArmyPanel({
   // hero
   heroAtk, onHeroAtk,
   heroDef, onHeroDef,
+  // hero HP
+  heroHp, onHeroHp,
   // off/def bonus
   bonusPct, onBonusPct,
   // weapon
@@ -417,6 +434,13 @@ function ArmyPanel({
               onChange={showWall ? onHeroDef : onHeroAtk}
               hint="Hero's total Strength stat (hero points + equipment). Added directly to combat as flat attack (attacker) or defense (defender)."
             />
+            {/* Hero HP */}
+            <FlatInput
+              label="Hero HP %"
+              value={heroHp}
+              onChange={onHeroHp}
+              hint="Current hero HP before battle (0-100). We estimate HP lost = lossRatio × HP."
+            />
             {/* Weapon bonus */}
             {(() => {
               const tribeUnits = UNITS[groups[0]?.tribe] ?? []
@@ -534,7 +558,7 @@ function CasualtyRow({ result, wins }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 52px 52px 52px 76px', gap: 6, alignItems: 'center', padding: '5px 8px', borderBottom: `1px solid ${C.border}`, fontSize: '0.75rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: C.text, overflow: 'hidden' }}>
-        <UnitTypeIcon type={unit.type} />
+        <UnitTypeIcon type={unit.type} size={10} />
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{unit.name}</span>
       </div>
       <div style={{ color: C.text,                           textAlign: 'right' }}>{initial.toLocaleString()}</div>
@@ -549,7 +573,7 @@ function CasualtyRow({ result, wins }) {
 }
 
 // ─── Results section ──────────────────────────────────────────────────────────
-function ResultsSection({ result, heroAtk = 0, heroDef = 0 }) {
+function ResultsSection({ result, heroAtk = 0, heroDef = 0, heroAtkHp = 100, heroDefHp = 100 }) {
   const {
     attackerWins, totalAttack, totalDefense, effectiveDefense,
     wallMult, infRatio, cavRatio, attackerLossRatio, defenderLossRatio,
@@ -562,6 +586,17 @@ function ResultsSection({ result, heroAtk = 0, heroDef = 0 }) {
 
   const aColor = attackerWins ? C.win : C.lose
   const dColor = attackerWins ? C.lose : C.win
+
+  // Hero HP calculations
+  const atkHeroHpLost  = Math.round(attackerLossRatio * heroAtkHp)
+  const atkHeroHpAfter = Math.max(0, heroAtkHp - atkHeroHpLost)
+  const atkHeroSurvives = atkHeroHpAfter > 0
+
+  const defHeroHpLost  = Math.round(defenderLossRatio * heroDefHp)
+  const defHeroHpAfter = Math.max(0, heroDefHp - defHeroHpLost)
+  const defHeroSurvives = defHeroHpAfter > 0
+
+  const showHeroPanel = heroAtk > 0 || heroDef > 0
 
   return (
     <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, overflow: 'hidden' }}>
@@ -600,6 +635,76 @@ function ResultsSection({ result, heroAtk = 0, heroDef = 0 }) {
               </div>
             ))}
           </div>
+
+          {/* Hero summary panel */}
+          {showHeroPanel && (
+            <div style={{ padding: '8px 14px', borderBottom: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {heroAtk > 0 && (
+                <div style={{
+                  background: '#1a1200',
+                  border: `1px solid ${C.goldDim}`,
+                  borderRadius: 6,
+                  padding: '7px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  fontSize: '0.8rem',
+                }}>
+                  <Crown size={14} color={C.gold} />
+                  <span style={{ color: C.text, flex: 1 }}>
+                    <span style={{ color: C.gold, fontFamily: 'Cinzel, serif', fontWeight: 700 }}>Hero (Attacker)</span>
+                    {': '}
+                    {heroAtk.toLocaleString()} strength · HP {heroAtkHp}% → {atkHeroHpAfter}%
+                  </span>
+                  <span style={{
+                    background: atkHeroSurvives ? C.winDim : C.loseDim,
+                    color: atkHeroSurvives ? C.win : C.lose,
+                    border: `1px solid ${atkHeroSurvives ? C.win : C.lose}`,
+                    borderRadius: 4,
+                    padding: '2px 8px',
+                    fontSize: '0.65rem',
+                    fontFamily: 'Cinzel, serif',
+                    fontWeight: 700,
+                    letterSpacing: '0.05em',
+                  }}>
+                    {atkHeroSurvives ? '⚔ SURVIVED' : '☠ FALLEN'}
+                  </span>
+                </div>
+              )}
+              {heroDef > 0 && (
+                <div style={{
+                  background: '#001020',
+                  border: `1px solid #3b5a8a`,
+                  borderRadius: 6,
+                  padding: '7px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  fontSize: '0.8rem',
+                }}>
+                  <Crown size={14} color="#60a5fa" />
+                  <span style={{ color: C.text, flex: 1 }}>
+                    <span style={{ color: '#60a5fa', fontFamily: 'Cinzel, serif', fontWeight: 700 }}>Hero (Defender)</span>
+                    {': '}
+                    {heroDef.toLocaleString()} strength · HP {heroDefHp}% → {defHeroHpAfter}%
+                  </span>
+                  <span style={{
+                    background: defHeroSurvives ? C.winDim : C.loseDim,
+                    color: defHeroSurvives ? C.win : C.lose,
+                    border: `1px solid ${defHeroSurvives ? C.win : C.lose}`,
+                    borderRadius: 4,
+                    padding: '2px 8px',
+                    fontSize: '0.65rem',
+                    fontFamily: 'Cinzel, serif',
+                    fontWeight: 700,
+                    letterSpacing: '0.05em',
+                  }}>
+                    {defHeroSurvives ? '🛡 SURVIVED' : '☠ FALLEN'}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Casualty tables */}
           <div style={{ display: 'flex', borderBottom: `1px solid ${C.border}`, flexWrap: 'wrap' }}>
@@ -677,7 +782,8 @@ function ArenaUnitIcon({ type }) {
 }
 
 function buildArenaDots(results, scale, maxDots) {
-  const active = results.filter(r => r.initial > 0)
+  // Exclude chief units from arena dots
+  const active = results.filter(r => r.initial > 0 && r.unit.type !== 'chief')
   if (!active.length) return []
   const dots = []
   for (const r of active) {
@@ -690,6 +796,7 @@ function buildArenaDots(results, scale, maxDots) {
         unitName:    r.unit.name,
         willSurvive: i < survive,
         deathDelay:  0,
+        isHero:      false,
       })
     }
   }
@@ -703,6 +810,43 @@ function buildArenaDots(results, scale, maxDots) {
 
 function ArenaDot({ dot, side, enterDelay, phase }) {
   const isAtk = side === 'atk'
+
+  // Hero dot styling
+  if (dot.isHero) {
+    let anim
+    if (phase === 'entering') {
+      anim = `dot-in-${isAtk ? 'left' : 'right'} 0.55s cubic-bezier(.22,1,.36,1) ${enterDelay}ms both`
+    } else if (!dot.willSurvive) {
+      anim = `dot-dying 0.7s ease-out ${dot.deathDelay}ms both`
+    } else {
+      anim = 'none'
+    }
+    return (
+      <div
+        title={`${dot.unitName} (Hero)`}
+        style={{
+          width:          44,
+          height:         44,
+          borderRadius:   '50%',
+          background:     '#2a1a00',
+          border:         `2px solid ${C.gold}`,
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'center',
+          color:          C.gold,
+          animation:      anim,
+          flexShrink:     0,
+          boxShadow:      `0 0 12px ${C.gold}88, inset 0 0 8px ${C.gold}33`,
+          filter:         phase === 'done' && dot.willSurvive ? `drop-shadow(0 0 8px ${C.gold})` : 'none',
+          transition:     'filter 0.6s',
+        }}
+      >
+        <Crown size={18} strokeWidth={2} />
+      </div>
+    )
+  }
+
+  // Normal dot
   const bdr   = isAtk ? '#ef4444' : '#60a5fa'
   const bg    = isAtk ? '#3f0909' : '#091830'
 
@@ -740,7 +884,7 @@ function ArenaDot({ dot, side, enterDelay, phase }) {
   )
 }
 
-function BattleArena({ result, animKey }) {
+function BattleArena({ result, animKey, heroAtk = 0, heroDef = 0, heroAtkHp = 100, heroDefHp = 100 }) {
   const [phase, setPhase]         = useState('idle')
   const [showFlash, setShowFlash] = useState(false)
 
@@ -750,12 +894,46 @@ function BattleArena({ result, animKey }) {
     const totalAtk = result.attackerResults.reduce((s, r) => s + r.initial, 0)
     const totalDef = result.defenderResults.reduce((s, r) => s + r.initial, 0)
     const sv       = Math.max(1, Math.ceil(Math.max(totalAtk, totalDef) / MAX_DOTS))
+
+    // Hero survival
+    const atkHeroHpLost   = Math.round(result.attackerLossRatio * heroAtkHp)
+    const heroAtkSurvives = Math.max(0, heroAtkHp - atkHeroHpLost) > 0
+    const defHeroHpLost   = Math.round(result.defenderLossRatio * heroDefHp)
+    const heroDefSurvives = Math.max(0, heroDefHp - defHeroHpLost) > 0
+
+    let builtAtkDots = buildArenaDots(result.attackerResults, sv, MAX_DOTS)
+    let builtDefDots = buildArenaDots(result.defenderResults, sv, MAX_DOTS)
+
+    // Prepend hero dots if hero strength > 0
+    if (heroAtk > 0) {
+      const heroDot = {
+        id: 'hero-atk',
+        unitType: 'hero',
+        unitName: 'Hero',
+        willSurvive: heroAtkSurvives,
+        deathDelay: 1000,
+        isHero: true,
+      }
+      builtAtkDots = [heroDot, ...builtAtkDots.slice(0, MAX_DOTS - 1)]
+    }
+    if (heroDef > 0) {
+      const heroDot = {
+        id: 'hero-def',
+        unitType: 'hero',
+        unitName: 'Hero',
+        willSurvive: heroDefSurvives,
+        deathDelay: 1000,
+        isHero: true,
+      }
+      builtDefDots = [heroDot, ...builtDefDots.slice(0, MAX_DOTS - 1)]
+    }
+
     return {
-      atkDots:  buildArenaDots(result.attackerResults, sv, MAX_DOTS),
-      defDots:  buildArenaDots(result.defenderResults, sv, MAX_DOTS),
+      atkDots:  builtAtkDots,
+      defDots:  builtDefDots,
       scaleVal: sv,
     }
-  }, [result])
+  }, [result, heroAtk, heroDef, heroAtkHp, heroDefHp])
 
   useEffect(() => {
     if (!result) { setPhase('idle'); return }
@@ -781,25 +959,32 @@ function BattleArena({ result, animKey }) {
       <style>{ARENA_CSS}</style>
       <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid #6b4f2a', boxShadow: '0 4px 32px #00000070' }}>
 
-        {/* ── Crowd strip ── */}
-        <div style={{
-          height:         30,
-          background:     'repeating-linear-gradient(90deg,#160e04 0,#160e04 3px,#1f1208 3px,#1f1208 6px)',
-          display:        'flex',
-          alignItems:     'center',
-          justifyContent: 'center',
-          borderBottom:   '2px solid #6b4f2a',
-          overflow:       'hidden',
-        }}>
-          <span style={{
-            color:         '#7a5a28',
-            fontSize:      '0.62rem',
-            fontFamily:    'Cinzel, Georgia, serif',
-            letterSpacing: '0.22em',
-            animation:     'crowd-flicker 2s ease-in-out infinite',
-          }}>
-            ⬤ ⬤ ⬤ ⬤ ⬤ &nbsp;·&nbsp; COLOSSEUM &nbsp;·&nbsp; ⬤ ⬤ ⬤ ⬤ ⬤
-          </span>
+        {/* ── Crowd tiers ── */}
+        <div style={{ height: 58, background: '#1a1008', overflow: 'hidden' }}>
+          {[0, 1, 2].map(row => (
+            <div key={row} style={{ display: 'flex', gap: 1, padding: '1px 0', opacity: 1 - row * 0.2 }}>
+              {Array.from({ length: 80 }).map((_, j) => (
+                <div key={j} style={{
+                  width: 5,
+                  height: 7,
+                  background: j % 7 === 0 ? '#ef4444' : j % 11 === 0 ? '#3b82f6' : j % 5 === 0 ? '#f0a820' : j % 3 === 0 ? '#c4a882' : '#a08060',
+                  borderRadius: '2px 2px 0 0',
+                }} />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* ── Stone arch row ── */}
+        <div style={{ height: 28, background: '#5a3d28', display: 'flex', borderBottom: '2px solid #8B7355', overflow: 'hidden' }}>
+          {Array.from({ length: 14 }).map((_, i) => (
+            <div key={i} style={{ flex: 1, borderRight: '1px solid #8B735530', position: 'relative' }}>
+              <div style={{
+                position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '65%', height: '90%', background: '#3d2b1a', borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
+              }} />
+            </div>
+          ))}
         </div>
 
         {/* ── Arena floor ── */}
@@ -899,6 +1084,7 @@ function emptyGroup(tribe = 'roman') {
 export default function BattleCalculator() {
   const [attackerGroups, setAttackerGroups] = useState([emptyGroup('roman')])
   const [attackerHeroAtk, setAttackerHeroAtk] = useState(0)
+  const [attackerHeroHp, setAttackerHeroHp] = useState(100)
   const [offBonusPct, setOffBonusPct] = useState(0)
   const [attackerWeapon, setAttackerWeapon] = useState({ unitId: '', bonus: 0 })
 
@@ -906,6 +1092,7 @@ export default function BattleCalculator() {
   const [wallLevel, setWallLevel] = useState(0)
   const [defenderHeroDef, setDefenderHeroDef] = useState(0)
   const [defenderHeroAtk, setDefenderHeroAtk] = useState(0)
+  const [defenderHeroHp, setDefenderHeroHp] = useState(100)
   const [defBonusPct, setDefBonusPct] = useState(0)
   const [defenderWeapon, setDefenderWeapon] = useState({ unitId: '', bonus: 0 })
   const [residenceLevel, setResidenceLevel] = useState(0)
@@ -1011,6 +1198,7 @@ export default function BattleCalculator() {
             residenceLevel={0} onResidenceLevel={() => {}}
             heroAtk={attackerHeroAtk} onHeroAtk={setAttackerHeroAtk}
             heroDef={0} onHeroDef={() => {}}
+            heroHp={attackerHeroHp} onHeroHp={setAttackerHeroHp}
             bonusPct={offBonusPct} onBonusPct={setOffBonusPct}
             weapon={attackerWeapon} onWeapon={setAttackerWeapon}
             totalAttack={atkPanelAtk} totalDefense={atkPanelDef}
@@ -1060,6 +1248,7 @@ export default function BattleCalculator() {
             residenceLevel={residenceLevel} onResidenceLevel={setResidenceLevel}
             heroAtk={defenderHeroAtk} onHeroAtk={setDefenderHeroAtk}
             heroDef={defenderHeroDef} onHeroDef={setDefenderHeroDef}
+            heroHp={defenderHeroHp} onHeroHp={setDefenderHeroHp}
             bonusPct={defBonusPct} onBonusPct={setDefBonusPct}
             weapon={defenderWeapon} onWeapon={setDefenderWeapon}
             totalAttack={defPanelAtk} totalDefense={defPanelDef}
@@ -1067,9 +1256,24 @@ export default function BattleCalculator() {
         </div>
       </div>
 
-      <BattleArena result={battleResult} animKey={animKey} />
+      <BattleArena
+        result={battleResult}
+        animKey={animKey}
+        heroAtk={attackerHeroAtk}
+        heroDef={defenderHeroDef}
+        heroAtkHp={attackerHeroHp}
+        heroDefHp={defenderHeroHp}
+      />
 
-      {battleResult && <ResultsSection result={battleResult} heroAtk={attackerHeroAtk} heroDef={defenderHeroDef} />}
+      {battleResult && (
+        <ResultsSection
+          result={battleResult}
+          heroAtk={attackerHeroAtk}
+          heroDef={defenderHeroDef}
+          heroAtkHp={attackerHeroHp}
+          heroDefHp={defenderHeroHp}
+        />
+      )}
 
       {!battleResult && (
         <div style={{ textAlign: 'center', color: C.muted, fontSize: '0.8rem', padding: '20px 0', fontStyle: 'italic' }}>

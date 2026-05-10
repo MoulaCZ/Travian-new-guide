@@ -80,7 +80,7 @@ Most offensive players in your alliance keep **3 administrators trained and read
 
    > 💡 If this happens, ask whether you should send resources to cover that lost chief. They helped you get the village — a small thank-you is good alliance etiquette.
 
-8. **Secure the village** — once taken, build a Residence or Palace immediately and send defensive reinforcements
+8. **Secure the village** — see After the Conquest below
 
 ---
 
@@ -90,11 +90,15 @@ Do these **immediately** — in this order:
 
 1. **Build a Residence or Palace right away.** Until you do, the village has no loyalty protection and anyone else can chief it out from under you. This is the very first thing you build.
 
-2. **Message players who were farming this village.** The previous owner likely had this village in other players' farm lists. Send a polite message letting them know you're the new owner and asking them to remove it. Most players will respect this — it's standard etiquette.
+2. **Withdraw all your troops — chiefs and escorts.** Pull everything out immediately after the conquest. The village is fresh and undefended, but that's intentional for now — see step 3.
 
-4. **Send resources and a trade route.** The village has nothing. Ship food and building materials from your other villages immediately so you can start building.
+3. **Wait for incoming attacks before defending.** The previous owner almost certainly had this village on other players' farm lists. Those players have attacks in flight that were planned against the old owner — not against you. Don't garrison troops until the last of those attacks has landed. Killing someone's raid party when they had no idea the village changed hands is bad etiquette — they weren't attacking you.
 
-5. **Send defensive reinforcements.** A freshly taken village with no troops is an easy target. Get at least a token defense there while you rebuild.
+4. **Message players who were farming this village.** Once you've spotted the incoming attacks in your rally point, message those players. Let them know the village is under new ownership and ask them to remove it from their farm list. Most will respect this — it's standard etiquette.
+
+5. **Send resources and a trade route.** The village has nothing. Ship food and building materials from your other villages immediately so you can start building.
+
+6. **Send defensive reinforcements once the last farm attack has cleared.** Only then garrison troops — now you know anyone attacking is targeting you, not the old owner.
 
 Other things to know:
 - The village **resets**: academy research, smithy upgrades, walls, and tribe buildings are gone

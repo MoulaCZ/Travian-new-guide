@@ -44,7 +44,7 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 
 > 🟨 **Watch the ad** before every build for the free 25% speed boost.
 
-> 💡 **Operative grain rule:** Early on you won't run short of grain — hero inventory can cover it. Focus on wood, clay, and iron first. When free grain drops below **+20/h**, upgrade one cropland and continue. There is no fixed schedule — react to demand as it grows.
+> 💡 **Operative grain rule:** Early on you won't run short of grain — hero inventory can cover it. Focus on wood, clay, and iron first. When available grain for  buildings drops below **20**, upgrade one cropland and continue. There is no fixed schedule — react to demand as it grows.
 
 **Legend:** ⚔ Start training troops here | ★ Prerequisite unlocked
 
@@ -100,11 +100,11 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 The Hospital is more powerful than most players realise. Think of it this way:
 
 - **Barracks** produces fresh troops
-- **Hospital** recovers wounded troops after a battle at roughly **half the resource cost** of training new ones
+- **Hospital** recovers(aka produce) wounded troops twice as fast.
 
-**The critical rule:** Wounded troops only stay in the Hospital for **24 hours**. After that, any unhealed troops die permanently. So after **every battle**, immediately check your Hospital and queue ALL wounded for healing. Once queued, they are safe — they won't disappear no matter how long healing takes.
+**The critical rule:** Wounded troops only stay in the Hospital for **24 hours**. After that, 10% of unhealed troops die permanently. So after **every battle**, immediately check your Hospital and queue ALL wounded for healing. Once queued, they are safe — they won't disappear no matter how long healing takes.
 
-The moment your healing queue fills up, it effectively becomes a second source of troops running in parallel with your Barracks. A level 15 Hospital can recover a large batch each battle, which over time saves you a significant amount of resources.
+The moment your healing queue fills up, it effectively becomes a second source of troops running in parallel with your Barracks. A level 15 Hospital can recover a large batch each battle, which over time saves you a significant amount of time.
 
 ---
 

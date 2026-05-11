@@ -55,7 +55,7 @@ A mixed wall (infantry + cavalry) is stronger than a pure one — infantry fills
 
 | Unit | Role | Why |
 |------|------|-----|
-| Praetorian | Anti-infantry (infantry) | Best infantry defender in the game |
+| Praetorian | Anti-infantry (infantry) | Cheap infantry defender |
 | Legionnaire | Flexible (infantry) | Weaker than Preto for pure DEF, but usable offensively too |
 
 - Romans are the **slowest classic DEF tribe** — slower troop speed means slower response to calls
@@ -81,7 +81,7 @@ A mixed wall (infantry + cavalry) is stronger than a pure one — infantry fills
 |-------|----------------|-----------------|-------|
 | Teutons | Spearman (75%) | Paladin (25%) | Cheapest DEF, volume wins |
 | Gauls | Phalanx (70%) | Druidrider (30%) | Fast rebuild, great all-round |
-| Romans | Praetorian (100%) | — | Slowest but strongest infantry wall |
+| Romans | Praetorian (100%) | — | Slowest but strongest infantry wall in early |
 
 ---
 

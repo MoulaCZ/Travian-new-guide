@@ -22,7 +22,7 @@ Yes. A village without a Residence, Palace, or Command Center has no loyalty pro
 Yes — and whoever reduces loyalty to 0% first takes the village. If two administrator waves land at the same second, the one sent earlier wins.
 
 **Q: Does the 25% ad speed boost apply to field upgrades too?**
-Yes. It applies to all construction — buildings and resource fields alike.
+Yes. It applies to all construction — buildings and resource fields alike (except Residency and Palace).
 
 ---
 
@@ -87,7 +87,7 @@ No. A village can only have one administration building. The Palace makes that v
 It allows you to train catapults and rams. For a pure DEF account, a Workshop level 1 is often built just to fill a building slot — you won't actively use it.
 
 **Q: Should I demolish buildings to make room for others?**
-Good idea for crannies you biuilt in first village.
+Good idea for crannies you built in first village.
 
 **Q: Romans can build fields and buildings simultaneously — is that true?**
 Yes. Romans have a unique ability to queue one building upgrade and one resource field upgrade at the same time with a single Master Builder slot. Very efficient early game.
@@ -130,9 +130,8 @@ As F2P, try to avoid it — it costs 3 Gold per use. Plan resource needs in adva
 ## Common Mistakes
 
 - **Letting the hero die** — always monitor HP. Level-ups fully heal. Use Ointments. Keep a Bucket.
-- **Building fields above level 10 in a non-capital** — wasted investment, hard cap is there.
-- **Running Small Celebrations when you have 4+ villages** — Large gives 4× the CP for similar cost.
-- **Ignoring the free 25% production bonus** — activate it the moment the server starts. It's permanent.
+- **Building fields above level 10 in first village (soon to be a non-capital)** — wasted investment, once you change capital, all fields downgrade to level 10.
+- **Running Small Celebrations when you have 4+ villages** — Large gives cca 4× the CP for similar cost.
 - **Selling Tablets of Law early** — their price spikes hard when chiefing season begins.
 - **Building Great Barracks/Stables** — three normal buildings across three villages is always better.
 - **Sending chief as a raid** — does nothing. Must be a normal attack.

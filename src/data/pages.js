@@ -1,4 +1,4 @@
-import readmeMd        from '../../README.md?raw'
+import readmeMd        from '../README.md?raw'
 import firstVillageMd  from '../../docs/first-village.md?raw'
 import secondVillageMd from '../../docs/second-village.md?raw'
 import feederVillageMd from '../../docs/feeder-village.md?raw'

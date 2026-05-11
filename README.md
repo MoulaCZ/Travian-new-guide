@@ -11,6 +11,11 @@ This guide walks you through the full progression of a **defensive (def) player*
 You don't need to spend real money. You don't need to be online 24/7. You need a plan — and this is it.
 
 ---
+## Tribe
+
+We will **not** choose Romans for a defensive account, because they are not ideal for inexperienced players and it is harder to get good defensive value from them. The choice should be between Gauls and Teutons. Gauls are the easiest and safest option, good for players who want stable growth and simple defensive gameplay. Teutons are a bit more challenging and require slightly better activity and planning, but they are still not a hardcore option.
+
+---
 
 ## Core Strategy at a Glance
 

@@ -16,6 +16,8 @@ You don't need to spend real money. You don't need to be online 24/7. You need a
 
 We will **not** choose Romans for a defensive account, because they are not ideal for inexperienced players and it is harder to get good defensive value from them. The choice should be between Gauls and Teutons. Gauls are the easiest and safest option, good for players who want stable growth and simple defensive gameplay. Teutons are a bit more challenging and require slightly better activity and planning, but they are still not a hardcore option.
 
+The [Defence Style](docs/defence-style.md) page still covers **all three tribes** (including Roman unit choices) so mixed alliances and anyone who already plays Romans has a reference — the paragraph above is simply **what we suggest when starting fresh as a def-focused beginner**.
+
 ---
 
 ## Core Strategy at a Glance
@@ -35,7 +37,7 @@ Each group covers a part of the map. New groups are settled in different areas t
 | [First Village](docs/first-village.md) | 3-party settler build order, hero guide, CP rules |
 | [Second Village — Anvil](docs/second-village.md) | Anvil setup on a 3339 tile, build phases, final build |
 | [Feeder Village](docs/feeder-village.md) | 3rd–7th village strategy, 3rd/4th vs 5th+ build approach |
-| [Defence Style](docs/defence-style.md) | Which units to train by tribe, how many troops you need |
+| [Defence Style](docs/defence-style.md) | Which units to train by tribe, troop benchmarks, **alliance defence calls (Discord)** |
 | [Chiefing](docs/chief.md) | How to conquer villages — for your second anvil and beyond |
 | [Gold & Premium](docs/gold-and-premium.md) | F2P guide: earning gold, auction hustle, hero items |
 | [Good to Know](docs/good-to-know.md) | FAQ, common mistakes, things nobody tells you |

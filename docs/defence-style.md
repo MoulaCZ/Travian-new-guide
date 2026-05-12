@@ -120,3 +120,23 @@ Aim to be within the **top 15 defenders in your alliance** at all times.
 | Alliance top 15 | Alliance member list sorted by def strength |
 
 If you're failing one — the root cause is almost always the same: **the anvil queue isn't running non-stop**.
+
+---
+
+## Alliance defence calls (Discord)
+
+Big defences are almost always **planned on Discord** (or your alliance’s chat), not improvised alone in silence.
+
+**Typical flow**
+
+1. Leadership announces a **flat defence** (everyone contributes) when one or more villages — or a strategic objective — is under real pressure.
+2. A coordinator posts **which villages need reinforcements**, what **troop mix** is desired (anti-inf vs anti-cav), and the **exact arrival window** (or second-precise landing time) everyone should hit.
+3. **Each player sends from their own villages** so troops **land at that agreed time**, not “whenever they get there.” Travel time varies by distance, so you back-calculate send time in the **Rally Point** from the coordinator’s clock.
+4. **Where to send** changes with **which villages are actually under attack** and what scouts show. Read the pinned / def channel message, refresh when it updates, and ask if a target moves — burning a 6h march to the wrong coords helps nobody.
+
+**Etiquette**
+
+- Late arrivals or tiny “symbolic” sends can waste crop and **miss the battle window**. If you cannot make a call, say so early so someone else covers the slot.
+- When unsure, **post a screenshot of your rally timing** before you launch — coordinators can fix mistakes in seconds but cannot unsend troops.
+
+Sniping (landing between clearing and chief waves) is an advanced trick — follow alliance doctrine; don’t freestyle on your first ops.

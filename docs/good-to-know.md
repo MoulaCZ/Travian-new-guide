@@ -100,7 +100,7 @@ Yes. Romans have a unique ability to queue one building upgrade and one resource
 Sniping means landing a reinforcement wave between two enemy attack waves — specifically between the clearing wave and the chief wave — to defend at the exact right moment. It takes practice.
 
 **Q: My ally is under attack — should I send all my troops?**
-Coordinate with your alliance.
+**Not automatically** — random reinforcements can miss the window or waste crop. Wait for **Discord / def channel** orders: coordinators name **which village** to reinforce, **what time** troops must **land**, and often **which unit types** they need. Time your send from the **Rally Point** so you hit that arrival second. See **Alliance defence calls** at the end of the [Defence Style](defence-style.md) page for the full pattern.
 
 **Q: Is the Hospital worth building?**
 Yes, always. Wounded troops (those that survive but are injured) return to your village instead of dying. At scale, this saves thousands of troops per battle.
@@ -116,11 +116,23 @@ Troop Evasion (Gold Club feature) lets you send all your troops away from a capi
 ## Economy & Trade
 
 **Q: How do Trade Routes work?**
-Trade Routes (Gold Club feature) automatically send merchants from one village to another on a set schedule — every hour, every few hours, etc. Set them up from feeder villages to your anvil. Once configured, resources flow without any clicks.
+**Gold Club** unlocks automated **Trade Routes** in the **Marketplace**. In the **source** village you configure: **destination village**, **which resources**, **amount per shipment**, and **interval** (e.g. every hour, every 6h, every 10h). Merchants then loop on their own — no daily clicking.
+
+Typical pattern: **feeders → anvil** for wood/clay/iron/crop. You can also move crop **between any two of your villages** if one has surplus hourly balance and another is negative (troops eating grain faster than fields feed).
+
+**Q: What is crop lock / getting croplocked?**
+**Crop lock** means your account hits a state where **crop consumption outruns income** so badly that you **cannot start new builds or troop queues** until you fix the balance (exact UI wording varies by version, but the idea is the same: you are “locked” behind missing crop).
+
+**Common causes**
+
+- **Self-inflicted:** too many troops + parties + low fields for the crop you actually produce.
+- **Hostile:** offensive players **catapult your croplands** on purpose to destroy output and stall your account — a classic way to ruin someone’s round. That is more “off meta” than everyday feeder play, but def players should know it exists.
+
+**Recovery levers:** ship crop from other villages, hero inventory, marketplace buys, **temporary troop cuts** (send extras home or to alliance storage if offered), rebuild fields, and get **trade routes** feeding the starving village before queues idle for days.
 
 **Q: My Marketplace merchants are too slow — what helps?**
 - Upgrade the **Trade Office** — each level increases merchant carry capacity and speed
-- You should built your feeder villages closer to the anvil when choosing new tiles
+- You should **build** your feeder villages closer to the anvil when choosing new tiles
 
 **Q: When should I use the NPC Merchant?**
 As F2P, try to avoid it — it costs 3 Gold per use. Plan resource needs in advance and use the regular Marketplace instead. If you're stuck mid-build and absolutely need a specific resource, it's a last resort.

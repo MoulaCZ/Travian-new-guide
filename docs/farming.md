@@ -44,6 +44,8 @@ You're looking for villages that:
 
 Both are widely used in the community. Use them at the start of each session to refresh your target list.
 
+> **Note:** third-party tools and in-game labels change between rounds and clients — if something looks different on your server, trust the live UI and ask your alliance what they use this week.
+
 ---
 
 ## Scouting Before You Raid

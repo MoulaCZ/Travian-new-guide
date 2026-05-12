@@ -22,7 +22,7 @@ Yes. A village without a Residence, Palace, or Command Center has no loyalty pro
 Yes — and whoever reduces loyalty to 0% first takes the village. If two administrator waves land at the same second, the one sent earlier wins.
 
 **Q: Does the 25% ad speed boost apply to field upgrades too?**
-Yes. It applies to all construction — buildings and resource fields alike (except Residency and Palace).
+Yes. It applies to all construction — buildings and resource fields alike (except Residence and Palace).
 
 ---
 
@@ -100,7 +100,7 @@ Yes. Romans have a unique ability to queue one building upgrade and one resource
 Sniping means landing a reinforcement wave between two enemy attack waves — specifically between the clearing wave and the chief wave — to defend at the exact right moment. It takes practice.
 
 **Q: My ally is under attack — should I send all my troops?**
-Coordiante with your alliance.
+Coordinate with your alliance.
 
 **Q: Is the Hospital worth building?**
 Yes, always. Wounded troops (those that survive but are injured) return to your village instead of dying. At scale, this saves thousands of troops per battle.
@@ -143,8 +143,10 @@ As F2P, try to avoid it — it costs 3 Gold per use. Plan resource needs in adva
 
 These tools are not part of Travian itself but are widely used by experienced players:
 
-**[TravcoTools](https://travcotools.com/cs/)**
-Find inactive players near your villages — useful for scouting farm lists and identifying abandoned villages worth chiefing.
+**[GetterTools](https://www.gettertools.com/en/)**
+Find inactive villages around your coordinates — filter by radius, days without population change, and travel time per troop type. Results can link straight into your Rally Point.
 
-**[GetterTools](https://www.gettertools.com/cs/)**
-Share your troop counts with alliance leadership. Leaders can see exactly how much defence the alliance has available without asking everyone individually. Strongly recommended for all alliance members.
+**[TravcoTools](https://travcotools.com/en/)**
+Filter by inactivity and population range, use alliance whitelist/blacklist, and see whether a village is already in your farm list.
+
+**Alliance troop reporting:** GetterTools is also commonly used to share troop counts with leadership so coordinators can see alliance defence totals without polling every player individually.

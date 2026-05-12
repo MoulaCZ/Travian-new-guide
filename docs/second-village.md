@@ -44,13 +44,15 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 
 > 🟨 **Watch the ad** before every build for the free 25% speed boost.
 
-> 💡 **Operative grain rule:** Early on you won't run short of grain — hero inventory can cover it. Focus on wood, clay, and iron first. When available grain for  buildings drops below **20**, upgrade one cropland and continue. There is no fixed schedule — react to demand as it grows.
+> 💡 **Operative grain rule:** Early on you won't run short of grain — hero inventory can cover it. Focus on wood, clay, and iron first. When available grain for buildings drops below **20**, upgrade one cropland and continue. There is no fixed schedule — react to demand as it grows.
 
 **Legend:** ⚔ Start training troops here | ★ Prerequisite unlocked
 
+The **wall** building uses tribe-specific names in-game: **City Wall** (Romans), **Palisade** (Gauls), **Earth Wall** (Teutons). The rows below say **Wall** for all tribes.
+
 | # | What | Tier | Notes |
 |---|------|------|-------|
-| 1 | All 3-3-3 fields → 1 | 1 | Wood, clay, iron first — croplands se upgradují operativně podle grain rule |
+| 1 | All 3-3-3 fields → 1 | 1 | Wood, clay, iron first — upgrade croplands as needed using the grain rule above |
 | 2 | Main Building → 3 | 1 | Prerequisite for Barracks |
 | 3 | Granary → 1 | 1 | Prevent early overflow |
 | 4 | Warehouse → 2 | 1 | |
@@ -76,7 +78,7 @@ Once your first group of 4 is running, repeat the pattern. Each new anvil gets 3
 | 24 | All 9 Croplands → 10 | 3 | Max level without Palace — ★ Prerequisite for Mill + Bakery |
 | 25 | Mill → 5 | 3 | Requires 1 Cropland at L10 — ★ Prerequisite for Bakery |
 | 26 | Bakery → 5 | 3 | Requires Mill L5 + Cropland L10 — **+20% grain output** |
-| 27 | City Wall → 20 | 3 | DEF bonus on this village |
+| 27 | Wall → 20 | 3 | DEF bonus on this village (see tribe-specific wall names above) |
 
 ---
 
@@ -127,7 +129,7 @@ The moment your healing queue fills up, it effectively becomes a second source o
 | 1 | Town Hall | 10 |
 | 1 | Mill | 5 |
 | 1 | Bakery | 5 |
-| 1 | City Wall | 20 |
+| 1 | Wall | 20 |
 
 ---
 

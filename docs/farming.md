@@ -44,7 +44,7 @@ These tools find inactive players around your coordinates automatically:
 
 **[TravcoTools](https://travcotools.com/en/)** — filter by days inactive, population range, alliance whitelist/blacklist. Shows "In farmlist / Not in farmlist" status so you know what you've already added.
 
-Both are officially endorsed by Travian. Use them at the start of each session to refresh your target list.
+Both are widely used in the community. Use them at the start of each session to refresh your target list.
 
 ---
 
@@ -73,7 +73,7 @@ The best raiding troop depends on your tribe. Key stats: **carry capacity** (res
 | Tribe | Unit | Carry | Speed | Notes |
 |-------|------|-------|-------|-------|
 | Teutons | Clubswinger | 60 | 7 f/h | Best early raider — cheap, fast to mass-produce |
-| Teutons | Teuton Knight | 80 | 12 f/h | Mid-game upgrade, higher carry |
+| Teutons | Teutonic Knight | 80 | 12 f/h | Mid-game upgrade, higher carry |
 | Gauls | Theutates Thunder | 75 | 19 f/h | Best speed; excellent for nearby farms |
 | Romans | Equites Imperatoris | 100 | 14 f/h | High carry, expensive — not ideal for massing |
 | Romans | Legionnaire | 50 | 6 f/h | Poor raider — slow, low carry, avoid if possible |

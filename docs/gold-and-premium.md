@@ -7,10 +7,17 @@
 ## How to Earn Gold Without Paying
 
 ### 1. Refer a Friend
-The most valuable free Gold source. For every friend you invite who progresses:
-- Villages 2–9 of your invitee: **20 Gold each** (up to 8 invitees × 8 villages = 160 Gold per person)
-- Village 10 of your invitee: **40 Gold**
-- Works up to **10 different invitees** → up to **2,000 Gold total**
+The most valuable free Gold source. For each **invited player** who actually progresses their account:
+
+| Milestone (invitee’s account) | You receive |
+|------------------------------|-------------|
+| Their villages **2 through 9** (8 villages) | **20 Gold per village** → up to **160 Gold** if all eight complete |
+| Their **10th village** | **+40 Gold** (one-time on that milestone) |
+
+**Per invitee cap (if they reach village 10):** **200 Gold** from that one person (160 + 40).  
+**Your cap across invitees:** rewards apply to up to **10 different invited players** → up to **2,000 Gold total** if everyone maxes the track.
+
+**Quick example:** one active friend who reaches village 10 → **200 Gold** for you — that alone almost pays for **Gold Club** (200 Gold) on many servers.
 
 If you have even one friend starting the server, invite them. The Gold from a single active invitee covers the Gold Club and then some.
 
@@ -19,17 +26,27 @@ If you have even one friend starting the server, invite them. The Gold from a si
 ### 2. Farm Silver at the Auction House
 **200 Silver = 1 Gold**. Silver comes from hero adventures, selling items — and smart bidding.
 
-#### The low-bid hustle
+#### The max-bid hustle (Silver auctions)
 
 The goal is to accumulate enough Silver to convert to Gold and buy the Gold Club (200 Gold = 40,000 Silver). Adventures alone won't get you there fast. The auction house will.
 
-**How it works:**
-1. Browse auctions and look for items with **no bids yet** (or only the minimum starting bid)
-2. Place a small bid — just above the minimum. Example: if someone lists 5× Tablets of Law with a starting price of 5 Silver, bid **10–20**
-3. Most players respond by outbidding you by just 1 Silver (e.g. 6). When they see they lost anyway, they assume you really wanted it stop
-4. You sometimes win the item at a very low price → **relist it later at market price for profit**
+**How Travian’s bidding hides your real number**
 
-> This works on all consumable items — Tablets of Law, Ointments, Scrolls, Cages, Bandages, Buckets. Items that become more valuable later in the game (like Tablets of Law, which spike in price once chiefing starts) are especially good targets: buy cheap now, sell high later.
+When you bid, you set a **maximum bid** (your real ceiling). Other players **do not see that number**. They only see the **next minimum step** they are allowed to type in.
+
+**Example:** someone lists **10× Tablets of Law** and the UI shows a **minimum increment of 10 Silver**. You might enter a max bid of **30** (or another modest ceiling). A competitor tries **22** — the game tells them **their bid is still not enough**, but they **still cannot see** that you are willing to go to 30.
+
+**Why people quit early**
+
+Many players tap the **smallest bump** the interface suggests, assume you already “own” the lot at **full market value**, and **give up** — even though you may only be **a few Silver ahead** of the visible price. You win the lot cheap, then **relist** when demand spikes (chiefing season is classic for Tablets of Law).
+
+**Practical loop**
+
+1. Watch fresh listings on consumables you understand (Tablets, Ointments, Scrolls, Cages, Bandages, Buckets).
+2. Place a **max bid slightly above** the obvious minimum — not necessarily “all-in,” just enough to survive one or two lazy counters.
+3. **Relist** after you win if the buy price was below late-server demand.
+
+> This works best on items whose **price curve** you know. Tablets of Law, for example, often jump once alliances start chiefing in bulk — great buy-early / sell-later targets.
 
 The logic is simple: **hustle the auction house consistently** and the Silver adds up. Convert it to Gold, buy the Gold Club, and your economy runs itself.
 
@@ -50,11 +67,21 @@ Unused Gold from a finished server can be transferred to the next one. When a se
 **Buy this first.** It's the best value purchase in the game and never expires on that server.
 
 Key features you actually need as F2P:
-- **Trade Routes** — automatically ship surplus resources from feeders to anvil, every hour, without you clicking anything
+- **Trade Routes** — automatically ship resources between your own villages on a timer (see below)
 - **Farm List** — send raids to dozens of inactives with one click
 - **Troop Evasion** — evacuate your troops before an incoming attack lands
 
 Without Gold Club, managing trade routes manually across 4+ villages is a full-time job. With it, your economy runs while you sleep.
+
+#### Trade Routes — how to set them up (Marketplace)
+
+Open the **Marketplace** in the **sending** village. Create a **trade route**: pick the **destination village**, choose **which resources** move, **how much per trip**, and **how often** the merchants should run (e.g. every 1, 2, 6, or 10 hours — whatever matches production and warehouse headroom).
+
+**Example:** that village makes **1,500 wood/h** but your anvil is always short on wood. You might schedule **15,000 wood every 10 hours** (~10× hourly output) so merchants drain predictable stacks instead of you babysitting manual sends.
+
+**Crop:** the same tool fixes **grain overflow in one village and hourly crop deficit in another** — route surplus crop into the village that runs troop queues so training never stalls.
+
+Feeders → anvil is the standard pattern, but any **source → sink** pair inside your account works as long as merchants and Trade Office levels keep up.
 
 ### 🥈 Priority 2 — Travian Plus (quality of life)
 

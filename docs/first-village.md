@@ -4,6 +4,15 @@
 
 ---
 
+## TL;DR
+
+- **Goal:** queue **three Large Celebrations** (your three “parties”), then train **three settlers** and send them to your second village without starving the build.
+- **Ads:** watch the **25% construction-speed ad** before every upgrade — it adds up massively over the server.
+- **Field cap:** in this first village, **do not push resource fields above level 10** (non-capital cap once it is no longer your capital); invest spare res in your anvil / feeders later.
+- **How to use this page:** the big **Build Order** table below is the full step-by-step path. Follow it strictly if you want the safest route; if you are already ahead on CP, you can skip or compress individual rows — the milestones (⭐ / 🎉) matter most.
+
+---
+
 > 🟨 **Always watch the ad before every build** — it speeds up construction by 25%. It's free and makes a significant difference over the course of the game.
 
 ---

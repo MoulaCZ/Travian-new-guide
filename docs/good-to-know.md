@@ -144,9 +144,7 @@ As F2P, try to avoid it — it costs 3 Gold per use. Plan resource needs in adva
 These tools are not part of Travian itself but are widely used by experienced players:
 
 **[GetterTools](https://www.gettertools.com/en/)**
-Find inactive villages around your coordinates — filter by radius, days without population change, and travel time per troop type. Results can link straight into your Rally Point.
+Share a **troop overview with alliance leaders** — coordinators use it to see defence totals across the alliance without asking every player individually. Also supports radius search and travel-time filters for your own scouting.
 
 **[TravcoTools](https://travcotools.com/en/)**
-Filter by inactivity and population range, use alliance whitelist/blacklist, and see whether a village is already in your farm list.
-
-**Alliance troop reporting:** GetterTools is also commonly used to share troop counts with leadership so coordinators can see alliance defence totals without polling every player individually.
+Find **inactive players** near your villages — inactivity days, population range, alliance whitelist/blacklist, and farmlist status for farm-list work.

@@ -1,6 +1,6 @@
 import {
   BookOpen, MapPin, Shield, Wheat, Swords,
-  Flag, Coins, Lightbulb, X, ChevronRight, ChevronLeft, Rocket, MessageSquarePlus, Target, Calculator,
+  Flag, Coins, Lightbulb, X, ChevronRight, Rocket, MessageSquarePlus, Target, Calculator,
 } from 'lucide-react'
 
 const iconMap = { BookOpen, MapPin, Shield, Wheat, Swords, Flag, Coins, Lightbulb, Target, Calculator }
@@ -9,7 +9,7 @@ export default function Sidebar({
   pages, currentPage, onNavigate,
   isOpen, onClose,
   onOpenOnboarding,
-  collapsed, onToggleCollapse,
+  collapsed,
   onSuggest,
 }) {
   return (
@@ -22,13 +22,13 @@ export default function Sidebar({
         'transition-all duration-300 ease-in-out',
         /* Mobile slide in/out; desktop always visible */
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-        /* Width: full on mobile, collapsed/expanded on desktop */
+        /* Width: full on mobile, collapsed/expanded on desktop (w-16 when collapsed so header icons are not clipped) */
         'w-64',
-        collapsed ? 'lg:w-12' : 'lg:w-64',
+        collapsed ? 'lg:w-16' : 'lg:w-64',
       ].join(' ')}
     >
       {/* ── Brand header ─────────────────────────────── */}
-      <div className="relative flex items-center h-16 border-b border-[#3e3226] flex-shrink-0 overflow-hidden px-3">
+      <div className={`relative flex items-center h-16 border-b border-[#3e3226] flex-shrink-0 overflow-hidden ${collapsed ? 'lg:px-2' : 'px-3'}`}>
         <div className="absolute inset-0 bg-gradient-to-r from-[#241d14] to-[#1a1510]" />
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#f0a820] to-transparent opacity-60" />
 
@@ -37,7 +37,7 @@ export default function Sidebar({
           <Shield className="w-4 h-4 text-[#f0a820]" />
         </div>
 
-        {/* Title — hidden when desktop-collapsed */}
+        {/* Title — hidden when desktop-collapsed (desktop expand/collapse lives on TopBar) */}
         <div className={`relative flex-1 min-w-0 ml-3 ${collapsed ? 'lg:hidden' : ''}`}>
           <div
             className="text-sm font-bold leading-none tracking-wide truncate"
@@ -49,18 +49,6 @@ export default function Sidebar({
             Alliance Guide
           </div>
         </div>
-
-        {/* Desktop collapse toggle */}
-        <button
-          onClick={onToggleCollapse}
-          className={`relative hidden lg:flex p-1 text-[#7a6a55] hover:text-[#d4c4a8] rounded flex-shrink-0 transition-colors ${collapsed ? 'ml-auto' : 'ml-1'}`}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={collapsed ? 'Expand' : 'Collapse'}
-        >
-          {collapsed
-            ? <ChevronRight className="w-4 h-4" />
-            : <ChevronLeft className="w-4 h-4" />}
-        </button>
 
         {/* Mobile close button */}
         <button

@@ -38,11 +38,9 @@ You're looking for villages that:
 
 ### External tools
 
-These tools find inactive players around your coordinates automatically:
+**[TravcoTools](https://travcotools.com/en/)** — find inactive villages near you: filter by days inactive, population range, alliance whitelist/blacklist, and whether a village is already in your farm list. Strong first stop when building a farm list.
 
-**[GetterTools](https://www.gettertools.com/en/)** — filter by radius, inactivity (days without population change), travel time per troop type. Click a result → goes straight to your Rally Point.
-
-**[TravcoTools](https://travcotools.com/en/)** — filter by days inactive, population range, alliance whitelist/blacklist. Shows "In farmlist / Not in farmlist" status so you know what you've already added.
+**[GetterTools](https://www.gettertools.com/en/)** — radius search, travel time per troop type, and (very commonly) **sharing your troop overview with alliance leaders** so defence coordinators see alliance totals without polling everyone. Also useful for personal target discovery with inactivity filters.
 
 Both are widely used in the community. Use them at the start of each session to refresh your target list.
 

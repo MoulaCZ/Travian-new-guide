@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   Shield, Swords, Flame, Skull, Crown,
-  ChevronUp, ChevronDown, Info, Plus, Trash2, Zap,
+  ChevronUp, ChevronDown, Info, Plus, Trash2, Zap, Play,
 } from 'lucide-react'
 import { UNITS, WALL_NAMES, TRIBE_LABELS } from '../data/units'
 import { calculateBattle, smithyMult, buildingDefensePoints } from '../utils/combat'
@@ -1209,27 +1209,35 @@ export default function BattleCalculator() {
           <div style={{ width: 1, flex: 1, background: C.border }} />
           <div style={{ fontFamily: 'Cinzel, serif', color: C.gold, fontSize: '1.1rem', fontWeight: 900, letterSpacing: '0.1em' }}>VS</div>
           <button
+            type="button"
             onClick={() => battleResult && setAnimKey(k => k + 1)}
             disabled={!battleResult}
-            title={battleResult ? 'Play battle animation' : 'Add units first'}
+            title={battleResult ? 'Replay battle animation' : 'Add units first'}
             style={{
+              display:       'inline-flex',
+              flexDirection: 'column',
+              alignItems:    'center',
+              justifyContent:'center',
+              gap:           6,
               background:    battleResult ? C.gold : C.surface2,
               color:         battleResult ? '#0f0c09' : C.muted,
-              border:        `1px solid ${battleResult ? C.gold : C.border}`,
-              borderRadius:  6,
-              padding:       '5px 8px',
-              cursor:        battleResult ? 'pointer' : 'default',
-              fontSize:      '0.65rem',
+              border:        `2px solid ${battleResult ? C.goldDim : C.border}`,
+              borderRadius:  10,
+              padding:       '12px 14px',
+              minWidth:      120,
+              cursor:        battleResult ? 'pointer' : 'not-allowed',
+              fontSize:      '0.72rem',
               fontFamily:    'Cinzel, serif',
-              fontWeight:    700,
-              letterSpacing: '0.04em',
+              fontWeight:    800,
+              letterSpacing: '0.06em',
+              lineHeight:    1.15,
+              textAlign:     'center',
               transition:    'all 0.15s',
-              whiteSpace:    'nowrap',
-              writingMode:   'vertical-rl',
-              textOrientation:'mixed',
+              boxShadow:     battleResult ? '0 4px 14px rgba(240,168,32,0.25)' : 'none',
             }}
           >
-            ⚔ Sim
+            <Play size={24} strokeWidth={2.4} fill={battleResult ? '#0f0c09' : 'none'} aria-hidden />
+            <span>VISUALIZE FIGHT</span>
           </button>
           <div style={{ width: 1, flex: 1, background: C.border }} />
         </div>

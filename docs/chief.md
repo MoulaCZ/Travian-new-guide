@@ -78,8 +78,8 @@ Most offensive players in your alliance keep **3 administrators trained and read
 6. **You send all your chiefs in one attack, timed to arrive 1–2 minutes after the ally's attack** — this gap is intentional. Starting loyalty can be 100%, 125%, or lower — nobody knows in advance. If the ally's attack accidentally reduces loyalty to 0 and they take the village, they have those 1–2 minutes to see it and recall their troops before your attack lands. Your attack then takes the village from them — they lose one chief, their army gets home safely.
    > 💡 If this happens, ask whether you should send resources to cover that lost chief. They helped you get the village — a small thank-you is good alliance etiquette.
 
-8. **Start a Large Celebration** — time it to be active when your attacks land
-9. **Secure the village** — see After the Conquest below
+7. **Start a Large Celebration** — time it to be active when your attacks land
+8. **Secure the village** — see After the Conquest below
 
 ---
 

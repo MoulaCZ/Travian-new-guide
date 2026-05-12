@@ -49,7 +49,6 @@ export default function App() {
         onClose={() => setSidebarOpen(false)}
         onOpenOnboarding={onboarding.open}
         collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(c => !c)}
         onSuggest={() => setSuggestOpen(true)}
       />
 
@@ -58,6 +57,8 @@ export default function App() {
         <TopBar
           title={page.title}
           onMenuToggle={() => setSidebarOpen(o => !o)}
+          sidebarCollapsed={sidebarCollapsed}
+          onToggleSidebarCollapse={() => setSidebarCollapsed(c => !c)}
         />
 
         <main ref={contentRef} className="flex-1 overflow-y-auto">

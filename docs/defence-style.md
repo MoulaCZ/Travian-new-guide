@@ -56,12 +56,12 @@ A mixed wall (infantry + cavalry) is stronger than a pure one — infantry fills
 | Unit | Role | Why |
 |------|------|-----|
 | Praetorian | Anti-infantry (infantry) | Cheap infantry defender |
-| Legionnaire | Flexible (infantry) | Weaker than Preto for pure DEF, but usable offensively too |
+| Legionnaire | Flexible (infantry) | Weaker than Praetorians for pure DEF, but usable offensively too |
 
 - Romans are the **slowest classic DEF tribe** — slower troop speed means slower response to calls
 - Compensate with a high-level **Tournament Square** to close the speed gap
 - **No cavalry needed** — Praetorians alone make an extremely strong wall
-- If you want flexibility (raids, small hammer), mix in some Legionnaires — but pure Pretos are stronger for DEF
+- If you want flexibility (raids, small hammer), mix in some Legionnaires — but pure Praetorians are stronger for DEF
 
 ---
 

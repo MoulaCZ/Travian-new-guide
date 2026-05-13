@@ -3,7 +3,7 @@ import {
   Shield, Swords, Flame, Skull, Crown,
   ChevronUp, ChevronDown, Info, Plus, Trash2, Zap, Play,
 } from 'lucide-react'
-import { UNITS, WALL_NAMES, TRIBE_LABELS } from '../data/units'
+import { UNITS, WALL_NAMES, TRIBE_LABELS, getUnitIconUrl, getHeroIconUrl } from '../data/units'
 import { calculateBattle, smithyMult, buildingDefensePoints } from '../utils/combat'
 
 // ─── Colour tokens ────────────────────────────────────────────────────────────
@@ -781,7 +781,7 @@ function ArenaUnitIcon({ type }) {
   return <Swords {...p} />
 }
 
-function buildArenaDots(results, scale, maxDots) {
+function buildArenaDots(results, scale, maxDots, tribe) {
   // Exclude chief units from arena dots
   const active = results.filter(r => r.initial > 0 && r.unit.type !== 'chief')
   if (!active.length) return []
@@ -789,11 +789,13 @@ function buildArenaDots(results, scale, maxDots) {
   for (const r of active) {
     const n       = Math.max(1, Math.round(r.initial / scale))
     const survive = r.initial > 0 ? Math.round((r.survived / r.initial) * n) : 0
+    const iconUrl = getUnitIconUrl(tribe, r.unit)
     for (let i = 0; i < n; i++) {
       dots.push({
         id:          `${r.unit.id}-${i}`,
         unitType:    r.unit.type,
         unitName:    r.unit.name,
+        iconUrl,
         willSurvive: i < survive,
         deathDelay:  0,
         isHero:      false,
@@ -810,45 +812,9 @@ function buildArenaDots(results, scale, maxDots) {
 
 function ArenaDot({ dot, side, enterDelay, phase }) {
   const isAtk = side === 'atk'
-
-  // Hero dot styling
-  if (dot.isHero) {
-    let anim
-    if (phase === 'entering') {
-      anim = `dot-in-${isAtk ? 'left' : 'right'} 0.55s cubic-bezier(.22,1,.36,1) ${enterDelay}ms both`
-    } else if (!dot.willSurvive) {
-      anim = `dot-dying 0.7s ease-out ${dot.deathDelay}ms both`
-    } else {
-      anim = 'none'
-    }
-    return (
-      <div
-        title={`${dot.unitName} (Hero)`}
-        style={{
-          width:          44,
-          height:         44,
-          borderRadius:   '50%',
-          background:     '#2a1a00',
-          border:         `2px solid ${C.gold}`,
-          display:        'flex',
-          alignItems:     'center',
-          justifyContent: 'center',
-          color:          C.gold,
-          animation:      anim,
-          flexShrink:     0,
-          boxShadow:      `0 0 12px ${C.gold}88, inset 0 0 8px ${C.gold}33`,
-          filter:         phase === 'done' && dot.willSurvive ? `drop-shadow(0 0 8px ${C.gold})` : 'none',
-          transition:     'filter 0.6s',
-        }}
-      >
-        <Crown size={18} strokeWidth={2} />
-      </div>
-    )
-  }
-
-  // Normal dot
-  const bdr   = isAtk ? '#ef4444' : '#60a5fa'
-  const bg    = isAtk ? '#3f0909' : '#091830'
+  const bdr   = dot.isHero ? C.gold : (isAtk ? '#ef4444' : '#60a5fa')
+  const bg    = dot.isHero ? '#2a1a00' : (isAtk ? '#3f0909' : '#091830')
+  const size  = dot.isHero ? 48 : 42
 
   let anim
   if (phase === 'entering') {
@@ -859,12 +825,16 @@ function ArenaDot({ dot, side, enterDelay, phase }) {
     anim = 'none'
   }
 
+  const survivedGlow = phase === 'done' && dot.willSurvive
+  // Mirror attacker sprites so units face their opponent
+  const spriteTransform = isAtk ? 'scaleX(-1)' : 'none'
+
   return (
     <div
-      title={dot.unitName}
+      title={dot.isHero ? `${dot.unitName} (Hero)` : dot.unitName}
       style={{
-        width:          38,
-        height:         38,
+        width:          size,
+        height:         size,
         borderRadius:   '50%',
         background:     bg,
         border:         `2px solid ${bdr}`,
@@ -874,17 +844,52 @@ function ArenaDot({ dot, side, enterDelay, phase }) {
         color:          bdr,
         animation:      anim,
         flexShrink:     0,
-        boxShadow:      `0 0 8px ${bdr}55, inset 0 0 6px ${bdr}22`,
-        filter:         phase === 'done' && dot.willSurvive ? `drop-shadow(0 0 5px ${bdr})` : 'none',
+        boxShadow:      dot.isHero
+          ? `0 0 14px ${C.gold}aa, inset 0 0 10px ${C.gold}44`
+          : `0 0 8px ${bdr}55, inset 0 0 6px ${bdr}22`,
+        filter:         survivedGlow ? `drop-shadow(0 0 ${dot.isHero ? 10 : 6}px ${bdr})` : 'none',
         transition:     'filter 0.6s',
+        overflow:       'hidden',
+        position:       'relative',
       }}
     >
-      <ArenaUnitIcon type={dot.unitType} />
+      {dot.iconUrl ? (
+        <img
+          src={dot.iconUrl}
+          alt={dot.unitName}
+          draggable={false}
+          style={{
+            width:          '78%',
+            height:         '78%',
+            objectFit:      'contain',
+            imageRendering: 'pixelated',
+            transform:      spriteTransform,
+            pointerEvents:  'none',
+            userSelect:     'none',
+            filter:         !dot.willSurvive && phase === 'fighting'
+              ? 'grayscale(0.4)'
+              : 'none',
+          }}
+        />
+      ) : dot.isHero ? (
+        <Crown size={18} strokeWidth={2} />
+      ) : (
+        <ArenaUnitIcon type={dot.unitType} />
+      )}
     </div>
   )
 }
 
-function BattleArena({ result, animKey, heroAtk = 0, heroDef = 0, heroAtkHp = 100, heroDefHp = 100 }) {
+function BattleArena({
+  result,
+  animKey,
+  heroAtk = 0,
+  heroDef = 0,
+  heroAtkHp = 100,
+  heroDefHp = 100,
+  attackerTribe,
+  defenderTribe,
+}) {
   const [phase, setPhase]         = useState('idle')
   const [showFlash, setShowFlash] = useState(false)
 
@@ -901,8 +906,8 @@ function BattleArena({ result, animKey, heroAtk = 0, heroDef = 0, heroAtkHp = 10
     const defHeroHpLost   = Math.round(result.defenderLossRatio * heroDefHp)
     const heroDefSurvives = Math.max(0, heroDefHp - defHeroHpLost) > 0
 
-    let builtAtkDots = buildArenaDots(result.attackerResults, sv, MAX_DOTS)
-    let builtDefDots = buildArenaDots(result.defenderResults, sv, MAX_DOTS)
+    let builtAtkDots = buildArenaDots(result.attackerResults, sv, MAX_DOTS, attackerTribe)
+    let builtDefDots = buildArenaDots(result.defenderResults, sv, MAX_DOTS, defenderTribe)
 
     // Prepend hero dots if hero strength > 0
     if (heroAtk > 0) {
@@ -910,6 +915,7 @@ function BattleArena({ result, animKey, heroAtk = 0, heroDef = 0, heroAtkHp = 10
         id: 'hero-atk',
         unitType: 'hero',
         unitName: 'Hero',
+        iconUrl: getHeroIconUrl(attackerTribe),
         willSurvive: heroAtkSurvives,
         deathDelay: 1000,
         isHero: true,
@@ -921,6 +927,7 @@ function BattleArena({ result, animKey, heroAtk = 0, heroDef = 0, heroAtkHp = 10
         id: 'hero-def',
         unitType: 'hero',
         unitName: 'Hero',
+        iconUrl: getHeroIconUrl(defenderTribe),
         willSurvive: heroDefSurvives,
         deathDelay: 1000,
         isHero: true,
@@ -933,7 +940,7 @@ function BattleArena({ result, animKey, heroAtk = 0, heroDef = 0, heroAtkHp = 10
       defDots:  builtDefDots,
       scaleVal: sv,
     }
-  }, [result, heroAtk, heroDef, heroAtkHp, heroDefHp])
+  }, [result, heroAtk, heroDef, heroAtkHp, heroDefHp, attackerTribe, defenderTribe])
 
   useEffect(() => {
     if (!result) { setPhase('idle'); return }
@@ -1129,6 +1136,7 @@ export default function BattleCalculator() {
     )
   , [defenderGroups])
 
+  const attackerTribe = attackerGroups[0]?.tribe ?? 'roman'
   const defenderTribe = defenderGroups[0]?.tribe ?? 'roman'
 
   // ── Panel summary values ───────────────────────────────────────────────────
@@ -1271,6 +1279,8 @@ export default function BattleCalculator() {
         heroDef={defenderHeroDef}
         heroAtkHp={attackerHeroHp}
         heroDefHp={defenderHeroHp}
+        attackerTribe={attackerTribe}
+        defenderTribe={defenderTribe}
       />
 
       {battleResult && (

@@ -1,6 +1,29 @@
 // Travian Legends unit stats — all three classic tribes
 // Stats: attack / defInf (defense vs infantry) / defCav (defense vs cavalry)
 // crop: upkeep per hour | carry: resource carry capacity | speed: fields/hour
+//
+// `iconId` (optional) overrides the icon filename when the unit ID does not match
+// the PNG in src/assets/units/<tribe>/<iconId>.png (e.g. battering_ram → ram.png)
+
+const _iconModules = import.meta.glob('../assets/units/**/*.png', { eager: true })
+
+const _iconUrls = {}
+for (const [path, mod] of Object.entries(_iconModules)) {
+  const url = (mod && (mod.default ?? mod)) || null
+  const m = path.match(/\/units\/([^/]+)\/([^/]+)\.png$/)
+  if (m && url) _iconUrls[`${m[1]}/${m[2]}`] = url
+}
+
+export function getUnitIconUrl(tribe, unit) {
+  if (!tribe || !unit) return null
+  const id = unit.iconId ?? unit.id
+  return _iconUrls[`${tribe}/${id}`] ?? null
+}
+
+export function getHeroIconUrl(tribe) {
+  if (!tribe) return null
+  return _iconUrls[`${tribe}/hero`] ?? null
+}
 
 export const UNITS = {
   roman: [
@@ -72,6 +95,7 @@ export const UNITS = {
     },
     {
       id: 'battering_ram',
+      iconId: 'ram',
       name: 'Battering Ram',
       type: 'siege',
       attack: 60,
@@ -265,6 +289,7 @@ export const UNITS = {
     },
     {
       id: 'gaul_ram',
+      iconId: 'ram',
       name: 'Ram',
       type: 'siege',
       attack: 50,

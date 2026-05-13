@@ -220,6 +220,21 @@ export const UNITS = {
     },
   ],
 
+  // Wild oasis animals (Nature). Used as a defender reinforcement when raiding
+  // an unoccupied oasis. Stats per Travian Legends standard server.
+  nature: [
+    { id: 'rat',       name: 'Rat',       type: 'infantry', attack:  10, defInf:  25, defCav:  20, crop: 1, carry: 0, speed: 20 },
+    { id: 'spider',    name: 'Spider',    type: 'infantry', attack:  20, defInf:  35, defCav:  40, crop: 1, carry: 0, speed: 20 },
+    { id: 'snake',     name: 'Snake',     type: 'infantry', attack:  60, defInf:  40, defCav:  60, crop: 1, carry: 0, speed: 20 },
+    { id: 'bat',       name: 'Bat',       type: 'cavalry',  attack:  80, defInf:  66, defCav:  50, crop: 1, carry: 0, speed: 20 },
+    { id: 'boar',      name: 'Wild Boar', type: 'infantry', attack:  50, defInf:  70, defCav:  33, crop: 1, carry: 0, speed: 20 },
+    { id: 'wolf',      name: 'Wolf',      type: 'cavalry',  attack: 100, defInf:  80, defCav:  70, crop: 2, carry: 0, speed: 20 },
+    { id: 'bear',      name: 'Bear',      type: 'cavalry',  attack: 250, defInf: 140, defCav: 200, crop: 3, carry: 0, speed: 20 },
+    { id: 'crocodile', name: 'Crocodile', type: 'infantry', attack: 450, defInf: 380, defCav: 240, crop: 3, carry: 0, speed: 20 },
+    { id: 'tiger',     name: 'Tiger',     type: 'cavalry',  attack: 200, defInf: 170, defCav: 250, crop: 3, carry: 0, speed: 20 },
+    { id: 'elephant',  name: 'Elephant',  type: 'cavalry',  attack: 600, defInf: 440, defCav: 520, crop: 5, carry: 0, speed: 20 },
+  ],
+
   gaul: [
     {
       id: 'phalanx',
@@ -328,10 +343,12 @@ export const WALL_NAMES = {
   roman: 'City Wall',
   teuton: 'Earth Wall',
   gaul: 'Palisade',
+  nature: 'Oasis',
 }
 
 export const TRIBE_LABELS = {
   roman: 'Romans',
   teuton: 'Teutons',
   gaul: 'Gauls',
+  nature: 'Animals (Oasis)',
 }

@@ -1,0 +1,36 @@
+arena: stop phantom auto-play, force fresh dots per click, fade fallen heroes
+
+Three intertwined bugs were making "the start of the battle" look wrong:
+
+1. Auto-play on page load
+   - BattleArena.useEffect had [animKey] as its dependency. animKey
+     starts at 0, so the effect fires once on mount and immediately
+     kicks the arena into 'entering' -> 'marching' -> 'clash' before
+     the user has clicked anything. By the time the user actually
+     hit "Visualize Fight", the dots were already parked at the
+     previous run's clash positions, so the second animation looked
+     like it skipped the rim entirely.
+   - Fix: animKey is now `null` until the first real click. The
+     effect early-returns while it's null, leaving the arena dormant.
+
+2. Defenders sometimes still appeared mid-arena on replay
+   - Even with the new transition: none reset trick, a CSS transition
+     in flight from a previous run could still smear into the new
+     entry on some browsers.
+   - Fix: every PosDot wrapper now keys off `${animKey}-${dot.id}`, so
+     React unmounts the entire previous battle's dots and mounts a
+     fresh set on every click. No transition leakage, no half-played
+     dying animation surviving across runs - guaranteed clean slate.
+
+3. Heroes never disappeared even when they died
+   - The hero objects were built without a `deathRound`, so the
+     ArenaDot dying check (`clashIdx === dot.deathRound`) never
+     evaluated to true even when willSurvive was false. Fallen heroes
+     stayed on screen as if alive.
+   - Fix: heroes are now assigned `deathRound: 4` (the final clash
+     round). On a loss the hero now fades out together with the last
+     wave - the proper "and the hero went down with the last blow"
+     beat instead of an immortal-looking ghost.
+
+Build
+- New bundle: index-uZkEJj6G.js.

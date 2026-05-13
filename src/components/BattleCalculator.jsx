@@ -1308,7 +1308,7 @@ function PosDot({ dot, leftPct, topPct, size, side, phase, enterDelay, waveDelay
 // Render one side as an array of absolutely-positioned dots (no flex/grid
 // involved in motion). Each row of the 4×4 grid uses its own `top:` and a
 // staggered `transition-delay` so the rows charge in waves.
-function SidePanel({ side, hero, dots, phase, marching }) {
+function SidePanel({ side, hero, dots, phase, marching, animKey }) {
   const isAtk = side === 'atk'
 
   // Vertical layout — hero above the 4 dot rows. Spread the rows wider so
@@ -1321,10 +1321,16 @@ function SidePanel({ side, hero, dots, phase, marching }) {
   const heroIdle  = isAtk ? ATK_HERO_IDLE  : DEF_HERO_IDLE
   const heroMarch = isAtk ? ATK_HERO_MARCH : DEF_HERO_MARCH
 
+  // Burning the animKey into every key forces React to UNMOUNT the
+  // entire previous battle's dots and MOUNT a fresh set on every click.
+  // That guarantees a clean slate: no leftover CSS transition from the
+  // previous clash position smearing onto the new entry, no half-played
+  // dying animations carrying over.
   return (
     <>
       {hero && (
         <PosDot
+          key={`${animKey}-${hero.id}`}
           dot={hero} side={side} phase={phase}
           leftPct={marching ? heroMarch : heroIdle}
           topPct={HERO_TOP}
@@ -1337,7 +1343,7 @@ function SidePanel({ side, hero, dots, phase, marching }) {
         const rowIdx = Math.floor(i / COLS_PER_SIDE)
         return (
           <PosDot
-            key={dot.id}
+            key={`${animKey}-${dot.id}`}
             dot={dot} side={side} phase={phase}
             leftPct={marching ? colsMarch[colIdx] : colsIdle[colIdx]}
             topPct={ROW_TOPS[rowIdx]}
@@ -1398,17 +1404,21 @@ function BattleArena({
     const { dots: builtDefDots } =
       buildSideArenaDots(defResultsWithTribe, DOTS_PER_SIDE, COLS_PER_SIDE, defenderTribe)
 
+    // Heroes that fall fade out in the FINAL clash round so the player
+    // gets a clear "and the hero went down with the last blow" beat
+    // (otherwise the bubble would just stay there pretending to be
+    // alive even on a TPK loss).
     const builtAtkHero = heroAtk > 0 ? {
       id: 'hero-atk', unitType: 'hero', unitName: 'Hero',
       iconUrl: getHeroIconUrl(attackerTribe),
       unitsPerDot: 1,
-      willSurvive: heroAtkSurvives, deathDelay: 0, isHero: true,
+      willSurvive: heroAtkSurvives, deathDelay: 0, deathRound: 4, isHero: true,
     } : null
     const builtDefHero = heroDef > 0 ? {
       id: 'hero-def', unitType: 'hero', unitName: 'Hero',
       iconUrl: getHeroIconUrl(defenderTribe),
       unitsPerDot: 1,
-      willSurvive: heroDefSurvives, deathDelay: 0, isHero: true,
+      willSurvive: heroDefSurvives, deathDelay: 0, deathRound: 4, isHero: true,
     } : null
 
     // Average units-per-dot for the footer scale legend.
@@ -1442,7 +1452,10 @@ function BattleArena({
   const T_MARCH = 1100
   const T_ROUND = 1500
   useEffect(() => {
-    if (!result) { setPhase('idle'); return }
+    // animKey is null until the user has clicked "Visualize Fight" at
+    // least once. Skipping the very first run is what keeps the arena
+    // dormant on page load instead of auto-playing a phantom battle.
+    if (animKey == null || !result) { setPhase('idle'); return }
     setPhase('entering')
     setShowFlash(false)
     const timers = []
@@ -1612,6 +1625,7 @@ function BattleArena({
             dots={atkDots}
             phase={phase}
             marching={marching}
+            animKey={animKey}
           />
 
           {/* Center — VS + clash flash */}
@@ -1649,6 +1663,7 @@ function BattleArena({
             dots={defDots}
             phase={phase}
             marching={marching}
+            animKey={animKey}
           />
         </div>
 
@@ -1710,7 +1725,11 @@ export default function BattleCalculator() {
   const [defBonusPct, setDefBonusPct] = useState(0)
   const [defenderWeapon, setDefenderWeapon] = useState({ unitId: '', bonus: 0 })
   const [residenceLevel, setResidenceLevel] = useState(0)
-  const [animKey, setAnimKey] = useState(0)
+  // animKey is NULL until the user actually clicks "Visualize Fight" the
+  // very first time. This stops the arena from auto-playing on page load
+  // (previously useEffect fired once for animKey=0 on mount, kicking off
+  // an unwanted phantom battle in the background).
+  const [animKey, setAnimKey] = useState(null)
 
   // ── Attacker mutations ─────────────────────────────────────────────────────
   const setAttackerTribe = useCallback((i, tribe) =>
@@ -1860,7 +1879,7 @@ export default function BattleCalculator() {
       }}>
         <button
           type="button"
-          onClick={() => battleResult && setAnimKey(k => k + 1)}
+          onClick={() => battleResult && setAnimKey(k => (k ?? 0) + 1)}
           disabled={!battleResult}
           title={battleResult ? 'Replay battle animation' : 'Add units first'}
           style={{

@@ -318,10 +318,16 @@ function ArmyPanel({
         </span>
       </div>
 
-      {/* ── Scrollable middle: unit groups, defensive structures, hero ── */}
+      {/* ── Scrollable middle: unit groups, defensive structures, hero ──
+          minHeight: 0 is the classic flex-scroll trick: without it, a
+          flex:1 child won't shrink below its content's natural height,
+          so the scrollbar never appears (the panel just grows instead).
+          With it, the child is properly constrained to the leftover space
+          inside the fixed-height card and `overflowY: auto` engages. */}
       <div
         style={{
           flex:          1,
+          minHeight:     0,
           overflowY:     'auto',
           overflowX:     'hidden',
           display:       'flex',
@@ -1210,7 +1216,10 @@ const DOTS_PER_SIDE = COLS_PER_SIDE * ROWS_PER_SIDE  // 16
 // like a brawl rather than two lines parking next to each other.
 const ATK_COLS_IDLE   = [11,  8,  4,  1]   // % from floor left, col 0 = front
 const ATK_COLS_MARCH  = [55, 50, 45, 40]
-const DEF_COLS_IDLE   = [60, 62, 64, 66]   // col 0 = front, closest to atk
+// Defenders cluster RIGHT against the wall. Back row at 67% sits exactly at
+// the wall start, so the rear half of the bubble hides behind the wall —
+// reads as "defenders stationed behind their fortifications".
+const DEF_COLS_IDLE   = [61, 63, 65, 67]   // col 0 = front, closest to atk
 const DEF_COLS_MARCH  = [45, 50, 53, 56]
 // Hero positions (top-of-side, above the dot rows). Hero idle hugs the rim
 // just like its army; on the clash they meet face-to-face, ATK hero just
@@ -1225,7 +1234,15 @@ const DEF_HERO_MARCH  = 47
 // wave. The visible bubble is wrapped in an inner div so the entrance / death
 // keyframe animations (which use `transform`) don't fight with the wrapper's
 // own centring transform.
+//
+// During the 'entering' reset phase we DISABLE the transition so the dots
+// snap straight back to their idle (rim) position — without this, a second
+// click would have the dots smoothly slide from the previous clash spot
+// back toward the rim, never actually reaching it before the next "marching"
+// phase tells them to charge again. End result: on every replay the dots
+// genuinely re-form at the edges before charging.
 function PosDot({ dot, leftPct, topPct, size, side, phase, enterDelay, waveDelay }) {
+  const resetting = phase === 'entering'
   return (
     <div style={{
       position: 'absolute',
@@ -1233,7 +1250,9 @@ function PosDot({ dot, leftPct, topPct, size, side, phase, enterDelay, waveDelay
       top:  `${topPct}%`,
       // Centre the bubble on the (left,top) anchor point.
       transform: 'translate(-50%, -50%)',
-      transition: `left 0.85s cubic-bezier(.45,.05,.55,.95) ${waveDelay}ms`,
+      transition: resetting
+        ? 'none'
+        : `left 0.85s cubic-bezier(.45,.05,.55,.95) ${waveDelay}ms`,
       willChange: 'left',
       zIndex: dot.isHero ? 3 : 2,
     }}>

@@ -6,7 +6,7 @@
 
 ## TL;DR
 
-- **Goal:** queue **three Large Celebrations** (your three “parties”), then train **three settlers** and send them to your second village without starving the build.
+- **Goal:** queue **small  Large Celebrations** (your three “parties”), then train **three settlers** and send them to your second village without starving the build.
 - **Ads:** watch the **25% construction-speed ad** before every upgrade — it adds up massively over the server.
 - **Field cap:** in this first village, **do not push resource fields above level 10** (non-capital cap once it is no longer your capital); invest spare res in your anvil / feeders later.
 - **How to use this page:** the big **Build Order** table below is the full step-by-step path. Follow it strictly if you want the safest route; if you are already ahead on CP, you can skip or compress individual rows — the milestones (⭐ / 🎉) matter most.
@@ -132,7 +132,7 @@
 - **Small Celebration** — generates CP equal to **this village's daily CP output**, capped at **500 CP**
 - **Large Celebration** — generates CP equal to **all your villages' combined daily CP output**, capped at **2,000 CP**
 
-At this early stage you likely only have one village, so both types give the same result. Run whichever is cheaper per CP. Once you have multiple villages, Large Celebrations become significantly more efficient.
+At this early stage you likely only have one village, so both types give the same result. Run whichever is cheaper (=samall) per CP. Once you have multiple villages, Large Celebrations become significantly more efficient.
 
 **How to calculate:** Figure out how many CP you're short, then pick buildings from the CP Efficiency Reference table below (sorted cheapest CP per resource first) until you cover the deficit. You have 3 parties total. You can see your progress in Residence tabs. In your free time go through all tabs to better understand your current status. Parties in queue are not calculated for the estimated new village slot.
 

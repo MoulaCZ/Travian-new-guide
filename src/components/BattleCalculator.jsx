@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import {
   Shield, Swords, Flame, Skull, Crown,
   ChevronUp, ChevronDown, Info, Plus, Trash2, Zap, Play,
@@ -291,6 +291,32 @@ function ArmyPanel({
   totalAttack, totalDefense,
 }) {
   const [extrasOpen, setExtrasOpen] = useState(false)
+  const scrollRef    = useRef(null)
+  const extrasRef    = useRef(null)
+
+  // When the user opens "Hero & Modifiers" we auto-scroll the panel so
+  // the whole hero strip lands fully in view — otherwise on a tall
+  // defender side the inputs can be hidden below the visible area and
+  // you'd have to hunt for the scrollbar to find them.
+  useEffect(() => {
+    if (!extrasOpen) return
+    const t = setTimeout(() => {
+      const sc  = scrollRef.current
+      const box = extrasRef.current
+      if (!sc || !box) return
+      sc.scrollTo({
+        top: sc.scrollHeight - sc.clientHeight,
+        behavior: 'smooth',
+      })
+    }, 30)
+    return () => clearTimeout(t)
+  }, [extrasOpen])
+
+  // Inject a panel-scoped scrollbar style so users on every browser
+  // (WebKit, Blink, Firefox) get a clearly visible gold/brown scrollbar
+  // — the previous near-invisible thin one made many people think the
+  // panel just couldn't scroll at all.
+  const scrollerClass = 'army-panel-scroll'
 
   return (
     <div
@@ -307,7 +333,7 @@ function ArmyPanel({
         // Both panels share the same fixed height so the page length never
         // grows when defenders pile on reinforcements — instead the inner
         // scroll area takes over.
-        height:        720,
+        height:        760,
       }}
     >
       {/* Header (always visible at top) */}
@@ -318,6 +344,20 @@ function ArmyPanel({
         </span>
       </div>
 
+      {/* Visible scrollbar styling for the inner panel area */}
+      <style>{`
+        .${scrollerClass} { scrollbar-width: auto; scrollbar-color: ${C.gold} ${C.surface2}; }
+        .${scrollerClass}::-webkit-scrollbar { width: 12px; }
+        .${scrollerClass}::-webkit-scrollbar-track {
+          background: ${C.surface2}; border-radius: 6px;
+        }
+        .${scrollerClass}::-webkit-scrollbar-thumb {
+          background: ${C.gold}; border-radius: 6px;
+          border: 2px solid ${C.surface2};
+        }
+        .${scrollerClass}::-webkit-scrollbar-thumb:hover { background: ${C.goldDim}; }
+      `}</style>
+
       {/* ── Scrollable middle: unit groups, defensive structures, hero ──
           minHeight: 0 is the classic flex-scroll trick: without it, a
           flex:1 child won't shrink below its content's natural height,
@@ -325,6 +365,8 @@ function ArmyPanel({
           With it, the child is properly constrained to the leftover space
           inside the fixed-height card and `overflowY: auto` engages. */}
       <div
+        ref={scrollRef}
+        className={scrollerClass}
         style={{
           flex:          1,
           minHeight:     0,
@@ -334,9 +376,6 @@ function ArmyPanel({
           flexDirection: 'column',
           gap:           12,
           paddingRight:  6,           // breathing room next to scrollbar
-          // Custom thin scrollbar styling (WebKit + Firefox)
-          scrollbarWidth: 'thin',
-          scrollbarColor: `${C.border} transparent`,
         }}
       >
         {/* Unit groups — animals (Nature) only on the defender side */}
@@ -432,8 +471,10 @@ function ArmyPanel({
           </div>
         )}
 
-        {/* Extras (hero + modifiers) — last entry inside the scroll area */}
-        <div style={{ background: C.surface2, border: `1px solid ${C.border}`, borderRadius: 6, overflow: 'hidden' }}>
+        {/* Extras (hero + modifiers) — last entry inside the scroll area.
+            We hold a ref so the panel can auto-scroll this strip into
+            view when the user opens it. */}
+        <div ref={extrasRef} style={{ background: C.surface2, border: `1px solid ${C.border}`, borderRadius: 6, overflow: 'hidden', flexShrink: 0 }}>
         <button
           onClick={() => setExtrasOpen(o => !o)}
           style={{

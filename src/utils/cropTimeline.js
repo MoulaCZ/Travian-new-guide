@@ -51,10 +51,19 @@ function applyGranaryFloorAndCap(stock, capacity) {
   return s
 }
 
+/**
+ * Rows that actually affect stock simulation: excludes past multi-leg legs (`alreadyArrived`)
+ * and deliveries with no parsed countdown (same filter as the chart / hourly overview).
+ */
+export function incomingDeliveriesUsedInModel(incoming = []) {
+  return (incoming || []).filter(
+    (d) =>
+      !d.alreadyArrived && d.minutesFromNow != null && Number.isFinite(d.minutesFromNow),
+  )
+}
+
 function sortedIncomingEvents(incoming) {
-  return (incoming || [])
-    .filter((d) => !d.alreadyArrived)
-    .filter((d) => d.minutesFromNow != null && Number.isFinite(d.minutesFromNow))
+  return incomingDeliveriesUsedInModel(incoming)
     .map((d) => ({
       t: Math.max(0, Math.round(d.minutesFromNow)),
       crop: d.crop ?? 0,
@@ -198,9 +207,7 @@ export function simulateCropTimeline({
   horizonHours = 12,
   stepMinutes = 1,
 }) {
-  const events = incoming
-    .filter((d) => !d.alreadyArrived)
-    .filter((d) => d.minutesFromNow != null && Number.isFinite(d.minutesFromNow))
+  const events = incomingDeliveriesUsedInModel(incoming)
     .map((d) => ({
       t: Math.max(0, Math.round(d.minutesFromNow)),
       crop: d.crop ?? 0,
@@ -212,6 +219,7 @@ export function simulateCropTimeline({
   const step = Math.max(1, Math.round(stepMinutes))
   const cap = (s) => applyGranaryFloorAndCap(s, capacity)
   const points = []
+  let totalDiscarded = 0
   let rawStart = Math.max(0, stockStart)
   if (capacity != null && capacity > 0 && rawStart > capacity) {
     totalDiscarded += rawStart - capacity
@@ -221,7 +229,6 @@ export function simulateCropTimeline({
   let minStock = Infinity
   let minAt = 0
   let emptyAt = null
-  let totalDiscarded = 0
 
   const addDiscarded = (beforeCap) => {
     if (capacity != null && capacity > 0 && beforeCap > capacity) {
@@ -298,11 +305,8 @@ export function simulateCropTimeline({
 }
 
 export function computeHorizonHours(incoming, fallback = 12) {
-  const maxIn = incoming.reduce(
-    (mx, d) =>
-      d.minutesFromNow != null && Number.isFinite(d.minutesFromNow)
-        ? Math.max(mx, d.minutesFromNow)
-        : mx,
+  const maxIn = incomingDeliveriesUsedInModel(incoming).reduce(
+    (mx, d) => Math.max(mx, d.minutesFromNow ?? 0),
     0,
   )
   const hours = Math.ceil((maxIn + 120) / 60)
@@ -339,14 +343,8 @@ export function buildArrivalPlan({
     }
   }
 
-  const cropDel = [...incoming]
-    .filter(
-      (d) =>
-        !d.alreadyArrived &&
-        (d.crop ?? 0) > 0 &&
-        d.minutesFromNow != null &&
-        Number.isFinite(d.minutesFromNow),
-    )
+  const cropDel = incomingDeliveriesUsedInModel(incoming)
+    .filter((d) => (d.crop ?? 0) > 0)
     .sort((a, b) => a.minutesFromNow - b.minutesFromNow)
 
   for (const d of cropDel) {
@@ -383,7 +381,7 @@ export function buildDiscordReport({
   serverTimeLabel = '',
   hourlyOverview = [],
   simulation = null,
-  incomingDeliveries = [],
+  incomingDeliveries: _incomingDeliveries = [],
 }) {
   const lines = []
   const bal = balancePerHour
@@ -400,57 +398,31 @@ export function buildDiscordReport({
   if (serverTimeLabel) lines.push(`Server: ${serverTimeLabel}`)
   lines.push('')
 
-  const cropIncoming = [...incomingDeliveries]
-    .filter((d) => (d.crop ?? 0) > 0)
-    .sort((a, b) => {
-      const ar = a.alreadyArrived ? 1 : 0
-      const br = b.alreadyArrived ? 1 : 0
-      if (ar !== br) return ar - br
-      return (
-        (a.minutesFromNow ?? Number.POSITIVE_INFINITY) -
-        (b.minutesFromNow ?? Number.POSITIVE_INFINITY)
-      )
-    })
-  if (cropIncoming.length) {
-    lines.push('Incoming crop (scheduled):')
-    for (const d of cropIncoming) {
-      const eta = d.alreadyArrived
-        ? 'arrived'
-        : d.minutesFromNow != null && Number.isFinite(d.minutesFromNow)
-          ? `~${formatDuration(d.minutesFromNow)}`
-          : (d.arrivalLabel ?? 'ETA unknown').replace(/\s+/g, ' ').trim()
-      const who = [d.village, d.player].filter(Boolean).join(' : ') || '—'
-      lines.push(`  • ${eta} · +${formatNum(d.crop)} · ${who}`)
-    }
-    lines.push('')
-  }
-
   if (mapUrl) {
     lines.push(`📍 Send crop here: ${mapUrl}`)
     lines.push('')
   }
 
   if (hourlyOverview.length) {
-    lines.push('12h overview (stock at each hour):')
-    for (const row of hourlyOverview) {
-      const needPart = row.need > 0 ? ` · send ${formatNum(row.need)}` : ''
+    const alertRows = hourlyOverview.filter((row) => row.statusEmoji !== '✅')
+    if (alertRows.length) {
+      lines.push('Next hours:')
+      for (const row of alertRows) {
+        const needPart = row.need > 0 ? ` · send ${formatNum(row.need)}` : ''
+        lines.push(
+          `${row.hourEmoji} ${row.clock} — ${formatNum(row.stock)} crop${needPart} — ${row.statusEmoji}`,
+        )
+      }
+      lines.push('')
       lines.push(
-        `${row.hourEmoji} ${row.clock} — ${formatNum(row.stock)} crop${needPart} — ${row.statusEmoji}`,
+        "Covered an hour? React with that row's emoji so others know it's handled.",
       )
+      lines.push('')
     }
-    lines.push('')
-    lines.push(
-      '_Covered an hour? React with that row\'s emoji so others know it\'s handled._',
-    )
-    lines.push('')
   }
 
   if (simulation) {
-    if (simulation.minStock <= 0) {
-      lines.push(
-        `☠️ STARVATION RISK — hits 0 in ~${formatDuration(simulation.emptyAt ?? simulation.minAt)}`,
-      )
-    } else if (balancePerHour < 0) {
+    if (balancePerHour < 0 && simulation.minStock > 0) {
       lines.push(
         `📉 Minimum stock: ${formatNum(simulation.minStock)} at +${formatDuration(simulation.minAt)}`,
       )

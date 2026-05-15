@@ -31,11 +31,21 @@ function findSendMarkerHint(text) {
 }
 
 const SAMPLE_PLACEHOLDER =
-  'Paste the marketplace page here (Ctrl+A → Ctrl+C from Tržiště → Přehled dodávek)…'
+  'Open the Marketplace → second tab (send resources). Select all (Ctrl+A), copy (Ctrl+C), and paste here.'
+
+/** Signed crop/h from prefix (+ surplus / − deficit) and digits-only input */
+function cropBalancePerHour(sign, digitsRaw) {
+  const digits = String(digitsRaw ?? '').replace(/\D/g, '')
+  if (!digits) return NaN
+  const n = parseInt(digits, 10)
+  if (!Number.isFinite(n)) return NaN
+  return sign === '-' ? -n : n
+}
 
 export default function CropTimelineCalculator() {
   const [paste, setPaste] = useState('')
-  const [consumptionPerHour, setConsumptionPerHour] = useState('')
+  const [cropBalanceSign, setCropBalanceSign] = useState('-')
+  const [cropBalanceDigits, setCropBalanceDigits] = useState('')
   const [parsedSnapshot, setParsedSnapshot] = useState(null)
   const [report, setReport] = useState('')
   const [simulation, setSimulation] = useState(null)
@@ -78,11 +88,11 @@ export default function CropTimelineCalculator() {
     const url = parsed.mapUrl ?? (coords ? buildMapUrl(parsed.serverBase, coords.x, coords.y) : null)
 
     if (coords) {
-      notes.push(`Coords from village list: (${coords.x}|${coords.y})`)
+      notes.push(`Coordinates (from paste): (${coords.x}|${coords.y})`)
       if (url) notes.push(`Map: ${url}`)
     } else if (parsed.villageName) {
       notes.push(
-        '⚠️ Coordinates not found — paste must include the VESNICE list (sidebar with all villages).',
+        '⚠️ Coordinates not found — include the footer village/coordinates block from the same marketplace paste.',
       )
     }
 
@@ -102,7 +112,9 @@ export default function CropTimelineCalculator() {
   const handleGenerate = () => {
     const text = paste.trim()
     if (!text) {
-      setReport('⚠️ Paste the Travian marketplace page first (Ctrl+A on Přehled dodávek).')
+      setReport(
+        '⚠️ Paste the Travian marketplace page first — Marketplace → send-resources tab → Ctrl+A, Ctrl+C.',
+      )
       setSimulation(null)
       setHourlyOverview([])
       return
@@ -112,7 +124,7 @@ export default function CropTimelineCalculator() {
 
     const stock = parsed.currentCrop
     const capacity = parsed.granaryCapacity ?? null
-    const balance = parseFloat(String(consumptionPerHour).replace(/\s/g, '').replace(',', '.'))
+    const balance = cropBalancePerHour(cropBalanceSign, cropBalanceDigits)
 
     if (stock == null || !Number.isFinite(stock) || stock < 0) {
       const hints = []
@@ -121,7 +133,7 @@ export default function CropTimelineCalculator() {
       else hints.push('missing Send resources / Poslat suroviny / Stuur grondstoffen section')
       setReport(
         `⚠️ Could not read crop stock from paste.\n` +
-          `Use Ctrl+A on the marketplace page (send form with 0/NNNNN for each resource + village list in sidebar).\n` +
+          `Use the Marketplace send-resources tab (second tab): Ctrl+A on that screen.\n` +
           (hints.length ? `Detected: ${hints.join(', ')}.` : ''),
       )
       setSimulation(null)
@@ -129,7 +141,9 @@ export default function CropTimelineCalculator() {
       return
     }
     if (!Number.isFinite(balance)) {
-      setReport('⚠️ Enter net crop balance per hour (e.g. -20000 for deficit).')
+      setReport(
+        '⚠️ Enter net crop per hour: pick − or + above, type digits only (no minus inside the box). Example: − with 20000 = −20,000 crop/h.',
+      )
       setSimulation(null)
       setHourlyOverview([])
       return
@@ -273,10 +287,12 @@ export default function CropTimelineCalculator() {
       </div>
 
       <p style={{ color: C.muted, fontSize: '0.85rem', lineHeight: 1.55, margin: 0 }}>
-        Paste marketplace (<strong style={{ color: C.text }}>Ctrl+A</strong>) — must include the
-        village list in the sidebar. You only type{' '}
-        <strong style={{ color: C.text }}>net crop/h</strong>; village name and map link are read
-        automatically.
+        Open the{' '}
+        <strong style={{ color: C.text }}>Marketplace</strong>, switch to the{' '}
+        <strong style={{ color: C.text }}>second tab</strong> (send resources / ships merchants).{' '}
+        <strong style={{ color: C.text }}>Ctrl+A</strong>, then <strong style={{ color: C.text }}>Ctrl+C</strong>{' '}
+        from that tab and paste below. Enter{' '}
+        <strong style={{ color: C.text }}>net crop/h</strong> with the sign dropdown + digits only; village name and map link are read from the paste.
       </p>
 
       <div
@@ -336,21 +352,53 @@ export default function CropTimelineCalculator() {
         }}
       >
         <label style={{ fontSize: '0.72rem', color: C.gold, display: 'block', marginBottom: 6 }}>
-          Net crop balance / hour *
+          Net crop per hour *
         </label>
-        <input
-          type="text"
-          value={consumptionPerHour}
-          onChange={(e) => setConsumptionPerHour(e.target.value)}
-          placeholder="-20000"
+        <div
           style={{
-            ...inputStyle,
+            display: 'flex',
+            alignItems: 'stretch',
+            gap: 8,
             maxWidth: '100%',
-            borderColor: consumptionPerHour ? C.goldDim : C.border,
           }}
-        />
+        >
+          <select
+            value={cropBalanceSign}
+            onChange={(e) => setCropBalanceSign(e.target.value)}
+            aria-label="Surplus or deficit"
+            style={{
+              flex: '0 0 auto',
+              background: '#0f0c09',
+              border: `1px solid ${cropBalanceDigits ? C.goldDim : C.border}`,
+              borderRadius: 6,
+              color: C.text,
+              fontSize: '1rem',
+              padding: '8px 10px',
+              fontFamily: 'inherit',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="-">−</option>
+            <option value="+">+</option>
+          </select>
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            value={cropBalanceDigits}
+            onChange={(e) => setCropBalanceDigits(e.target.value.replace(/\D/g, ''))}
+            placeholder="e.g. 20000"
+            aria-label="Amount per hour, digits only"
+            style={{
+              ...inputStyle,
+              flex: 1,
+              minWidth: 0,
+              borderColor: cropBalanceDigits ? C.goldDim : C.border,
+            }}
+          />
+        </div>
         <span style={{ fontSize: '0.65rem', color: C.muted, display: 'block', marginTop: 6 }}>
-          Negative = deficit. Only field you type manually.
+          Use the dropdown for − / +; this box accepts digits only (no long dashes or spaces).
         </span>
 
         {mapUrl && (

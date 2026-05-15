@@ -9,6 +9,7 @@ const INCOMING_MARKERS = [
   /Příchozí dodávky/i,
   /Incoming deliveries/i,
   /Eingehende Lieferungen/i,
+  /Ankommende Lieferungen/i,
   /Inkomende leveringen/i,
 ]
 
@@ -96,7 +97,7 @@ function sliceIncomingSection(text) {
     if (i !== -1 && i > start && i < end) end = i
   }
   const expected =
-    /Očekáváno celkem|Expected total|Gesamt erwartet|Verwachte aantal|Verwacht totaal/i
+    /Očekáváno celkem|Expected total|Gesamt erwartet|Erwartet gesamt|Verwachte aantal|Verwacht totaal/i
   const expIdx = norm.slice(start, end).search(expected)
   if (expIdx !== -1) {
     const afterSection = norm.slice(start + expIdx)
@@ -129,6 +130,7 @@ function findLastSendMarkerIndex(norm) {
     /Poslat suroviny/i,
     /Send resources/i,
     /Rohstoffe senden/i,
+    /Verschicken/i,
     /Stuur grondstoffen/i,
   ]
   let start = -1
@@ -227,7 +229,7 @@ function sliceSendResourcesBlock(text) {
   }
 
   const tail = norm.slice(start, end)
-  const merchantEnd = tail.search(/\n(?:Merchants|Handelaren)\s*:/i)
+  const merchantEnd = tail.search(/\n(?:Merchants|Handelaren|Händler)\s*:/iu)
   const totalEnd = tail.search(/\n(?:Total|Celkem|Gesamt|Totaal)\s*:\s*\d/i)
   const cut =
     merchantEnd !== -1

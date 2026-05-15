@@ -27,7 +27,7 @@ const C = {
 const HORIZON_HOURS = 12
 
 function findSendMarkerHint(text) {
-  return /Poslat suroviny|Send resources|Rohstoffe senden|Verschicken|Stuur grondstoffen|Sūtīt resursus/i.test(
+  return /Poslat suroviny|Send resources|Rohstoffe senden|Verschicken|Stuur grondstoffen|Sūtīt resursus|Siųsti resursus/i.test(
     text,
   )
 }

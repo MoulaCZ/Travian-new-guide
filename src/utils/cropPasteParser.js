@@ -1,5 +1,5 @@
 /**
- * Parse Travian marketplace / village copy-paste (CZ, EN, DE, NL, LV headers).
+ * Parse Travian marketplace / village copy-paste (CZ, EN, DE, NL, LV, LT headers).
  * Focus: incoming deliveries (crop), granary stock & capacity, server time.
  */
 
@@ -12,6 +12,7 @@ const INCOMING_MARKERS = [
   /Ankommende Lieferungen/i,
   /Inkomende leveringen/i,
   /Ienākošās piegādes/i,
+  /Atvykstantys pristatymai/i,
 ]
 
 const OUTGOING_MARKERS = [
@@ -20,17 +21,22 @@ const OUTGOING_MARKERS = [
   /Ausgehende Lieferungen/i,
   /Uitgaande leveringen/i,
   /Izejošās piegādes/i,
+  /Išvykstantys pristatymai/i,
 ]
 
 const TRANSPORT_FROM_GENERIC = /^Transport\s+(?:z|from|von|van)\s+(.+?)\s*:\s*(.+)$/i
 /** Latvian Legends: "Transportē no 08 Ostrava : Moula" */
 const TRANSPORT_FROM_LV = /^Transportē\s+no\s+(.+?)\s*:\s*(.+)$/iu
+/** Lithuanian: "Gabenama iš 08 Ostrava : Moula" */
+const TRANSPORT_FROM_LT = /^Gabenama\s+iš\s+(.+?)\s*:\s*(.+)$/iu
 
 function matchTransportFrom(line) {
   const norm = normalizeTravianText(line).trim()
   let m = norm.match(TRANSPORT_FROM_GENERIC)
   if (m) return m
   m = norm.match(TRANSPORT_FROM_LV)
+  if (m) return m
+  m = norm.match(TRANSPORT_FROM_LT)
   return m || null
 }
 
@@ -38,10 +44,11 @@ function isTransportFromLine(line) {
   return matchTransportFrom(line) != null
 }
 
-/** CZ/EN/DE/NL-style vs LV "Pēc HH:MM:SS - HH:MM" */
+/** CZ/EN/DE/NL / LV / LT arrival line formats */
 const ARRIVAL_PATTERNS = [
   /(?:Za|in)\s+(\d{2}):(\d{2}):(\d{2})\s+(?:v|at|um|om)\s+(\d{1,2}):(\d{2})/i,
   /Pēc\s+(\d{2}):(\d{2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/iu,
+  /Per\s+(\d{2}):(\d{2}):(\d{2})\s+atvyks\s+(\d{1,2}):(\d{2})/iu,
 ]
 
 function matchArrivalLine(line) {
@@ -58,7 +65,7 @@ function isArrivalLine(line) {
 }
 
 const SERVER_TIME =
-  /(?:Čas serveru|Server time|Serverzeit|Servertijd|Servera laiks)\s*:?\s*(\d{1,2}):(\d{2}):(\d{2})/i
+  /(?:Čas serveru|Server time|Serverzeit|Servertijd|Servera laiks|Serverio laikas)\s*:?\s*(\d{1,2}):(\d{2}):(\d{2})/i
 
 /** Strip Travian bidi / invisible chars and NBSP. */
 export function normalizeTravianText(text) {
@@ -129,7 +136,7 @@ function sliceIncomingSection(text) {
     if (i !== -1 && i > start && i < end) end = i
   }
   const expected =
-    /Očekáváno celkem|Expected total|Gesamt erwartet|Erwartet gesamt|Verwachte aantal|Verwacht totaal|Paredzamā kopsumma/i
+    /Očekáváno celkem|Expected total|Gesamt erwartet|Erwartet gesamt|Verwachte aantal|Verwacht totaal|Paredzamā kopsumma|Viso laukiama/i
   const expIdx = norm.slice(start, end).search(expected)
   if (expIdx !== -1) {
     const afterSection = norm.slice(start + expIdx)
@@ -165,6 +172,7 @@ function findLastSendMarkerIndex(norm) {
     /Verschicken/i,
     /Stuur grondstoffen/i,
     /Sūtīt resursus/i,
+    /Siųsti resursus/i,
   ]
   let start = -1
   for (const re of sendMarkers) {
@@ -257,14 +265,15 @@ function sliceSendResourcesBlock(text) {
     /Lieferübersicht/i,
     /Leveringsoverzicht/i,
     /Piegāžu pārskats/i,
+    /Pristatymo apžvalga/i,
   ]) {
     const i = norm.search(re)
     if (i > start && i < end) end = i
   }
 
   const tail = norm.slice(start, end)
-  const merchantEnd = tail.search(/\n(?:Merchants|Handelaren|Händler|Tirgotāji)\s*:/iu)
-  const totalEnd = tail.search(/\n(?:Total|Celkem|Gesamt|Totaal|Kopā)\s*:\s*\d/i)
+  const merchantEnd = tail.search(/\n(?:Merchants|Handelaren|Händler|Tirgotāji|Prekeiviai)\s*:/iu)
+  const totalEnd = tail.search(/\n(?:Total|Celkem|Gesamt|Totaal|Kopā|Viso)\s*:\s*\d/i)
   const cut =
     merchantEnd !== -1
       ? merchantEnd
@@ -277,7 +286,7 @@ function sliceSendResourcesBlock(text) {
 /** Numbers from the top resource bar (around server time — EN paste often lists them just after). */
 function parseResourceBarNumbers(text) {
   const norm = normalizeTravianText(text)
-  const parts = norm.split(/Čas serveru|Server time|Serverzeit|Servertijd|Servera laiks/i)
+  const parts = norm.split(/Čas serveru|Server time|Serverzeit|Servertijd|Servera laiks|Serverio laikas/i)
   const head = parts[0] ?? ''
   const afterServer = (parts[1] ?? '').split('\n').slice(0, 12).join('\n')
   const scan = `${head}\n${afterServer}`
@@ -482,7 +491,7 @@ export function parseVillageCoords(text, villageName) {
 export function parseVillageNameFromPaste(text) {
   const norm = normalizeTravianText(text)
   const m = norm.match(
-    /(?:^|\n)([^\n:]+)\n(\d{2}\s+[^\n]+)\n(?:Obyvatelé|Population|Einwohner|Inwoners|Populācija)\b/im,
+    /(?:^|\n)([^\n:]+)\n(\d{2}\s+[^\n]+)\n(?:Obyvatelé|Population|Einwohner|Inwoners|Populācija|Gyventojų skaičius)\s*:+/im,
   )
   if (!m) return null
   const village = (m[2] ?? '').trim()

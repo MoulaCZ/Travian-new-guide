@@ -8,8 +8,11 @@ import Onboarding, { useOnboarding } from './components/Onboarding'
 import SuggestEdit from './components/SuggestEdit'
 import { pages } from './data/pages'
 
+import CropTimelineCalculator from './components/CropTimelineCalculator'
+
 const COMPONENTS = {
   BattleCalculator,
+  CropTimelineCalculator,
 }
 
 export default function App() {

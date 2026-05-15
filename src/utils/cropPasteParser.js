@@ -28,9 +28,15 @@ const SERVER_TIME =
 /** Strip Travian bidi / invisible chars and NBSP. */
 export function normalizeTravianText(text) {
   return String(text ?? '')
+    .replace(/\r\n/g, '\n')
     .replace(/[\u202A-\u202E\u200E\u200F\uFEFF]/g, '')
     .replace(/\u00a0/g, ' ')
+    .replace(/[‭‬]/g, '')
+    .replace(/−/g, '-')
 }
+
+/** Parenthesized coords: (-196|-33) with optional unicode minus. */
+const COORDS_IN_PARENS = /\(\s*(-?\d+)\s*[|,;]\s*(-?\d+)\s*\)/
 
 /** "15 200" / "‭68 093‬" → 15200 */
 export function parseTravianNumber(raw) {
@@ -90,7 +96,12 @@ function sliceIncomingSection(text) {
   const expected = /Očekáváno celkem|Expected total|Gesamt erwartet/i
   const expIdx = norm.slice(start, end).search(expected)
   if (expIdx !== -1) {
-    const after = norm.slice(start + expIdx).search(OUTGOING_MARKERS[0])
+    const afterSection = norm.slice(start + expIdx)
+    let after = -1
+    for (const re of OUTGOING_MARKERS) {
+      const i = afterSection.search(re)
+      if (i !== -1 && (after === -1 || i < after)) after = i
+    }
     if (after !== -1 && start + expIdx + after < end) end = start + expIdx + after
   }
 
@@ -168,6 +179,11 @@ export function parseIncomingDeliveries(text, serverTime = null) {
   return out
 }
 
+/** EN paste often splits "0 / 48690" across lines — merge before parsing. */
+function collapseSplitSlashPairs(text) {
+  return text.replace(/(?:\r?\n)\s*\/\s*(?:\r?\n)/g, ' / ')
+}
+
 /** Send-resources block only (avoids Obchodníci 7/20 and Celkem merchant totals). */
 function sliceSendResourcesBlock(text) {
   const norm = normalizeTravianText(text)
@@ -183,16 +199,22 @@ function sliceSendResourcesBlock(text) {
   if (start === -1) return ''
 
   const tail = norm.slice(start)
-  const endRel = tail.search(/Celkem\s*:|Total\s*:|Gesamt\s*:|Dodávky|Deliveries|Přehled dodávek/i)
+  // End before send-form "Total:" / merchants — not "Delivery overview" or bare "Deliveries"
+  const endRel = tail.search(
+    /\n(?:Total|Celkem|Gesamt)\s*:|(?:\n|\r)Merchants\s*:|(?:\n|\r)(?:Delivery overview|Přehled dodávek)\b/i,
+  )
   return endRel !== -1 ? tail.slice(0, endRel) : tail.slice(0, 1200)
 }
 
-/** Numbers from the top resource bar (before server time). */
+/** Numbers from the top resource bar (around server time — EN paste often lists them just after). */
 function parseResourceBarNumbers(text) {
   const norm = normalizeTravianText(text)
-  const head = norm.split(/Čas serveru|Server time|Serverzeit/i)[0]
+  const parts = norm.split(/Čas serveru|Server time|Serverzeit/i)
+  const head = parts[0] ?? ''
+  const afterServer = (parts[1] ?? '').split('\n').slice(0, 12).join('\n')
+  const scan = `${head}\n${afterServer}`
   const nums = []
-  for (const line of head.split(/\r?\n/)) {
+  for (const line of scan.split('\n')) {
     if (isStandaloneNumberLine(line)) {
       const n = parseTravianNumber(line)
       if (n != null) nums.push(n)
@@ -207,14 +229,24 @@ function parseResourceBarNumbers(text) {
  * - Capacity = standalone number on the line BEFORE stock in the top resource bar
  *   (e.g. 80 000 above 28 081), matching the in-game granary UI.
  */
+function parseSlashPairsFromBlock(block) {
+  const pairs = []
+  for (const line of block.split('\n')) {
+    const m = line.trim().match(/^(\d[\d\s]*)\s*\/\s*([\d\s]+)$/)
+    if (m) pairs.push([m[1], m[2]])
+  }
+  if (pairs.length >= 4) return pairs
+  return [...block.matchAll(/(\d[\d\s]*)\s*\/\s*([\d\s]+?)(?=\n|$)/g)].map((m) => [m[1], m[2]])
+}
+
 export function parseGranaryFromPaste(text) {
-  const sendBlock = sliceSendResourcesBlock(text)
-  const blockPairs = [...sendBlock.matchAll(/(\d[\d\s]*)\s*\/\s*([\d\s]+)/g)]
+  const sendBlock = collapseSplitSlashPairs(sliceSendResourcesBlock(text))
+  const blockPairs = parseSlashPairsFromBlock(sendBlock)
 
   let currentCrop = null
   if (blockPairs.length >= 4) {
     const lastFour = blockPairs.slice(-4)
-    currentCrop = parseTravianNumber(lastFour[3][2])
+    currentCrop = parseTravianNumber(lastFour[3][1])
   }
 
   const headerNums = parseResourceBarNumbers(text)
@@ -282,17 +314,38 @@ export function villageNamesMatch(a, b) {
 export function parseVillageListFromPaste(text) {
   const norm = normalizeTravianText(text)
   const villages = []
-  const re = /(?:^|\n)(\d{2}\s+[^\n(]+?)\s*\(\s*(-?\d+)\s*[|,;]\s*(-?\d+)\s*\)/gim
+  const seen = new Set()
 
+  const push = (name, x, y) => {
+    const key = `${name}|${x}|${y}`
+    if (seen.has(key)) return
+    seen.add(key)
+    villages.push({ name: name.trim(), x, y })
+  }
+
+  const inlineRe = /(?:^|\n)(\d{2}\s+[^\n(]+?)\s*\(\s*(-?\d+)\s*[|,;]\s*(-?\d+)\s*\)/gim
   let m
-  while ((m = re.exec(norm)) !== null) {
-    const name = m[1].trim()
-    const x = parseInt(m[2], 10)
-    const y = parseInt(m[3], 10)
-    if (Number.isFinite(x) && Number.isFinite(y)) {
-      villages.push({ name, x, y })
+  while ((m = inlineRe.exec(norm)) !== null) {
+    push(m[1], parseInt(m[2], 10), parseInt(m[3], 10))
+  }
+
+  const lines = norm.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
+  const villageLineRe = /^(\d{2}\s+.+)$/
+  for (let i = 0; i < lines.length; i++) {
+    const vm = lines[i].match(villageLineRe)
+    if (!vm) continue
+    const name = vm[1].trim()
+    const onSame = name.match(/^(\d{2}\s+.+?)\s*\(\s*(-?\d+)\s*[|,;]\s*(-?\d+)\s*\)$/)
+    if (onSame) {
+      push(onSame[1], parseInt(onSame[2], 10), parseInt(onSame[3], 10))
+      continue
+    }
+    if (i + 1 < lines.length) {
+      const cm = lines[i + 1].match(COORDS_IN_PARENS)
+      if (cm) push(name, parseInt(cm[1], 10), parseInt(cm[2], 10))
     }
   }
+
   return villages
 }
 
@@ -338,10 +391,10 @@ export function parseVillageCoords(text, villageName) {
 export function parseVillageNameFromPaste(text) {
   const norm = normalizeTravianText(text)
   const m = norm.match(
-    /(?:^|\n)([^\n:]+)\n(\d{2}\s+[^\n]+)\nObyvatelé|(?:^|\n)([^\n:]+)\n(\d{2}\s+[^\n]+)\n(?:Population|Einwohner)/im,
+    /(?:^|\n)([^\n:]+)\n(\d{2}\s+[^\n]+)\n(?:Obyvatelé|Population|Einwohner)\b/im,
   )
   if (!m) return null
-  const village = (m[2] ?? m[4] ?? '').trim()
+  const village = (m[2] ?? '').trim()
   return village || null
 }
 

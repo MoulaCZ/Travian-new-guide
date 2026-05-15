@@ -154,12 +154,19 @@ export default function CropTimelineCalculator() {
       return
     }
 
-    const incoming = parsed.incoming.map((d) => ({
-      minutesFromNow: d.minutesFromNow ?? 0,
-      crop: d.crop ?? 0,
-      village: d.village,
-      player: d.player,
-    }))
+    const incoming = parsed.incoming
+      .filter(
+        (d) =>
+          !d.alreadyArrived &&
+          d.minutesFromNow != null &&
+          Number.isFinite(d.minutesFromNow),
+      )
+      .map((d) => ({
+        minutesFromNow: d.minutesFromNow,
+        crop: d.crop ?? 0,
+        village: d.village,
+        player: d.player,
+      }))
 
     const serverTime = parsed.serverTime ?? null
 
@@ -463,12 +470,24 @@ export default function CropTimelineCalculator() {
                     {formatNum(d.crop)}
                   </td>
                   <td style={{ padding: '6px 8px' }}>
-                    {d.minutesFromNow != null ? formatDuration(d.minutesFromNow) : '—'}
+                    {d.alreadyArrived ? (
+                      <span style={{ color: C.win }} title="Already in granary (past leg)">
+                        arrived
+                      </span>
+                    ) : d.minutesFromNow != null && Number.isFinite(d.minutesFromNow) ? (
+                      formatDuration(d.minutesFromNow)
+                    ) : (
+                      '—'
+                    )}
                   </td>
                   <td style={{ padding: '6px 8px', color: C.muted }}>
-                    {d.minutesFromNow != null && parsedSnapshot.serverTime
-                      ? formatClockFromServer(parsedSnapshot.serverTime, d.minutesFromNow) ?? '—'
-                      : d.arrivalLabel ?? '—'}
+                    {d.alreadyArrived
+                      ? '—'
+                      : d.minutesFromNow != null &&
+                          Number.isFinite(d.minutesFromNow) &&
+                          parsedSnapshot.serverTime
+                        ? formatClockFromServer(parsedSnapshot.serverTime, d.minutesFromNow) ?? '—'
+                        : d.arrivalLabel ?? '—'}
                   </td>
                 </tr>
               ))}

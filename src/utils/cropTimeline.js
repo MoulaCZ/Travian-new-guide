@@ -53,6 +53,7 @@ function applyGranaryFloorAndCap(stock, capacity) {
 
 function sortedIncomingEvents(incoming) {
   return (incoming || [])
+    .filter((d) => !d.alreadyArrived)
     .filter((d) => d.minutesFromNow != null && Number.isFinite(d.minutesFromNow))
     .map((d) => ({
       t: Math.max(0, Math.round(d.minutesFromNow)),
@@ -198,6 +199,7 @@ export function simulateCropTimeline({
   stepMinutes = 1,
 }) {
   const events = incoming
+    .filter((d) => !d.alreadyArrived)
     .filter((d) => d.minutesFromNow != null && Number.isFinite(d.minutesFromNow))
     .map((d) => ({
       t: Math.max(0, Math.round(d.minutesFromNow)),
@@ -338,7 +340,13 @@ export function buildArrivalPlan({
   }
 
   const cropDel = [...incoming]
-    .filter((d) => (d.crop ?? 0) > 0 && d.minutesFromNow != null)
+    .filter(
+      (d) =>
+        !d.alreadyArrived &&
+        (d.crop ?? 0) > 0 &&
+        d.minutesFromNow != null &&
+        Number.isFinite(d.minutesFromNow),
+    )
     .sort((a, b) => a.minutesFromNow - b.minutesFromNow)
 
   for (const d of cropDel) {
@@ -394,16 +402,21 @@ export function buildDiscordReport({
 
   const cropIncoming = [...incomingDeliveries]
     .filter((d) => (d.crop ?? 0) > 0)
-    .sort(
-      (a, b) =>
+    .sort((a, b) => {
+      const ar = a.alreadyArrived ? 1 : 0
+      const br = b.alreadyArrived ? 1 : 0
+      if (ar !== br) return ar - br
+      return (
         (a.minutesFromNow ?? Number.POSITIVE_INFINITY) -
-        (b.minutesFromNow ?? Number.POSITIVE_INFINITY),
-    )
+        (b.minutesFromNow ?? Number.POSITIVE_INFINITY)
+      )
+    })
   if (cropIncoming.length) {
     lines.push('Incoming crop (scheduled):')
     for (const d of cropIncoming) {
-      const eta =
-        d.minutesFromNow != null && Number.isFinite(d.minutesFromNow)
+      const eta = d.alreadyArrived
+        ? 'arrived'
+        : d.minutesFromNow != null && Number.isFinite(d.minutesFromNow)
           ? `~${formatDuration(d.minutesFromNow)}`
           : (d.arrivalLabel ?? 'ETA unknown').replace(/\s+/g, ' ').trim()
       const who = [d.village, d.player].filter(Boolean).join(' : ') || '—'

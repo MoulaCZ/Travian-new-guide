@@ -1,5 +1,5 @@
 /**
- * Parse Travian marketplace / village copy-paste (CZ, EN, DE headers).
+ * Parse Travian marketplace / village copy-paste (CZ, EN, DE, NL headers).
  * Focus: incoming deliveries (crop), granary stock & capacity, server time.
  */
 
@@ -9,21 +9,23 @@ const INCOMING_MARKERS = [
   /Příchozí dodávky/i,
   /Incoming deliveries/i,
   /Eingehende Lieferungen/i,
+  /Inkomende leveringen/i,
 ]
 
 const OUTGOING_MARKERS = [
   /Odchozí dodávky/i,
   /Outgoing deliveries/i,
   /Ausgehende Lieferungen/i,
+  /Uitgaande leveringen/i,
 ]
 
-const TRANSPORT_FROM = /^Transport\s+(?:z|from|von)\s+(.+?)\s*:\s*(.+)$/i
+const TRANSPORT_FROM = /^Transport\s+(?:z|from|von|van)\s+(.+?)\s*:\s*(.+)$/i
 
 const ARRIVAL_LINE =
-  /(?:Za|in)\s+(\d{2}):(\d{2}):(\d{2})\s+(?:v|at|um)\s+(\d{1,2}):(\d{2})/i
+  /(?:Za|in)\s+(\d{2}):(\d{2}):(\d{2})\s+(?:v|at|um|om)\s+(\d{1,2}):(\d{2})/i
 
 const SERVER_TIME =
-  /(?:Čas serveru|Server time|Serverzeit)\s*:?\s*(\d{1,2}):(\d{2}):(\d{2})/i
+  /(?:Čas serveru|Server time|Serverzeit|Servertijd)\s*:?\s*(\d{1,2}):(\d{2}):(\d{2})/i
 
 /** Strip Travian bidi / invisible chars and NBSP. */
 export function normalizeTravianText(text) {
@@ -93,7 +95,8 @@ function sliceIncomingSection(text) {
     const i = norm.search(re)
     if (i !== -1 && i > start && i < end) end = i
   }
-  const expected = /Očekáváno celkem|Expected total|Gesamt erwartet/i
+  const expected =
+    /Očekáváno celkem|Expected total|Gesamt erwartet|Verwachte aantal|Verwacht totaal/i
   const expIdx = norm.slice(start, end).search(expected)
   if (expIdx !== -1) {
     const afterSection = norm.slice(start + expIdx)
@@ -122,7 +125,12 @@ function isStandaloneNumberLine(line) {
 }
 
 function findLastSendMarkerIndex(norm) {
-  const sendMarkers = [/Poslat suroviny/i, /Send resources/i, /Rohstoffe senden/i]
+  const sendMarkers = [
+    /Poslat suroviny/i,
+    /Send resources/i,
+    /Rohstoffe senden/i,
+    /Stuur grondstoffen/i,
+  ]
   let start = -1
   for (const re of sendMarkers) {
     let idx = 0
@@ -208,14 +216,19 @@ function sliceSendResourcesBlock(text) {
     const i = norm.search(re)
     if (i > start && i < end) end = i
   }
-  for (const re of [/Delivery overview/i, /Přehled dodávek/i, /Lieferübersicht/i]) {
+  for (const re of [
+    /Delivery overview/i,
+    /Přehled dodávek/i,
+    /Lieferübersicht/i,
+    /Leveringsoverzicht/i,
+  ]) {
     const i = norm.search(re)
     if (i > start && i < end) end = i
   }
 
   const tail = norm.slice(start, end)
-  const merchantEnd = tail.search(/\nMerchants\s*:/i)
-  const totalEnd = tail.search(/\n(?:Total|Celkem|Gesamt)\s*:\s*\d/i)
+  const merchantEnd = tail.search(/\n(?:Merchants|Handelaren)\s*:/i)
+  const totalEnd = tail.search(/\n(?:Total|Celkem|Gesamt|Totaal)\s*:\s*\d/i)
   const cut =
     merchantEnd !== -1
       ? merchantEnd
@@ -228,7 +241,7 @@ function sliceSendResourcesBlock(text) {
 /** Numbers from the top resource bar (around server time — EN paste often lists them just after). */
 function parseResourceBarNumbers(text) {
   const norm = normalizeTravianText(text)
-  const parts = norm.split(/Čas serveru|Server time|Serverzeit/i)
+  const parts = norm.split(/Čas serveru|Server time|Serverzeit|Servertijd/i)
   const head = parts[0] ?? ''
   const afterServer = (parts[1] ?? '').split('\n').slice(0, 12).join('\n')
   const scan = `${head}\n${afterServer}`
@@ -272,20 +285,25 @@ function cropFromSlashPairs(pairs) {
   return right ?? left
 }
 
+/** Match crop stock line in header bar — exact or within ~tick refresh lag vs send form */
+function lookupGranaryCapacityFromHeaderNums(headerNums, currentCrop) {
+  if (currentCrop == null) return null
+  let idx = headerNums.lastIndexOf(currentCrop)
+  if (idx < 0) {
+    const tol = Math.max(200, Math.round(currentCrop * 0.004))
+    idx = headerNums.findLastIndex((n) => Math.abs(n - currentCrop) <= tol)
+  }
+  if (idx > 0 && headerNums[idx - 1] >= currentCrop) return headerNums[idx - 1]
+  return null
+}
+
 export function parseGranaryFromPaste(text) {
   const sendBlock = collapseSplitSlashPairs(sliceSendResourcesBlock(text))
   let blockPairs = parseSlashPairsFromBlock(sendBlock)
   let currentCrop = cropFromSlashPairs(blockPairs)
 
   const headerNums = parseResourceBarNumbers(text)
-  let capacity = null
-
-  if (currentCrop != null) {
-    const idx = headerNums.lastIndexOf(currentCrop)
-    if (idx > 0 && headerNums[idx - 1] >= currentCrop) {
-      capacity = headerNums[idx - 1]
-    }
-  }
+  let capacity = lookupGranaryCapacityFromHeaderNums(headerNums, currentCrop)
 
   if (currentCrop == null && headerNums.length >= 2) {
     for (let i = headerNums.length - 1; i > 0; i--) {
@@ -305,10 +323,8 @@ export function parseGranaryFromPaste(text) {
     )
     blockPairs = parseSlashPairsFromBlock(wide.slice(0, 2500))
     currentCrop = cropFromSlashPairs(blockPairs)
-    if (currentCrop != null && capacity == null) {
-      const idx = headerNums.lastIndexOf(currentCrop)
-      if (idx > 0 && headerNums[idx - 1] >= currentCrop) capacity = headerNums[idx - 1]
-    }
+    if (currentCrop != null && capacity == null)
+      capacity = lookupGranaryCapacityFromHeaderNums(headerNums, currentCrop)
   }
 
   return { currentCrop, capacity }
@@ -430,7 +446,7 @@ export function parseVillageCoords(text, villageName) {
 export function parseVillageNameFromPaste(text) {
   const norm = normalizeTravianText(text)
   const m = norm.match(
-    /(?:^|\n)([^\n:]+)\n(\d{2}\s+[^\n]+)\n(?:Obyvatelé|Population|Einwohner)\b/im,
+    /(?:^|\n)([^\n:]+)\n(\d{2}\s+[^\n]+)\n(?:Obyvatelé|Population|Einwohner|Inwoners)\b/im,
   )
   if (!m) return null
   const village = (m[2] ?? '').trim()

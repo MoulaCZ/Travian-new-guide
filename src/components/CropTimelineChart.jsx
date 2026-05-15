@@ -40,22 +40,35 @@ const CropTimelineChart = forwardRef(function CropTimelineChart(
     const capY = capacity != null && capacity > 0 ? y(capacity) : null
     const zeroY = y(0)
 
-    const tickStep = maxMin <= 360 ? 60 : maxMin <= 720 ? 120 : 180
+    /** Vertical grid every minute (subtle); time labels every hour to stay readable */
+    const minuteLines = []
+    for (let m = 0; m <= maxMin; m += 1) {
+      minuteLines.push({ minutes: m, x: x(m) })
+    }
+
+    const labelStep = 60
     const ticks = []
-    for (let m = 0; m <= maxMin; m += tickStep) {
+    for (let m = 0; m <= maxMin; m += labelStep) {
       ticks.push({
         minutes: m,
         x: x(m),
         label: serverTime ? formatClockFromServer(serverTime, m) : `+${m}m`,
       })
     }
+    if (maxMin % labelStep !== 0) {
+      ticks.push({
+        minutes: maxMin,
+        x: x(maxMin),
+        label: serverTime ? formatClockFromServer(serverTime, maxMin) : `+${maxMin}m`,
+      })
+    }
 
-    return { W, H, pathD, capY, zeroY, ticks, yMax, padL, innerH, padT, x, y }
+    return { W, H, pathD, capY, zeroY, ticks, minuteLines, yMax, padL, innerH, padT, x, y }
   }, [points, capacity, serverTime])
 
   if (!chart) return null
 
-  const { W, H, pathD, capY, zeroY, ticks, yMax, padL, innerH, padT, x, y } = chart
+  const { W, H, pathD, capY, zeroY, ticks, minuteLines, yMax, padL, innerH, padT, x, y } = chart
 
   return (
     <div
@@ -74,16 +87,29 @@ const CropTimelineChart = forwardRef(function CropTimelineChart(
         role="img"
         aria-label="Crop stock over time"
       >
+        {minuteLines.map((t) => (
+          <line
+            key={`m-${t.minutes}`}
+            x1={t.x}
+            y1={padT}
+            x2={t.x}
+            y2={padT + innerH}
+            stroke={C.border}
+            strokeWidth={0.35}
+            opacity={0.18}
+          />
+        ))}
         {ticks.map((t) => (
-          <g key={t.minutes}>
+          <g key={`lbl-${t.minutes}`}>
             <line
               x1={t.x}
               y1={padT}
               x2={t.x}
               y2={padT + innerH}
               stroke={C.border}
-              strokeWidth={0.5}
-              strokeDasharray="3 4"
+              strokeWidth={0.65}
+              strokeDasharray="4 5"
+              opacity={0.45}
             />
             <text x={t.x} y={H - 8} textAnchor="middle" fill={C.muted} fontSize={10}>
               {t.label}
@@ -127,15 +153,16 @@ const CropTimelineChart = forwardRef(function CropTimelineChart(
         />
 
         <path d={pathD} fill="none" stroke={C.line} strokeWidth={2} />
-        {points.map((p) => (
-          <circle
-            key={p.minutes}
-            cx={x(p.minutes)}
-            cy={y(p.stock)}
-            r={p.minutes === 0 ? 4 : 2.5}
-            fill={p.stock <= 0 ? C.lose : C.gold}
-          />
-        ))}
+        {points.length <= 96 &&
+          points.map((p) => (
+            <circle
+              key={p.minutes}
+              cx={x(p.minutes)}
+              cy={y(p.stock)}
+              r={p.minutes === 0 ? 4 : 2.5}
+              fill={p.stock <= 0 ? C.lose : C.gold}
+            />
+          ))}
       </svg>
       <div
         style={{

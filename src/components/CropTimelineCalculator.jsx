@@ -166,15 +166,17 @@ export default function CropTimelineCalculator() {
       balancePerHour: balance,
       incoming,
       horizonHours: HORIZON_HOURS,
-      stepMinutes: 60,
+      stepMinutes: 1,
     })
 
     const hourly = buildHourlyOverview({
       stockStart: stock,
       balancePerHour: balance,
       incoming,
+      capacity: Number.isFinite(capacity) ? capacity : null,
       serverTime,
       hours: HORIZON_HOURS,
+      horizonMinutes: HORIZON_HOURS * 60,
     })
 
     const out = buildDiscordReport({

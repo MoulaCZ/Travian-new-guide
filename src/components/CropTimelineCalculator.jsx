@@ -27,7 +27,7 @@ const C = {
 const HORIZON_HOURS = 12
 
 function findSendMarkerHint(text) {
-  return /Poslat suroviny|Send resources|Rohstoffe senden/i.test(text)
+  return /Poslat suroviny|Send resources|Rohstoffe senden|Stuur grondstoffen/i.test(text)
 }
 
 const SAMPLE_PLACEHOLDER =
@@ -118,7 +118,7 @@ export default function CropTimelineCalculator() {
       const hints = []
       if (!parsed.serverTime) hints.push('server time missing')
       if (findSendMarkerHint(text)) hints.push('found send-resources section')
-      else hints.push('missing Send resources / Poslat suroviny section')
+      else hints.push('missing Send resources / Poslat suroviny / Stuur grondstoffen section')
       setReport(
         `⚠️ Could not read crop stock from paste.\n` +
           `Use Ctrl+A on the marketplace page (send form with 0/NNNNN for each resource + village list in sidebar).\n` +

@@ -153,6 +153,31 @@ function isMerchantLine(line) {
   return /^\s*\d+\s*[×x]/i.test(line)
 }
 
+/** e.g. "3×" / "2 x" → 3 (cap sanity) */
+function parseMerchantMultiplier(line) {
+  if (!line || !isMerchantLine(line)) return null
+  const norm = normalizeTravianText(line).trim()
+  const m = norm.match(/^(\d+)\s*[×x]/i)
+  if (!m) return null
+  const n = parseInt(m[1], 10)
+  if (!Number.isFinite(n) || n < 1) return null
+  return Math.min(n, 99)
+}
+
+/** Read four consecutive resource integers; skip bidi-only lines handled by parseTravianNumber */
+function tryReadResourceQuad(lines, startIdx) {
+  const quad = []
+  let j = startIdx
+  while (j < lines.length && quad.length < 4) {
+    if (isTransportFromLine(lines[j]) || isArrivalLine(lines[j])) break
+    const n = parseTravianNumber(lines[j])
+    if (n === null) break
+    quad.push(n)
+    j++
+  }
+  return quad.length === 4 ? { quad, nextIdx: j } : null
+}
+
 /** Lines that are only a formatted integer (resource bar / granary header). */
 function isStandaloneNumberLine(line) {
   const trimmed = line.trim()
@@ -184,7 +209,7 @@ function findLastSendMarkerIndex(norm) {
 }
 
 /**
- * @returns {{ village: string, player: string, wood: number, clay: number, iron: number, crop: number, minutesFromNow: number|null, arrivalLabel: string|null }[]}
+ * @returns {{ village: string, player: string, wood: number, clay: number, iron: number, crop: number, minutesFromNow: number|null, arrivalLabel: string|null, alreadyArrived?: boolean }[]}
  */
 export function parseIncomingDeliveries(text, serverTime = null) {
   const section = sliceIncomingSection(text)
@@ -205,35 +230,77 @@ export function parseIncomingDeliveries(text, serverTime = null) {
     const player = tm[2].trim()
     i++
 
-    if (i < lines.length && isMerchantLine(lines[i])) i++
-
-    const resources = []
-    while (i < lines.length && resources.length < 4) {
-      if (isTransportFromLine(lines[i]) || isArrivalLine(lines[i])) break
-      const n = parseTravianNumber(lines[i])
-      if (n === null) break
-      resources.push(n)
+    let merchantMult = null
+    if (i < lines.length && isMerchantLine(lines[i])) {
+      merchantMult = parseMerchantMultiplier(lines[i])
       i++
     }
 
-    let arrivalLabel = null
-    let minutesFromNow = null
+    /** @type {{ quad: number[], min: number|null, lab: string|null, arrived: boolean }[]} */
+    const legs = []
+    while (i < lines.length) {
+      const r = tryReadResourceQuad(lines, i)
+      if (!r) break
+      i = r.nextIdx
+      let min = null
+      let lab = null
+      if (i < lines.length && isArrivalLine(lines[i])) {
+        lab = lines[i]
+        min = parseArrivalMinutes(lines[i], serverTime)
+        i++
+      }
+      legs.push({ quad: r.quad, min, lab, arrived: false })
+      if (i < lines.length && isTransportFromLine(lines[i])) break
+    }
+
+    // One trailing "Za …" after all resource rows (no per-row timer in paste) — Travian 2×/3× shorthand
     if (i < lines.length && isArrivalLine(lines[i])) {
-      arrivalLabel = lines[i]
-      minutesFromNow = parseArrivalMinutes(lines[i], serverTime)
+      const lab = lines[i]
+      const min = parseArrivalMinutes(lines[i], serverTime)
       i++
+      const q = legs.length
+      const m = merchantMult ?? q
+      if (min != null && Number.isFinite(min) && q >= 1) {
+        if (q === 1) {
+          legs[0].min = min
+          legs[0].lab = lab
+        } else if (q === 2 && (m === 2 || merchantMult == null)) {
+          legs.forEach((L) => {
+            L.min = min
+            L.lab = lab
+          })
+        } else if (q >= 3 && m >= 3 && q === m) {
+          legs[q - 1].min = min
+          legs[q - 1].lab = lab
+          for (let k = 0; k < q - 1; k++) legs[k].arrived = true
+        } else {
+          legs[q - 1].min = min
+          legs[q - 1].lab = lab
+        }
+      }
     }
 
-    if (resources.length >= 4) {
+    if (!legs.length) continue
+
+    // If multiple legs already have their own countdown, do not mark earlier legs as "arrived"
+    const etaCount = legs.filter((L) => L.min != null && Number.isFinite(L.min)).length
+    if (etaCount >= 2) {
+      for (const L of legs) {
+        if (L.arrived) L.arrived = false
+      }
+    }
+
+    for (const L of legs) {
       out.push({
         village,
         player,
-        wood: resources[0],
-        clay: resources[1],
-        iron: resources[2],
-        crop: resources[3],
-        minutesFromNow,
-        arrivalLabel,
+        wood: L.quad[0],
+        clay: L.quad[1],
+        iron: L.quad[2],
+        crop: L.quad[3],
+        minutesFromNow: L.min,
+        arrivalLabel: L.lab,
+        ...(L.arrived ? { alreadyArrived: true } : {}),
       })
     }
   }

@@ -44,29 +44,124 @@ export const HOUR_DISCORD_EMOJIS = [
 
 const HOURS_OVERVIEW = 12
 
+/** @param {number} stock @param {number|null|undefined} capacity */
+function applyGranaryFloorAndCap(stock, capacity) {
+  let s = Math.max(0, stock)
+  if (capacity != null && capacity > 0 && s > capacity) s = capacity
+  return s
+}
+
+function sortedIncomingEvents(incoming) {
+  return (incoming || [])
+    .filter((d) => d.minutesFromNow != null && Number.isFinite(d.minutesFromNow))
+    .map((d) => ({
+      t: Math.max(0, Math.round(d.minutesFromNow)),
+      crop: d.crop ?? 0,
+    }))
+    .sort((a, b) => a.t - b.t)
+}
+
+/**
+ * Stock after deliveries at `minute`, before burn during that minute (granary-capped).
+ * @param {{ stockStart: number, balancePerHour: number, incoming: object[], capacity?: number|null }} opts
+ */
+export function getStockAtMinute({ stockStart, balancePerHour, incoming, capacity = null }, minute) {
+  const events = sortedIncomingEvents(incoming)
+  const cap = (s) => applyGranaryFloorAndCap(s, capacity)
+  let stock = stockStart
+  let eventIdx = 0
+  const m = Math.max(0, Math.round(minute))
+
+  for (let i = 0; i < m; i++) {
+    while (eventIdx < events.length && events[eventIdx].t <= i) {
+      stock += events[eventIdx].crop
+      stock = cap(stock)
+      eventIdx++
+    }
+    stock = cap(stock + balancePerHour / 60)
+  }
+  while (eventIdx < events.length && events[eventIdx].t <= m) {
+    stock += events[eventIdx].crop
+    stock = cap(stock)
+    eventIdx++
+  }
+  return cap(stock)
+}
+
+/**
+ * Minimum stock during [hourStart, hourStart + span) after adding `extraCrop` at hourStart
+ * (after deliveries at hourStart, before that minute's burn).
+ * @param {{ stockStart: number, balancePerHour: number, incoming: object[], capacity?: number|null }} opts
+ */
+function minStockInHourWindowWithExtra(opts, hourStart, span, extraCrop) {
+  const cap = (s) => applyGranaryFloorAndCap(s, opts.capacity)
+  const eventsByMinute = new Map()
+  for (const ev of sortedIncomingEvents(opts.incoming)) {
+    const arr = eventsByMinute.get(ev.t)
+    if (arr) arr.push(ev)
+    else eventsByMinute.set(ev.t, [ev])
+  }
+
+  let stock = cap(getStockAtMinute(opts, hourStart) + (extraCrop ?? 0))
+  let mn = stock
+  const bal = opts.balancePerHour
+
+  for (let u = 0; u < span; u++) {
+    const m = hourStart + u
+    if (u > 0) {
+      for (const ev of eventsByMinute.get(m) ?? []) {
+        stock = cap(stock + ev.crop)
+      }
+    }
+    mn = Math.min(mn, stock)
+    stock = cap(stock + bal / 60)
+    mn = Math.min(mn, stock)
+  }
+  return mn
+}
+
+/** Smallest non-negative crop to add at hourStart so the next `span` minutes never hit 0 stock. */
+function cropNeededAtHourStart(opts, hourStart, span) {
+  if (opts.balancePerHour >= 0) return 0
+  if (minStockInHourWindowWithExtra(opts, hourStart, span, 0) > 0) return 0
+
+  let lo = 0
+  let hi = 1
+  while (minStockInHourWindowWithExtra(opts, hourStart, span, hi) <= 0 && hi < 5_000_000) {
+    hi *= 2
+  }
+  if (minStockInHourWindowWithExtra(opts, hourStart, span, hi) <= 0) return Math.ceil(hi)
+
+  while (lo + 1 < hi) {
+    const mid = Math.floor((lo + hi) / 2)
+    if (minStockInHourWindowWithExtra(opts, hourStart, span, mid) > 0) hi = mid
+    else lo = mid
+  }
+  return hi
+}
+
 /**
  * Hour-by-hour stock snapshot for the next 12 hours (at each full hour).
+ * `need` respects minute-level burn + incoming deliveries in that hour (incl. mid-hour saves).
  */
 export function buildHourlyOverview({
   stockStart,
   balancePerHour,
   incoming = [],
+  capacity = null,
   serverTime = null,
   hours = HOURS_OVERVIEW,
+  horizonMinutes = HOURS_OVERVIEW * 60,
 }) {
-  const hourlyBurn = balancePerHour < 0 ? -balancePerHour : 0
-  const opts = { stockStart, balancePerHour, incoming }
+  const opts = { stockStart, balancePerHour, incoming, capacity }
   const rows = []
 
   for (let h = 0; h < hours; h++) {
     const minutes = h * 60
+    const span = Math.min(60, Math.max(0, horizonMinutes - minutes))
     const stock = Math.round(getStockAtMinute(opts, minutes))
     const need =
-      hourlyBurn > 0
-        ? stock <= 0
-          ? hourlyBurn
-          : Math.max(0, Math.ceil(hourlyBurn - stock))
-        : 0
+      balancePerHour < 0 && span > 0 ? cropNeededAtHourStart(opts, minutes, span) : 0
     const covered = need === 0
     const critical = stock <= 0 && need > 0
 
@@ -100,7 +195,7 @@ export function simulateCropTimeline({
   balancePerHour,
   incoming = [],
   horizonHours = 12,
-  stepMinutes = 30,
+  stepMinutes = 1,
 }) {
   const events = incoming
     .filter((d) => d.minutesFromNow != null && Number.isFinite(d.minutesFromNow))
@@ -111,32 +206,34 @@ export function simulateCropTimeline({
     }))
     .sort((a, b) => a.t - b.t)
 
-  const totalMinutes = Math.max(stepMinutes, Math.round(horizonHours * 60))
+  const totalMinutes = Math.round(horizonHours * 60)
+  const step = Math.max(1, Math.round(stepMinutes))
+  const cap = (s) => applyGranaryFloorAndCap(s, capacity)
   const points = []
-  let stock = stockStart
+  let rawStart = Math.max(0, stockStart)
+  if (capacity != null && capacity > 0 && rawStart > capacity) {
+    totalDiscarded += rawStart - capacity
+  }
+  let stock = cap(rawStart)
   let eventIdx = 0
-  let minStock = stockStart
+  let minStock = Infinity
   let minAt = 0
   let emptyAt = null
+  let totalDiscarded = 0
 
-  for (let m = 0; m <= totalMinutes; m += stepMinutes) {
+  const addDiscarded = (beforeCap) => {
+    if (capacity != null && capacity > 0 && beforeCap > capacity) {
+      totalDiscarded += beforeCap - capacity
+    }
+  }
+
+  for (let m = 0; m <= totalMinutes; m++) {
     while (eventIdx < events.length && events[eventIdx].t <= m) {
-      stock += events[eventIdx].crop
+      const raw = stock + events[eventIdx].crop
+      addDiscarded(Math.max(0, raw))
+      stock = cap(raw)
       eventIdx++
     }
-    stock = Math.max(0, stock)
-
-    const capped =
-      capacity != null && capacity > 0 ? Math.min(stock, capacity) : stock
-    const overflow =
-      capacity != null && capacity > 0 && stock > capacity ? stock - capacity : 0
-
-    points.push({
-      minutes: m,
-      stock: Math.round(stock),
-      capped: Math.round(capped),
-      overflow: Math.round(overflow),
-    })
 
     if (stock < minStock) {
       minStock = stock
@@ -144,10 +241,29 @@ export function simulateCropTimeline({
     }
     if (emptyAt == null && stock <= 0) emptyAt = m
 
-    const dt = stepMinutes
-    stock += (balancePerHour / 60) * dt
-    stock = Math.max(0, stock)
+    if (m % step === 0 || m === totalMinutes) {
+      points.push({
+        minutes: m,
+        stock: Math.round(stock),
+        capped: Math.round(stock),
+        overflow: 0,
+      })
+    }
+
+    if (m === totalMinutes) break
+
+    const rawBurn = stock + balancePerHour / 60
+    addDiscarded(Math.max(0, rawBurn))
+    stock = cap(rawBurn)
+
+    if (stock < minStock) {
+      minStock = stock
+      minAt = m
+    }
+    if (emptyAt == null && stock <= 0) emptyAt = m
   }
+
+  if (!Number.isFinite(minStock)) minStock = cap(stockStart)
 
   if (emptyAt == null && balancePerHour < 0 && stockStart > 0) {
     const ratePerMin = balancePerHour / 60
@@ -156,14 +272,15 @@ export function simulateCropTimeline({
     let eIdx = 0
     while (m <= totalMinutes * 2 && projected > 0) {
       while (eIdx < events.length && events[eIdx].t <= m) {
-        projected += events[eIdx].crop
+        const raw = projected + events[eIdx].crop
+        projected = applyGranaryFloorAndCap(raw, capacity)
         eIdx++
       }
       if (projected <= 0) {
         emptyAt = m
         break
       }
-      projected += ratePerMin
+      projected = applyGranaryFloorAndCap(projected + ratePerMin, capacity)
       m += 1
     }
   }
@@ -174,36 +291,8 @@ export function simulateCropTimeline({
     minAt,
     emptyAt,
     finalStock: Math.round(stock),
+    totalDiscarded: Math.round(totalDiscarded),
   }
-}
-
-/** Stock at exact minute (before deliveries at that minute are applied). */
-export function getStockAtMinute({ stockStart, balancePerHour, incoming }, minute) {
-  const events = (incoming || [])
-    .filter((d) => d.minutesFromNow != null && Number.isFinite(d.minutesFromNow))
-    .map((d) => ({
-      t: Math.max(0, Math.round(d.minutesFromNow)),
-      crop: d.crop ?? 0,
-    }))
-    .sort((a, b) => a.t - b.t)
-
-  let stock = stockStart
-  let eventIdx = 0
-  const m = Math.max(0, Math.round(minute))
-
-  for (let i = 0; i < m; i++) {
-    while (eventIdx < events.length && events[eventIdx].t <= i) {
-      stock += events[eventIdx].crop
-      eventIdx++
-    }
-    stock += balancePerHour / 60
-    stock = Math.max(0, stock)
-  }
-  while (eventIdx < events.length && events[eventIdx].t <= m) {
-    stock += events[eventIdx].crop
-    eventIdx++
-  }
-  return Math.max(0, stock)
 }
 
 export function computeHorizonHours(incoming, fallback = 12) {
@@ -225,12 +314,13 @@ export function buildArrivalPlan({
   stockStart,
   balancePerHour,
   incoming = [],
+  capacity = null,
   serverTime = null,
   bufferMinutes = 60,
 }) {
   const hourlyNeed = balancePerHour < 0 ? -balancePerHour : 0
   const burnForBuffer = (hourlyNeed / 60) * bufferMinutes
-  const opts = { stockStart, balancePerHour, incoming }
+  const opts = { stockStart, balancePerHour, incoming, capacity }
   const slots = []
 
   if (hourlyNeed > 0) {
@@ -253,7 +343,7 @@ export function buildArrivalPlan({
 
   for (const d of cropDel) {
     const stockAt = getStockAtMinute(opts, d.minutesFromNow)
-    const after = stockAt + (d.crop ?? 0)
+    const after = applyGranaryFloorAndCap(stockAt + (d.crop ?? 0), capacity)
     const need60 = Math.max(0, burnForBuffer - after)
     const covered = need60 === 0
     slots.push({
@@ -335,8 +425,10 @@ export function buildDiscordReport({
       const roughH = stockStart / Math.abs(balancePerHour)
       lines.push(`⏳ ~${formatDuration(roughH * 60)} to empty (linear, no extra crop)`)
     }
-    if (capacity && simulation.points.some((p) => p.overflow > 0)) {
-      lines.push(`⚠️ Granary over capacity at some steps`)
+    if (capacity && (simulation.totalDiscarded ?? 0) > 0) {
+      lines.push(
+        `📦 Surplus crop discarded when deliveries exceeded granary capacity (model total ≈ ${formatNum(simulation.totalDiscarded)}).`,
+      )
     }
   }
 

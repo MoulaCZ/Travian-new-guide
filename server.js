@@ -48,7 +48,7 @@ function handleSuggest(req, res) {
         path: '/repos/MoulaCZ/Travian-new-guide/issues',
         method: 'POST',
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
           'User-Agent': 'travian-guide-app',
           'Content-Length': Buffer.byteLength(payload),
@@ -87,18 +87,26 @@ function handleSuggest(req, res) {
 http.createServer((req, res) => {
   const url = req.url.split('?')[0]
 
-  // Suggest endpoint — POST /api/suggest
-  if (req.method === 'POST' && url === '/api/suggest') {
+  const isSuggestPost =
+    req.method === 'POST' &&
+    (url === '/api/suggest' || url === `${BASE}/api/suggest`)
+
+  // Suggest endpoint — POST /api/suggest (or under SPA base path)
+  if (isSuggestPost) {
     return handleSuggest(req, res)
   }
 
-  // Keboola sends POST / on startup — respond OK
-  if (req.method === 'POST') {
+  // Keboola sends POST / on startup — respond OK (do not swallow other POST paths)
+  if (req.method === 'POST' && url === '/') {
     res.writeHead(200)
     return res.end()
   }
 
-  // Redirect root to base
+  // Unknown POST — avoid returning 200 (hides broken clients)
+  if (req.method === 'POST') {
+    res.writeHead(404, { 'Content-Type': 'application/json' })
+    return res.end(JSON.stringify({ error: 'Not found' }))
+  }
   if (url === '/') {
     res.writeHead(301, { Location: BASE + '/' })
     return res.end()

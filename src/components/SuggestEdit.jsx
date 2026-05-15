@@ -1,6 +1,58 @@
 import { useState } from 'react'
 import { MessageSquarePlus, X, Send, CheckCircle, AlertCircle, Loader } from 'lucide-react'
 
+/** Same origin + Vite base path so Keboola/GitHub Pages both hit the Node proxy URL */
+function suggestEndpointUrl() {
+  const base = import.meta.env.BASE_URL || '/'
+  return new URL('api/suggest', `${window.location.origin}${base}`).href
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms))
+}
+
+/** Cold starts / transient GitHub errors — retry POST only when failure looks retryable */
+async function postSuggestion(payload) {
+  const url = suggestEndpointUrl()
+  const delays = [0, 550, 1300]
+  let lastDetail = ''
+
+  for (let attempt = 0; attempt < delays.length; attempt++) {
+    if (delays[attempt]) await sleep(delays[attempt])
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (res.ok) return { ok: true }
+
+      let detail = ''
+      try {
+        const j = await res.json()
+        detail = typeof j?.error === 'string' ? j.error : ''
+      } catch {
+        /* ignore */
+      }
+      lastDetail = detail || `HTTP ${res.status}`
+
+      const retry =
+        res.status === 502 ||
+        res.status === 503 ||
+        res.status === 504
+
+      if (!retry || attempt === delays.length - 1)
+        return { ok: false, status: res.status, detail }
+    } catch {
+      lastDetail = 'Network error'
+      if (attempt === delays.length - 1) return { ok: false, status: 0, detail: lastDetail }
+    }
+  }
+
+  return { ok: false, status: 0, detail: lastDetail }
+}
+
 /* Controlled modal — no internal floating button.
    Parent is responsible for opening (open prop) and closing (onClose prop). */
 export default function SuggestEdit({ open, onClose, currentPage }) {
@@ -8,12 +60,14 @@ export default function SuggestEdit({ open, onClose, currentPage }) {
   const [body, setBody] = useState('')
   const [name, setName] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | success | error
+  const [errorHint, setErrorHint] = useState('')
 
   const reset = () => {
     setTitle('')
     setBody('')
     setName('')
     setStatus('idle')
+    setErrorHint('')
   }
 
   const close = () => {
@@ -24,6 +78,7 @@ export default function SuggestEdit({ open, onClose, currentPage }) {
   const submit = async () => {
     if (!body.trim()) return
     setStatus('sending')
+    setErrorHint('')
 
     const issueTitle = title.trim() || `Suggestion for: ${currentPage}`
     const issueBody = [
@@ -39,16 +94,25 @@ export default function SuggestEdit({ open, onClose, currentPage }) {
       .filter(l => l !== null)
       .join('\n')
 
-    try {
-      const res = await fetch('/api/suggest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: issueTitle, body: issueBody }),
-      })
-      setStatus(res.ok ? 'success' : 'error')
-    } catch {
-      setStatus('error')
+    const result = await postSuggestion({ title: issueTitle, body: issueBody })
+
+    if (result.ok) {
+      setStatus('success')
+      return
     }
+
+    setStatus('error')
+
+    const { status: httpStatus, detail } = result
+    if (detail === 'GITHUB_TOKEN not configured' || detail.includes('GITHUB_TOKEN'))
+      setErrorHint('Server is missing GitHub credentials — tell the admin to set GITHUB_TOKEN on the Keboola data app.')
+    else if (httpStatus === 404)
+      setErrorHint('Suggestion API was not found. Use the deployed guide (Keboola data app), not raw GitHub Pages.')
+    else if (httpStatus === 502 || httpStatus === 503 || httpStatus === 504)
+      setErrorHint('Backend or GitHub was temporarily unavailable — try again in a few seconds.')
+    else if (detail && detail !== `HTTP ${httpStatus}`)
+      setErrorHint(detail)
+    else setErrorHint(null)
   }
 
   if (!open) return null
@@ -86,7 +150,10 @@ export default function SuggestEdit({ open, onClose, currentPage }) {
             <div className="flex flex-col items-center py-6 text-center gap-3">
               <AlertCircle className="w-10 h-10 text-red-400" />
               <p className="text-white font-semibold">Something went wrong</p>
-              <p className="text-gray-400 text-sm">Could not submit the suggestion. This feature requires the Keboola deployment.</p>
+              <p className="text-gray-400 text-sm">
+                {errorHint ||
+                  'Could not submit the suggestion. Use the Keboola-hosted guide so suggestions reach GitHub (GitHub Pages has no backend).'}
+              </p>
               <button
                 onClick={() => setStatus('idle')}
                 className="mt-2 px-4 py-2 rounded-lg bg-[#21262d] border border-[#30363d] text-gray-300 hover:text-white text-sm transition-colors"

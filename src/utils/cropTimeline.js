@@ -26,20 +26,20 @@ export function formatNum(n) {
   return Math.round(n).toLocaleString('en-US')
 }
 
-/** Twelve distinct Discord emoji names — one per hour slot. */
+/** Twelve distinct Unicode emoji — renders reliably in Discord (colon aliases differ from Slack). */
 export const HOUR_DISCORD_EMOJIS = [
-  ':seedling:',
-  ':sunny:',
-  ':mostly_sunny:',
-  ':partly_sunny:',
-  ':cloud:',
-  ':umbrella:',
-  ':snowflake:',
-  ':ocean:',
-  ':cyclone:',
-  ':fog:',
-  ':fire:',
-  ':zap:',
+  '🌱',
+  '☀️',
+  '🌤️',
+  '⛅',
+  '☁️',
+  '🌧️',
+  '❄️',
+  '🌊',
+  '🌀',
+  '🌫️',
+  '🔥',
+  '⚡',
 ]
 
 const HOURS_OVERVIEW = 12
@@ -72,13 +72,13 @@ export function buildHourlyOverview({
 
     rows.push({
       hourIndex: h,
-      hourEmoji: HOUR_DISCORD_EMOJIS[h] ?? ':hourglass:',
+      hourEmoji: HOUR_DISCORD_EMOJIS[h] ?? '⌛',
       clock: serverTime ? formatClockFromServer(serverTime, minutes) : `+${h}h`,
       stock,
       need,
       covered,
       critical,
-      statusEmoji: critical ? ':skull:' : covered ? ':white_check_mark:' : ':warning:',
+      statusEmoji: critical ? '💀' : covered ? '✅' : '⚠️',
     })
   }
 
@@ -242,7 +242,7 @@ export function buildArrivalPlan({
         clock: serverTime ? formatClockFromServer(serverTime, 0) : 'NOW',
         amountNeeded: Math.ceil(needNow),
         covered: false,
-        emoji: ':skull:',
+        emoji: '💀',
       })
     }
   }
@@ -262,7 +262,7 @@ export function buildArrivalPlan({
       clock: formatClockFromServer(serverTime, d.minutesFromNow) ?? formatDuration(d.minutesFromNow),
       amountNeeded: Math.ceil(need60),
       covered,
-      emoji: covered ? ':sun:' : ':skull:',
+      emoji: covered ? '☀️' : '💀',
       incomingCrop: d.crop,
       village: d.village,
       player: d.player,

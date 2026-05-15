@@ -26,6 +26,10 @@ const C = {
 
 const HORIZON_HOURS = 12
 
+function findSendMarkerHint(text) {
+  return /Poslat suroviny|Send resources|Rohstoffe senden/i.test(text)
+}
+
 const SAMPLE_PLACEHOLDER =
   'Paste the marketplace page here (Ctrl+A → Ctrl+C from Tržiště → Přehled dodávek)…'
 
@@ -109,7 +113,15 @@ export default function CropTimelineCalculator() {
     const balance = parseFloat(String(consumptionPerHour).replace(/\s/g, '').replace(',', '.'))
 
     if (stock == null || !Number.isFinite(stock) || stock < 0) {
-      setReport('⚠️ Could not read crop stock from paste.')
+      const hints = []
+      if (!parsed.serverTime) hints.push('server time missing')
+      if (findSendMarkerHint(text)) hints.push('found send-resources section')
+      else hints.push('missing Send resources / Poslat suroviny section')
+      setReport(
+        `⚠️ Could not read crop stock from paste.\n` +
+          `Use Ctrl+A on the marketplace page (send form with 0/NNNNN for each resource + village list in sidebar).\n` +
+          (hints.length ? `Detected: ${hints.join(', ')}.` : ''),
+      )
       setSimulation(null)
       setHourlyOverview([])
       return

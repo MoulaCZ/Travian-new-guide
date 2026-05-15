@@ -115,10 +115,23 @@ function isMerchantLine(line) {
 /** Lines that are only a formatted integer (resource bar / granary header). */
 function isStandaloneNumberLine(line) {
   const trimmed = line.trim()
-  if (!trimmed || trimmed.length > 24) return false
+  if (!trimmed || trimmed.length > 28) return false
   const n = parseTravianNumber(trimmed)
   if (n == null || n < 100) return false
-  return /^[\d\s‭‬]+$/.test(trimmed.replace(/[‭‬]/g, ''))
+  return /^[\d\s‭‬.,]+$/.test(trimmed.replace(/[‭‬]/g, ''))
+}
+
+function findLastSendMarkerIndex(norm) {
+  const sendMarkers = [/Poslat suroviny/i, /Send resources/i, /Rohstoffe senden/i]
+  let start = -1
+  for (const re of sendMarkers) {
+    let idx = 0
+    let m
+    const r = new RegExp(re.source, 'gi')
+    while ((m = r.exec(norm)) !== null) idx = m.index
+    if (idx !== -1) start = Math.max(start, idx)
+  }
+  return start
 }
 
 /**
@@ -184,26 +197,32 @@ function collapseSplitSlashPairs(text) {
   return text.replace(/(?:\r?\n)\s*\/\s*(?:\r?\n)/g, ' / ')
 }
 
-/** Send-resources block only (avoids Obchodníci 7/20 and Celkem merchant totals). */
+/** Marketplace send form: last "Send resources" → before incoming / delivery overview. */
 function sliceSendResourcesBlock(text) {
   const norm = normalizeTravianText(text)
-  const sendMarkers = [/Poslat suroviny/i, /Send resources/i, /Rohstoffe senden/i]
-  let start = -1
-  for (const re of sendMarkers) {
-    let idx = 0
-    let m
-    const r = new RegExp(re.source, 'gi')
-    while ((m = r.exec(norm)) !== null) idx = m.index
-    if (idx !== -1) start = Math.max(start, idx)
-  }
+  const start = findLastSendMarkerIndex(norm)
   if (start === -1) return ''
 
-  const tail = norm.slice(start)
-  // End before send-form "Total:" / merchants — not "Delivery overview" or bare "Deliveries"
-  const endRel = tail.search(
-    /\n(?:Total|Celkem|Gesamt)\s*:|(?:\n|\r)Merchants\s*:|(?:\n|\r)(?:Delivery overview|Přehled dodávek)\b/i,
-  )
-  return endRel !== -1 ? tail.slice(0, endRel) : tail.slice(0, 1200)
+  let end = norm.length
+  for (const re of INCOMING_MARKERS) {
+    const i = norm.search(re)
+    if (i > start && i < end) end = i
+  }
+  for (const re of [/Delivery overview/i, /Přehled dodávek/i, /Lieferübersicht/i]) {
+    const i = norm.search(re)
+    if (i > start && i < end) end = i
+  }
+
+  const tail = norm.slice(start, end)
+  const merchantEnd = tail.search(/\nMerchants\s*:/i)
+  const totalEnd = tail.search(/\n(?:Total|Celkem|Gesamt)\s*:\s*\d/i)
+  const cut =
+    merchantEnd !== -1
+      ? merchantEnd
+      : totalEnd !== -1
+        ? totalEnd
+        : tail.length
+  return tail.slice(0, cut)
 }
 
 /** Numbers from the top resource bar (around server time — EN paste often lists them just after). */
@@ -232,22 +251,31 @@ function parseResourceBarNumbers(text) {
 function parseSlashPairsFromBlock(block) {
   const pairs = []
   for (const line of block.split('\n')) {
-    const m = line.trim().match(/^(\d[\d\s]*)\s*\/\s*([\d\s]+)$/)
+    const cleaned = line.trim().replace(/[‭‬]/g, '')
+    const m = cleaned.match(/^(\d[\d\s,.]*)\s*\/\s*([\d\s,.]+)$/)
     if (m) pairs.push([m[1], m[2]])
   }
   if (pairs.length >= 4) return pairs
-  return [...block.matchAll(/(\d[\d\s]*)\s*\/\s*([\d\s]+?)(?=\n|$)/g)].map((m) => [m[1], m[2]])
+  return [...block.matchAll(/(\d[\d\s,.]*)\s*\/\s*([\d\s,.]+?)(?=\n|$)/g)].map((m) => [
+    m[1],
+    m[2],
+  ])
+}
+
+function cropFromSlashPairs(pairs) {
+  if (pairs.length < 4) return null
+  const lastFour = pairs.slice(-4)
+  const right = parseTravianNumber(lastFour[3][1])
+  const left = parseTravianNumber(lastFour[3][0])
+  if (right != null && right >= 500) return right
+  if (left != null && left >= 500) return left
+  return right ?? left
 }
 
 export function parseGranaryFromPaste(text) {
   const sendBlock = collapseSplitSlashPairs(sliceSendResourcesBlock(text))
-  const blockPairs = parseSlashPairsFromBlock(sendBlock)
-
-  let currentCrop = null
-  if (blockPairs.length >= 4) {
-    const lastFour = blockPairs.slice(-4)
-    currentCrop = parseTravianNumber(lastFour[3][1])
-  }
+  let blockPairs = parseSlashPairsFromBlock(sendBlock)
+  let currentCrop = cropFromSlashPairs(blockPairs)
 
   const headerNums = parseResourceBarNumbers(text)
   let capacity = null
@@ -259,7 +287,6 @@ export function parseGranaryFromPaste(text) {
     }
   }
 
-  // Fallback: resource bar pair (capacity, stock) when send form not found
   if (currentCrop == null && headerNums.length >= 2) {
     for (let i = headerNums.length - 1; i > 0; i--) {
       const stock = headerNums[i]
@@ -269,6 +296,18 @@ export function parseGranaryFromPaste(text) {
         capacity = cap
         break
       }
+    }
+  }
+
+  if (currentCrop == null) {
+    const wide = collapseSplitSlashPairs(
+      normalizeTravianText(text).slice(findLastSendMarkerIndex(normalizeTravianText(text))),
+    )
+    blockPairs = parseSlashPairsFromBlock(wide.slice(0, 2500))
+    currentCrop = cropFromSlashPairs(blockPairs)
+    if (currentCrop != null && capacity == null) {
+      const idx = headerNums.lastIndexOf(currentCrop)
+      if (idx > 0 && headerNums[idx - 1] >= currentCrop) capacity = headerNums[idx - 1]
     }
   }
 

@@ -15,6 +15,20 @@ const INCOMING_MARKERS = [
   /Atvykstantys pristatymai/i,
 ]
 
+/**
+ * Travian link to expand a truncated incoming-delivery list. Extend this alternation when new
+ * locales appear — one place instead of scattering language checks across the UI.
+ */
+export const SHOW_ALL_INCOMING_LINK_RE =
+  /\b(?:Zobrazit\s+v(?:še|šetko)|Show\s+all|Alle\s+anzeigen|Toon\s+alles|Tout\s+afficher|Mostrar\s+todo|Vis\s+alle|Vis\s+mer|Rādīt\s+visu|Rodyti\s+viską|Näita\s+kõik|Zobacz\s+wszystko|Pokaż\s+wszystko)\b/i
+
+/** True when paste includes incoming section and still shows a "show all" style link (list likely collapsed). */
+export function pasteSignalsCollapsedIncomingList(text) {
+  const nt = normalizeTravianText(text)
+  if (!INCOMING_MARKERS.some((re) => re.test(nt))) return false
+  return SHOW_ALL_INCOMING_LINK_RE.test(nt)
+}
+
 const OUTGOING_MARKERS = [
   /Odchozí dodávky/i,
   /Outgoing deliveries/i,

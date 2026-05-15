@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from 'react'
-import { Wheat, Sparkles, Copy, Check, ExternalLink } from 'lucide-react'
-import { parseMarketplacePaste, buildMapUrl } from '../utils/cropPasteParser'
+import { useState, useCallback, useRef, useEffect } from 'react'
+import { Wheat, Sparkles, Copy, Check, ExternalLink, X } from 'lucide-react'
+import { parseMarketplacePaste, buildMapUrl, pasteSignalsCollapsedIncomingList } from '../utils/cropPasteParser'
 import {
   simulateCropTimeline,
   buildDiscordReport,
@@ -26,6 +26,8 @@ const C = {
 
 const HORIZON_HOURS = 12
 
+const MARKET_SHOW_ALL_HINT_LS = 'travian-crop-market-show-all-hint-dismissed'
+
 function findSendMarkerHint(text) {
   return /Poslat suroviny|Send resources|Rohstoffe senden|Verschicken|Stuur grondstoffen|Sūtīt resursus|Siųsti resursus/i.test(
     text,
@@ -33,7 +35,7 @@ function findSendMarkerHint(text) {
 }
 
 const SAMPLE_PLACEHOLDER =
-  'Open the Marketplace → second tab (send resources). Select all (Ctrl+A), copy (Ctrl+C), and paste here.'
+  'Marketplace → send-resources tab: if incoming list says Show all / Zobrazit vše, expand it first. Then Ctrl+A, Ctrl+C, paste here.'
 
 /** Signed crop/h from prefix (+ surplus / − deficit) and digits-only input */
 function cropBalancePerHour(sign, digitsRaw) {
@@ -56,11 +58,27 @@ export default function CropTimelineCalculator() {
   const [parseNotes, setParseNotes] = useState([])
   const [copiedText, setCopiedText] = useState(false)
   const [copiedChart, setCopiedChart] = useState(false)
+  const [showMarketExpandHint, setShowMarketExpandHint] = useState(false)
   const chartSvgRef = useRef(null)
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(MARKET_SHOW_ALL_HINT_LS) === '1') return
+    } catch {
+      return
+    }
+    setShowMarketExpandHint(true)
+  }, [])
 
   const applyParse = useCallback((text) => {
     const parsed = parseMarketplacePaste(text)
     const notes = []
+
+    if (pasteSignalsCollapsedIncomingList(text)) {
+      notes.push(
+        '⚠️ Paste still mentions “show all” for deliveries — in Travian expand **incoming** (Show all / Zobrazit vše / …) before Ctrl+A, or some transports are missing from the text.',
+      )
+    }
 
     if (parsed.serverTime) {
       notes.push(`Server time: ${parsed.serverTime.label}`)
@@ -270,6 +288,17 @@ export default function CropTimelineCalculator() {
 
   const hasReport = Boolean(report && simulation)
 
+  const dismissMarketExpandHint = (permanent) => {
+    if (permanent) {
+      try {
+        localStorage.setItem(MARKET_SHOW_ALL_HINT_LS, '1')
+      } catch {
+        /* ignore */
+      }
+    }
+    setShowMarketExpandHint(false)
+  }
+
   return (
     <div
       style={{
@@ -285,6 +314,112 @@ export default function CropTimelineCalculator() {
         color: C.text,
       }}
     >
+      {showMarketExpandHint && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="market-expand-hint-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+            background: 'rgba(0,0,0,0.65)',
+          }}
+          onClick={() => dismissMarketExpandHint(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') dismissMarketExpandHint(false)
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              maxWidth: 440,
+              width: '100%',
+              background: C.surface,
+              border: `2px solid ${C.gold}`,
+              borderRadius: 12,
+              padding: '22px 20px 18px',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => dismissMarketExpandHint(false)}
+              style={{
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                background: 'transparent',
+                border: 'none',
+                color: C.muted,
+                cursor: 'pointer',
+                padding: 4,
+                lineHeight: 0,
+              }}
+            >
+              <X size={18} />
+            </button>
+            <h2
+              id="market-expand-hint-title"
+              style={{
+                fontFamily: 'Cinzel, serif',
+                color: C.gold,
+                fontSize: '1.05rem',
+                margin: '0 28px 12px 0',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Incoming deliveries list
+            </h2>
+            <p style={{ color: C.text, fontSize: '0.9rem', lineHeight: 1.55, margin: '0 0 16px' }}>
+              Make sure to click <strong>Show all</strong> (or your language equivalent, e.g.{' '}
+              <strong>Zobrazit vše</strong>, <strong>Alle anzeigen</strong>, <strong>Toon alles</strong>) on the{' '}
+              <strong>incoming deliveries</strong> block in the Marketplace <strong>send-resources</strong> tab before
+              you <strong>Ctrl+A</strong> / copy — otherwise Travian hides rows and the paste is incomplete.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => dismissMarketExpandHint(false)}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 6,
+                  border: `1px solid ${C.border}`,
+                  background: C.surface2,
+                  color: C.text,
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                }}
+              >
+                Remind me later
+              </button>
+              <button
+                type="button"
+                onClick={() => dismissMarketExpandHint(true)}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 6,
+                  border: 'none',
+                  background: `linear-gradient(180deg, ${C.gold} 0%, ${C.goldDim} 100%)`,
+                  color: '#0f0c09',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                }}
+              >
+                Don't show again
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <Wheat size={24} color={C.gold} />
         <h1
@@ -306,7 +441,9 @@ export default function CropTimelineCalculator() {
         <strong style={{ color: C.text }}>Marketplace</strong>, switch to the{' '}
         <strong style={{ color: C.text }}>second tab</strong> (send resources / ships merchants).{' '}
         <strong style={{ color: C.text }}>Ctrl+A</strong>, then <strong style={{ color: C.text }}>Ctrl+C</strong>{' '}
-        from that tab and paste below. Enter{' '}
+        from that tab and paste below. If the incoming list shows{' '}
+        <strong style={{ color: C.text }}>Zobrazit vše</strong> / <strong style={{ color: C.text }}>Show all</strong>{' '}
+        (collapsed rows), expand it first so every delivery is in the copy. Enter{' '}
         <strong style={{ color: C.text }}>net crop/h</strong> with the sign dropdown + digits only; village name and map link are read from the paste.
       </p>
 

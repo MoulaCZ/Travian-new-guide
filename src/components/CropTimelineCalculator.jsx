@@ -101,6 +101,9 @@ export default function CropTimelineCalculator() {
     if (parsed.incoming.length) {
       const withCrop = parsed.incoming.filter((d) => d.crop > 0).length
       notes.push(`Incoming deliveries: ${parsed.incoming.length} (${withCrop} with crop)`)
+      notes.push(
+        'Model ETA = countdown (Za… / In…), not the wall clock after v/at — that clock is often your browser timezone, not server time.',
+      )
     } else {
       notes.push('No incoming deliveries.')
     }
@@ -189,6 +192,7 @@ export default function CropTimelineCalculator() {
       serverTimeLabel: serverTime?.label ?? '',
       hourlyOverview: hourly,
       simulation: sim,
+      incomingDeliveries: parsed.incoming,
     })
 
     setSimulation(sim)

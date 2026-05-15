@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { forwardRef, useMemo } from 'react'
 import { formatClockFromServer } from '../utils/cropTimeline'
 
 const C = {
@@ -11,7 +11,10 @@ const C = {
   zero: '#f87171',
 }
 
-export default function CropTimelineChart({ points, capacity, serverTime }) {
+const CropTimelineChart = forwardRef(function CropTimelineChart(
+  { points, capacity, serverTime },
+  ref,
+) {
   const chart = useMemo(() => {
     if (!points?.length) return null
 
@@ -65,6 +68,7 @@ export default function CropTimelineChart({ points, capacity, serverTime }) {
       }}
     >
       <svg
+        ref={ref}
         viewBox={`0 0 ${W} ${H}`}
         style={{ width: '100%', height: 'auto', display: 'block' }}
         role="img"
@@ -157,4 +161,6 @@ export default function CropTimelineChart({ points, capacity, serverTime }) {
       </div>
     </div>
   )
-}
+})
+
+export default CropTimelineChart

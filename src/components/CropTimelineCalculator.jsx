@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { Wheat, Sparkles, Copy, Check, ExternalLink } from 'lucide-react'
 import { parseMarketplacePaste, buildMapUrl } from '../utils/cropPasteParser'
 import {
@@ -42,7 +42,9 @@ export default function CropTimelineCalculator() {
   const [hourlyOverview, setHourlyOverview] = useState([])
   const [mapUrl, setMapUrl] = useState(null)
   const [parseNotes, setParseNotes] = useState([])
-  const [copied, setCopied] = useState(false)
+  const [copiedText, setCopiedText] = useState(false)
+  const [copiedChart, setCopiedChart] = useState(false)
+  const chartSvgRef = useRef(null)
 
   const applyParse = useCallback((text) => {
     const parsed = parseMarketplacePaste(text)
@@ -181,8 +183,45 @@ export default function CropTimelineCalculator() {
     const text = wrapCodeBlock ? `\`\`\`\n${report}\n\`\`\`` : report
     try {
       await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setCopiedText(true)
+      setTimeout(() => setCopiedText(false), 2000)
+    } catch {
+      /* ignored */
+    }
+  }
+
+  const handleCopyChart = async () => {
+    const svg = chartSvgRef.current
+    if (!svg) return
+    try {
+      const svgString = new XMLSerializer().serializeToString(svg)
+      const url = URL.createObjectURL(
+        new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' }),
+      )
+      const img = await new Promise((resolve, reject) => {
+        const el = new Image()
+        el.onload = () => resolve(el)
+        el.onerror = reject
+        el.src = url
+      })
+      URL.revokeObjectURL(url)
+      const W = 800
+      const H = 220
+      const scale = 2
+      const canvas = document.createElement('canvas')
+      canvas.width = W * scale
+      canvas.height = H * scale
+      const ctx = canvas.getContext('2d')
+      ctx.scale(scale, scale)
+      ctx.fillStyle = '#0a0806'
+      ctx.fillRect(0, 0, W, H)
+      ctx.drawImage(img, 0, 0, W, H)
+      const pngBlob = await new Promise((resolve, reject) => {
+        canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob'))), 'image/png')
+      })
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })])
+      setCopiedChart(true)
+      setTimeout(() => setCopiedChart(false), 2000)
     } catch {
       /* ignored */
     }
@@ -419,63 +458,13 @@ export default function CropTimelineCalculator() {
             gap: 14,
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: 8,
-            }}
-          >
-            <span style={{ fontFamily: 'Cinzel, serif', color: C.gold, fontSize: '0.9rem' }}>
-              Report — chart + Discord (12h)
-            </span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                type="button"
-                onClick={() => handleCopy(false)}
-                disabled={!report}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '6px 12px',
-                  background: copied ? '#1a2e1f' : C.surface2,
-                  border: `1px solid ${copied ? C.win : C.border}`,
-                  borderRadius: 6,
-                  color: copied ? C.win : C.text,
-                  cursor: report ? 'pointer' : 'default',
-                  fontSize: '0.75rem',
-                }}
-              >
-                {copied ? <Check size={14} /> : <Copy size={14} />}
-                {copied ? 'Copied' : 'Copy Discord'}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleCopy(true)}
-                disabled={!report}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '6px 12px',
-                  background: C.surface2,
-                  border: `1px solid ${C.border}`,
-                  borderRadius: 6,
-                  color: C.text,
-                  cursor: report ? 'pointer' : 'default',
-                  fontSize: '0.75rem',
-                }}
-              >
-                Copy ```
-              </button>
-            </div>
-          </div>
+          <span style={{ fontFamily: 'Cinzel, serif', color: C.gold, fontSize: '0.9rem' }}>
+            Report — chart + Discord (12h)
+          </span>
 
           {simulation && (
             <CropTimelineChart
+              ref={chartSvgRef}
               points={simulation.points}
               capacity={parsedSnapshot?.granaryCapacity ?? null}
               serverTime={parsedSnapshot?.serverTime ?? null}
@@ -513,6 +502,81 @@ export default function CropTimelineCalculator() {
               ))}
             </div>
           )}
+
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 8,
+              paddingTop: 4,
+              borderTop: `1px solid ${C.border}`,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => handleCopy(false)}
+              disabled={!report}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                background: copiedText ? '#1a2e1f' : C.surface2,
+                border: `1px solid ${copiedText ? C.win : C.border}`,
+                borderRadius: 6,
+                color: copiedText ? C.win : C.text,
+                cursor: report ? 'pointer' : 'default',
+                fontSize: '0.75rem',
+              }}
+            >
+              {copiedText ? <Check size={14} /> : <Copy size={14} />}
+              {copiedText ? 'Copied' : 'Copy Discord'}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCopy(true)}
+              disabled={!report}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                background: C.surface2,
+                border: `1px solid ${C.border}`,
+                borderRadius: 6,
+                color: C.text,
+                cursor: report ? 'pointer' : 'default',
+                fontSize: '0.75rem',
+              }}
+            >
+              Copy ```
+            </button>
+            {simulation && (
+              <button
+                type="button"
+                onClick={handleCopyChart}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 12px',
+                  background: copiedChart ? '#1a2e1f' : C.surface2,
+                  border: `1px solid ${copiedChart ? C.win : C.border}`,
+                  borderRadius: 6,
+                  color: copiedChart ? C.win : C.text,
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                }}
+              >
+                {copiedChart ? <Check size={14} /> : <Copy size={14} />}
+                {copiedChart ? 'Chart copied' : 'Copy chart'}
+              </button>
+            )}
+            <span style={{ fontSize: '0.68rem', color: C.muted, flex: '1 1 200px' }}>
+              Paste chart (Ctrl+V), then Discord text below.
+            </span>
+          </div>
 
           <pre
             style={{

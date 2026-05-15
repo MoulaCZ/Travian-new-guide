@@ -375,6 +375,7 @@ export function buildDiscordReport({
   serverTimeLabel = '',
   hourlyOverview = [],
   simulation = null,
+  incomingDeliveries = [],
 }) {
   const lines = []
   const bal = balancePerHour
@@ -390,6 +391,26 @@ export function buildDiscordReport({
   )
   if (serverTimeLabel) lines.push(`Server: ${serverTimeLabel}`)
   lines.push('')
+
+  const cropIncoming = [...incomingDeliveries]
+    .filter((d) => (d.crop ?? 0) > 0)
+    .sort(
+      (a, b) =>
+        (a.minutesFromNow ?? Number.POSITIVE_INFINITY) -
+        (b.minutesFromNow ?? Number.POSITIVE_INFINITY),
+    )
+  if (cropIncoming.length) {
+    lines.push('Incoming crop (scheduled):')
+    for (const d of cropIncoming) {
+      const eta =
+        d.minutesFromNow != null && Number.isFinite(d.minutesFromNow)
+          ? `~${formatDuration(d.minutesFromNow)}`
+          : (d.arrivalLabel ?? 'ETA unknown').replace(/\s+/g, ' ').trim()
+      const who = [d.village, d.player].filter(Boolean).join(' : ') || '—'
+      lines.push(`  • ${eta} · +${formatNum(d.crop)} · ${who}`)
+    }
+    lines.push('')
+  }
 
   if (mapUrl) {
     lines.push(`📍 Send crop here: ${mapUrl}`)

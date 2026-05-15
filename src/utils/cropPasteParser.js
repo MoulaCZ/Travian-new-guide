@@ -100,23 +100,21 @@ export function parseServerTime(text) {
   }
 }
 
-/** "Za … v …" / NL "In … om …" / LV "Pēc … - …" → minutes from now (ceil seconds). */
-export function parseArrivalMinutes(line, serverTime) {
+/** "Za … v …" / NL "In … om …" / LV "Pēc … - …" → minutes from now (ceil seconds).
+ *
+ * Uses only the **countdown** part (Za/In/Pēc … HH:MM:SS). The trailing wall-clock
+ * (e.g. `v 01:00` / `at 1:00 am`) is often shown in **the player's browser timezone**, while
+ * "Server time" in the paste is **game server time** — comparing the two misplaces deliveries
+ * when those zones differ. Travian's countdown is authoritative for "how many minutes from now".
+ */
+export function parseArrivalMinutes(line, _serverTime = null) {
   const m = matchArrivalLine(line)
   if (!m) return null
 
-  const durMin =
-    parseInt(m[1], 10) * 60 + parseInt(m[2], 10) + (parseInt(m[3], 10) > 0 ? 1 : 0)
-
-  if (serverTime) {
-    const arrH = parseInt(m[4], 10)
-    const arrM = parseInt(m[5], 10)
-    const nowSec = serverTime.hours * 3600 + serverTime.minutes * 60 + serverTime.seconds
-    let arrSec = arrH * 3600 + arrM * 60
-    if (arrSec < nowSec - 12 * 3600) arrSec += 24 * 3600
-    const diffSec = arrSec - nowSec
-    if (diffSec >= 0) return Math.ceil(diffSec / 60)
-  }
+  const hours = parseInt(m[1], 10)
+  const minutes = parseInt(m[2], 10)
+  const seconds = parseInt(m[3], 10)
+  const durMin = hours * 60 + minutes + (seconds > 0 ? 1 : 0)
 
   return durMin
 }

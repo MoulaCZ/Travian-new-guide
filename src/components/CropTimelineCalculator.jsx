@@ -5,6 +5,7 @@ import {
   simulateCropTimeline,
   buildDiscordReport,
   buildHourlyOverview,
+  incomingDeliveriesUsedInModel,
   formatNum,
   formatDuration,
   formatClockFromServer,
@@ -117,8 +118,15 @@ export default function CropTimelineCalculator() {
     }
 
     if (parsed.incoming.length) {
-      const withCrop = parsed.incoming.filter((d) => d.crop > 0).length
-      notes.push(`Incoming deliveries: ${parsed.incoming.length} (${withCrop} with crop)`)
+      const modeled = incomingDeliveriesUsedInModel(parsed.incoming)
+      const withCrop = modeled.filter((d) => d.crop > 0).length
+      notes.push(`Incoming deliveries (in model): ${modeled.length} (${withCrop} with crop)`)
+      const hidden = parsed.incoming.length - modeled.length
+      if (hidden > 0) {
+        notes.push(
+          `${hidden} row(s) from paste omitted — past multi-leg legs (already in granary) or no countdown parsed; not used in simulation.`,
+        )
+      }
       notes.push(
         'Model ETA = countdown (Za… / In…), not the wall clock after v/at — that clock is often your browser timezone, not server time.',
       )
@@ -172,19 +180,12 @@ export default function CropTimelineCalculator() {
       return
     }
 
-    const incoming = parsed.incoming
-      .filter(
-        (d) =>
-          !d.alreadyArrived &&
-          d.minutesFromNow != null &&
-          Number.isFinite(d.minutesFromNow),
-      )
-      .map((d) => ({
-        minutesFromNow: d.minutesFromNow,
-        crop: d.crop ?? 0,
-        village: d.village,
-        player: d.player,
-      }))
+    const incoming = incomingDeliveriesUsedInModel(parsed.incoming).map((d) => ({
+      minutesFromNow: d.minutesFromNow,
+      crop: d.crop ?? 0,
+      village: d.village,
+      player: d.player,
+    }))
 
     const serverTime = parsed.serverTime ?? null
 
@@ -287,6 +288,8 @@ export default function CropTimelineCalculator() {
   }
 
   const hasReport = Boolean(report && simulation)
+
+  const incomingDisplayRows = incomingDeliveriesUsedInModel(parsedSnapshot?.incoming ?? [])
 
   const dismissMarketExpandHint = (permanent) => {
     if (permanent) {
@@ -573,7 +576,7 @@ export default function CropTimelineCalculator() {
         )}
       </div>
 
-      {parsedSnapshot?.incoming?.length > 0 && (
+      {incomingDisplayRows.length > 0 && (
         <div
           style={{
             background: C.surface,
@@ -586,8 +589,14 @@ export default function CropTimelineCalculator() {
           <div
             style={{ fontFamily: 'Cinzel, serif', color: C.gold, fontSize: '0.8rem', marginBottom: 10 }}
           >
-            Parsed incoming deliveries
+            Parsed incoming deliveries (used in simulation)
           </div>
+          {(parsedSnapshot?.incoming?.length ?? 0) > incomingDisplayRows.length && (
+            <div style={{ fontSize: '0.72rem', color: C.muted, marginBottom: 10, lineHeight: 1.45 }}>
+              {(parsedSnapshot.incoming.length ?? 0) - incomingDisplayRows.length} row(s) from paste hidden —
+              already in granary (earlier legs of a multi‑delivery) or no countdown parsed; not in the chart.
+            </div>
+          )}
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
             <thead>
               <tr style={{ color: C.muted, textAlign: 'left' }}>
@@ -598,7 +607,7 @@ export default function CropTimelineCalculator() {
               </tr>
             </thead>
             <tbody>
-              {parsedSnapshot.incoming.map((d, i) => (
+              {incomingDisplayRows.map((d, i) => (
                 <tr key={i} style={{ borderTop: `1px solid ${C.border}` }}>
                   <td style={{ padding: '6px 8px' }}>
                     {d.village} ({d.player})
@@ -607,24 +616,12 @@ export default function CropTimelineCalculator() {
                     {formatNum(d.crop)}
                   </td>
                   <td style={{ padding: '6px 8px' }}>
-                    {d.alreadyArrived ? (
-                      <span style={{ color: C.win }} title="Already in granary (past leg)">
-                        arrived
-                      </span>
-                    ) : d.minutesFromNow != null && Number.isFinite(d.minutesFromNow) ? (
-                      formatDuration(d.minutesFromNow)
-                    ) : (
-                      '—'
-                    )}
+                    {formatDuration(d.minutesFromNow)}
                   </td>
                   <td style={{ padding: '6px 8px', color: C.muted }}>
-                    {d.alreadyArrived
-                      ? '—'
-                      : d.minutesFromNow != null &&
-                          Number.isFinite(d.minutesFromNow) &&
-                          parsedSnapshot.serverTime
-                        ? formatClockFromServer(parsedSnapshot.serverTime, d.minutesFromNow) ?? '—'
-                        : d.arrivalLabel ?? '—'}
+                    {parsedSnapshot.serverTime
+                      ? formatClockFromServer(parsedSnapshot.serverTime, d.minutesFromNow) ?? '—'
+                      : d.arrivalLabel ?? '—'}
                   </td>
                 </tr>
               ))}

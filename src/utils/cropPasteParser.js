@@ -44,6 +44,19 @@ const TRANSPORT_FROM_LV = /^Transportē\s+no\s+(.+?)\s*:\s*(.+)$/iu
 /** Lithuanian: "Gabenama iš 08 Ostrava : Moula" */
 const TRANSPORT_FROM_LT = /^Gabenama\s+iš\s+(.+?)\s*:\s*(.+)$/iu
 
+/**
+ * Return-trip block headers (2×/3×: first timed row = merchant heading back).
+ * cs Návrat do · de Rückkehr nach · en Return to · nl Stuur terug naar · lv Atgriež uz · lt Grįžti į
+ */
+const RETURN_TO_PATTERNS = [
+  /^Návrat\s+do\s+(.+?)\s*:\s*(.+)$/iu,
+  /^Rückkehr\s+nach\s+(.+?)\s*:\s*(.+)$/iu,
+  /^Return\s+to\s+(.+?)\s*:\s*(.+)$/iu,
+  /^Stuur\s+terug\s+naar\s+(.+?)\s*:\s*(.+)$/iu,
+  /^Atgriež\s+uz\s+(.+?)\s*:\s*(.+)$/iu,
+  /^Grįžti\s+į\s+(.+?)\s*:\s*(.+)$/iu,
+]
+
 function matchTransportFrom(line) {
   const norm = normalizeTravianText(line).trim()
   let m = norm.match(TRANSPORT_FROM_GENERIC)
@@ -54,8 +67,53 @@ function matchTransportFrom(line) {
   return m || null
 }
 
+function matchReturnTo(line) {
+  const norm = normalizeTravianText(line).trim()
+  for (const re of RETURN_TO_PATTERNS) {
+    const m = norm.match(re)
+    if (m) return m
+  }
+  return null
+}
+
+/** @returns {{ kind: 'incoming'|'return', village: string, player: string }|null} */
+function matchDeliveryHeader(line) {
+  const ret = matchReturnTo(line)
+  if (ret) {
+    return { kind: 'return', village: ret[1].trim(), player: ret[2].trim() }
+  }
+  const inc = matchTransportFrom(line)
+  if (inc) {
+    return { kind: 'incoming', village: inc[1].trim(), player: inc[2].trim() }
+  }
+  return null
+}
+
+function isDeliveryHeaderLine(line) {
+  return matchDeliveryHeader(line) != null
+}
+
 function isTransportFromLine(line) {
   return matchTransportFrom(line) != null
+}
+
+/**
+ * Return blocks: skip legs without ETA; skip first leg that has ETA (ride back);
+ * keep further legs (incoming to current village).
+ */
+function filterReturnTripLegs(legs) {
+  let skippedFirstTimed = false
+  const kept = []
+  for (const L of legs) {
+    const hasTime = L.min != null && Number.isFinite(L.min)
+    if (!hasTime) continue
+    if (!skippedFirstTimed) {
+      skippedFirstTimed = true
+      continue
+    }
+    kept.push(L)
+  }
+  return kept
 }
 
 /** CZ/EN/DE/NL / LV / LT arrival line formats */
@@ -183,7 +241,7 @@ function tryReadResourceQuad(lines, startIdx) {
   const quad = []
   let j = startIdx
   while (j < lines.length && quad.length < 4) {
-    if (isTransportFromLine(lines[j]) || isArrivalLine(lines[j])) break
+    if (isDeliveryHeaderLine(lines[j]) || isArrivalLine(lines[j])) break
     const n = parseTravianNumber(lines[j])
     if (n === null) break
     quad.push(n)
@@ -234,14 +292,13 @@ export function parseIncomingDeliveries(text, serverTime = null) {
   let i = 0
 
   while (i < lines.length) {
-    const tm = matchTransportFrom(lines[i])
-    if (!tm) {
+    const header = matchDeliveryHeader(lines[i])
+    if (!header) {
       i++
       continue
     }
 
-    const village = tm[1].trim()
-    const player = tm[2].trim()
+    const { kind, village, player } = header
     i++
 
     let merchantMult = null
@@ -264,7 +321,7 @@ export function parseIncomingDeliveries(text, serverTime = null) {
         i++
       }
       legs.push({ quad: r.quad, min, lab, arrived: false })
-      if (i < lines.length && isTransportFromLine(lines[i])) break
+      if (i < lines.length && isDeliveryHeaderLine(lines[i])) break
     }
 
     // One trailing "Za …" after all resource rows (no per-row timer in paste) — Travian 2×/3× shorthand
@@ -296,15 +353,20 @@ export function parseIncomingDeliveries(text, serverTime = null) {
 
     if (!legs.length) continue
 
-    // If multiple legs already have their own countdown, do not mark earlier legs as "arrived"
-    const etaCount = legs.filter((L) => L.min != null && Number.isFinite(L.min)).length
-    if (etaCount >= 2) {
-      for (const L of legs) {
-        if (L.arrived) L.arrived = false
+    let legsForModel = legs
+    if (kind === 'return') {
+      legsForModel = filterReturnTripLegs(legs)
+    } else {
+      // If multiple legs already have their own countdown, do not mark earlier legs as "arrived"
+      const etaCount = legs.filter((L) => L.min != null && Number.isFinite(L.min)).length
+      if (etaCount >= 2) {
+        for (const L of legs) {
+          if (L.arrived) L.arrived = false
+        }
       }
     }
 
-    for (const L of legs) {
+    for (const L of legsForModel) {
       out.push({
         village,
         player,

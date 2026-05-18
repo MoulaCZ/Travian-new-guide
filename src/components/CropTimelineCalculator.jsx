@@ -303,7 +303,7 @@ export default function CropTimelineCalculator() {
     const active = resolveActiveVillage(parsed, selectedVillageKey)
 
     if (villageNeedsPick(parsed, active)) {
-      setModalVillageKey(selectedVillageKey || '')
+      setModalVillageKey('')
       setShowVillagePickModal(true)
       return
     }
@@ -727,13 +727,17 @@ export default function CropTimelineCalculator() {
           value={paste}
           onChange={(e) => {
             setPaste(e.target.value)
+            // New paste = new marketplace view; do not reuse village from previous report.
+            setSelectedVillageKey('')
+            setModalVillageKey('')
+            setShowVillagePickModal(false)
             if (!e.target.value.trim()) {
               setParsedSnapshot(null)
-              setSelectedVillageKey('')
               setParseNotes([])
               setMapUrl(null)
-              setShowVillagePickModal(false)
-              setModalVillageKey('')
+              setReport('')
+              setSimulation(null)
+              setHourlyOverview([])
             }
           }}
           onBlur={() => {

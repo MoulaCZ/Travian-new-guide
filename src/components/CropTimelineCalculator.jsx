@@ -55,13 +55,23 @@ function cropBalancePerHour(sign, digitsRaw) {
 
 function resolveActiveVillage(parsed, selectedVillageKey) {
   if (!parsed) return null
+
   if (parsed.villageName) {
+    const coords =
+      parsed.villageCoords ??
+      (parsed.villageList?.length
+        ? (() => {
+            const match = parsed.villageList.find((v) => villageNamesMatch(v.name, parsed.villageName))
+            return match ? { x: match.x, y: match.y } : null
+          })()
+        : null)
     return {
       name: parsed.villageName,
-      coords: parsed.villageCoords ?? null,
+      coords,
       serverBase: parsed.serverBase,
     }
   }
+
   if (!selectedVillageKey || !parsed.villageList?.length) return null
   const v = parsed.villageList.find((entry) => villageListKey(entry) === selectedVillageKey)
   if (!v) return null
@@ -70,6 +80,13 @@ function resolveActiveVillage(parsed, selectedVillageKey) {
     coords: { x: v.x, y: v.y },
     serverBase: parsed.serverBase,
   }
+}
+
+/** Open village picker when name or coords are missing but the paste lists villages. */
+function villageNeedsPick(parsed, active) {
+  if (!parsed?.villageList?.length) return false
+  if (!active?.name || !active?.coords) return true
+  return false
 }
 
 export default function CropTimelineCalculator() {
@@ -86,6 +103,8 @@ export default function CropTimelineCalculator() {
   const [copiedChart, setCopiedChart] = useState(false)
   const [showMarketExpandHint, setShowMarketExpandHint] = useState(false)
   const [selectedVillageKey, setSelectedVillageKey] = useState('')
+  const [showVillagePickModal, setShowVillagePickModal] = useState(false)
+  const [modalVillageKey, setModalVillageKey] = useState('')
   const chartSvgRef = useRef(null)
 
   useEffect(() => {
@@ -125,49 +144,28 @@ export default function CropTimelineCalculator() {
 
     if (parsed.villageNameMissing) {
       notes.push(
-        '⚠️ Village name missing from paste (empty row before population in Travian footer) — pick your village below.',
+        '⚠️ Village name missing from paste (blank line before population) — Generate report will ask you to choose the village.',
       )
     }
 
-    if (parsed.villageName) {
-      const coord =
-        parsed.villageCoords
-          ? ` (${parsed.villageCoords.x}|${parsed.villageCoords.y})`
-          : ''
-      notes.push(`Village: ${parsed.villageName}${coord}`)
+    const previewActive = resolveActiveVillage(parsed, selectedVillageKey)
+    if (previewActive?.name && previewActive.coords) {
+      notes.push(
+        `Village: ${previewActive.name} (${previewActive.coords.x}|${previewActive.coords.y})`,
+      )
+    } else if (parsed.villageName) {
+      notes.push(`Village name: ${parsed.villageName} — coordinates not matched; choose on Generate.`)
     } else if (parsed.villageList?.length) {
       notes.push(
-        `Village list: ${parsed.villageList.length} found in paste — select which village this marketplace view is for.`,
+        `${parsed.villageList.length} villages in paste — choose yours when you Generate report.`,
       )
     }
 
-    let autoVillageKey = ''
-    if (parsed.villageName && parsed.villageList?.length) {
-      const match = parsed.villageList.find((v) => villageNamesMatch(v.name, parsed.villageName))
-      if (match) autoVillageKey = villageListKey(match)
-    } else if (parsed.villageList?.length === 1) {
-      autoVillageKey = villageListKey(parsed.villageList[0])
-    }
-    setSelectedVillageKey(autoVillageKey)
-
-    const activePreview = resolveActiveVillage(
-      { ...parsed, villageName: parsed.villageName, villageCoords: parsed.villageCoords },
-      autoVillageKey,
-    )
-    const coords = activePreview?.coords ?? null
+    const coords = previewActive?.coords ?? null
     const url =
-      coords && activePreview?.serverBase
-        ? buildMapUrl(activePreview.serverBase, coords.x, coords.y)
+      coords && previewActive?.serverBase
+        ? buildMapUrl(previewActive.serverBase, coords.x, coords.y)
         : null
-
-    if (coords && activePreview?.name) {
-      notes.push(`Coordinates: (${coords.x}|${coords.y}) for ${activePreview.name}`)
-      if (url) notes.push(`Map: ${url}`)
-    } else if (parsed.villageName) {
-      notes.push(
-        '⚠️ Coordinates not found — include the footer village/coordinates block from the same marketplace paste.',
-      )
-    }
 
     if (parsed.incoming.length) {
       const modeled = incomingDeliveriesUsedInModel(parsed.incoming)
@@ -192,6 +190,92 @@ export default function CropTimelineCalculator() {
     return { parsed, coords, mapUrl: url }
   }, [])
 
+  const runFullReport = useCallback(
+    (parsed, villageKey, pasteText) => {
+      const active = resolveActiveVillage(parsed, villageKey)
+      if (!active?.name || !active?.coords) return false
+
+      const coords = active.coords
+      const url =
+        active.serverBase ? buildMapUrl(active.serverBase, coords.x, coords.y) : null
+      setMapUrl(url)
+      setSelectedVillageKey(villageKey)
+
+      const stock = parsed.currentCrop
+      const capacity = parsed.granaryCapacity ?? null
+      const balance = cropBalancePerHour(cropBalanceSign, cropBalanceDigits)
+
+      if (stock == null || !Number.isFinite(stock) || stock < 0) {
+        const hints = []
+        if (!parsed.serverTime) hints.push('server time missing')
+        if (findSendMarkerHint(pasteText)) hints.push('found send-resources section')
+        else hints.push('missing send-resources tab section (Send resources / Verschicken / …)')
+        setReport(
+          `⚠️ Could not read crop stock from paste.\n` +
+            `Use the Marketplace send-resources tab (second tab): Ctrl+A on that screen.\n` +
+            (hints.length ? `Detected: ${hints.join(', ')}.` : ''),
+        )
+        setSimulation(null)
+        setHourlyOverview([])
+        return true
+      }
+      if (!Number.isFinite(balance)) {
+        setReport(
+          '⚠️ Enter net crop per hour: pick − or + above, type digits only (no minus inside the box). Example: − with 20000 = −20,000 crop/h.',
+        )
+        setSimulation(null)
+        setHourlyOverview([])
+        return true
+      }
+
+      const incoming = incomingDeliveriesUsedInModel(parsed.incoming).map((d) => ({
+        minutesFromNow: d.minutesFromNow,
+        crop: d.crop ?? 0,
+        village: d.village,
+        player: d.player,
+      }))
+
+      const serverTime = parsed.serverTime ?? null
+
+      const sim = simulateCropTimeline({
+        stockStart: stock,
+        capacity: Number.isFinite(capacity) ? capacity : null,
+        balancePerHour: balance,
+        incoming,
+        horizonHours: HORIZON_HOURS,
+        stepMinutes: 1,
+      })
+
+      const hourly = buildHourlyOverview({
+        stockStart: stock,
+        balancePerHour: balance,
+        incoming,
+        capacity: Number.isFinite(capacity) ? capacity : null,
+        serverTime,
+        hours: HORIZON_HOURS,
+        horizonMinutes: HORIZON_HOURS * 60,
+      })
+
+      const out = buildDiscordReport({
+        villageName: active.name,
+        villageCoords: coords,
+        mapUrl: url,
+        stockStart: stock,
+        capacity: Number.isFinite(capacity) ? capacity : null,
+        balancePerHour: balance,
+        serverTimeLabel: serverTime?.label ?? '',
+        hourlyOverview: hourly,
+        incomingDeliveries: parsed.incoming,
+      })
+
+      setSimulation(sim)
+      setHourlyOverview(hourly)
+      setReport(out)
+      return true
+    },
+    [cropBalanceSign, cropBalanceDigits],
+  )
+
   const handleGenerate = () => {
     const text = paste.trim()
     if (!text) {
@@ -203,43 +287,7 @@ export default function CropTimelineCalculator() {
       return
     }
 
-    const { parsed } = applyParse(text)
-    const active = resolveActiveVillage(parsed, selectedVillageKey)
-
-    if (!active?.name) {
-      setReport(
-        parsed.villageNameMissing && parsed.villageList?.length
-          ? '⚠️ Village name was not copied from Travian (blank line in the footer).\nSelect your village in the list below, then generate again.'
-          : '⚠️ Could not determine village — paste the full marketplace page footer or select a village below.',
-      )
-      setSimulation(null)
-      setHourlyOverview([])
-      return
-    }
-
-    const coords = active.coords
-    const url =
-      coords && active.serverBase ? buildMapUrl(active.serverBase, coords.x, coords.y) : null
-    setMapUrl(url)
-
-    const stock = parsed.currentCrop
-    const capacity = parsed.granaryCapacity ?? null
     const balance = cropBalancePerHour(cropBalanceSign, cropBalanceDigits)
-
-    if (stock == null || !Number.isFinite(stock) || stock < 0) {
-      const hints = []
-      if (!parsed.serverTime) hints.push('server time missing')
-      if (findSendMarkerHint(text)) hints.push('found send-resources section')
-      else hints.push('missing send-resources tab section (Send resources / Verschicken / …)')
-      setReport(
-        `⚠️ Could not read crop stock from paste.\n` +
-          `Use the Marketplace send-resources tab (second tab): Ctrl+A on that screen.\n` +
-          (hints.length ? `Detected: ${hints.join(', ')}.` : ''),
-      )
-      setSimulation(null)
-      setHourlyOverview([])
-      return
-    }
     if (!Number.isFinite(balance)) {
       setReport(
         '⚠️ Enter net crop per hour: pick − or + above, type digits only (no minus inside the box). Example: − with 20000 = −20,000 crop/h.',
@@ -249,49 +297,32 @@ export default function CropTimelineCalculator() {
       return
     }
 
-    const incoming = incomingDeliveriesUsedInModel(parsed.incoming).map((d) => ({
-      minutesFromNow: d.minutesFromNow,
-      crop: d.crop ?? 0,
-      village: d.village,
-      player: d.player,
-    }))
+    const { parsed } = applyParse(text)
+    const active = resolveActiveVillage(parsed, selectedVillageKey)
 
-    const serverTime = parsed.serverTime ?? null
+    if (villageNeedsPick(parsed, active)) {
+      setModalVillageKey(selectedVillageKey || '')
+      setShowVillagePickModal(true)
+      return
+    }
 
-    const sim = simulateCropTimeline({
-      stockStart: stock,
-      capacity: Number.isFinite(capacity) ? capacity : null,
-      balancePerHour: balance,
-      incoming,
-      horizonHours: HORIZON_HOURS,
-      stepMinutes: 1,
-    })
+    if (!active?.name || !active?.coords) {
+      setReport(
+        '⚠️ Could not determine village — paste the full marketplace page including the village list with coordinates in the footer.',
+      )
+      setSimulation(null)
+      setHourlyOverview([])
+      return
+    }
 
-    const hourly = buildHourlyOverview({
-      stockStart: stock,
-      balancePerHour: balance,
-      incoming,
-      capacity: Number.isFinite(capacity) ? capacity : null,
-      serverTime,
-      hours: HORIZON_HOURS,
-      horizonMinutes: HORIZON_HOURS * 60,
-    })
+    runFullReport(parsed, selectedVillageKey, text)
+  }
 
-    const out = buildDiscordReport({
-      villageName: active.name,
-      villageCoords: coords,
-      mapUrl: url,
-      stockStart: stock,
-      capacity: Number.isFinite(capacity) ? capacity : null,
-      balancePerHour: balance,
-      serverTimeLabel: serverTime?.label ?? '',
-      hourlyOverview: hourly,
-      incomingDeliveries: parsed.incoming,
-    })
-
-    setSimulation(sim)
-    setHourlyOverview(hourly)
-    setReport(out)
+  const confirmVillagePick = () => {
+    if (!modalVillageKey || !parsedSnapshot) return
+    const text = paste.trim()
+    setShowVillagePickModal(false)
+    runFullReport(parsedSnapshot, modalVillageKey, text)
   }
 
   const handleCopy = async (wrapCodeBlock = false) => {
@@ -359,12 +390,6 @@ export default function CropTimelineCalculator() {
 
   const incomingDisplayRows = incomingDeliveriesUsedInModel(parsedSnapshot?.incoming ?? [])
   const villageList = parsedSnapshot?.villageList ?? []
-  const showVillagePicker = villageList.length > 0 && !parsedSnapshot?.villageName
-  const activeVillage = resolveActiveVillage(parsedSnapshot, selectedVillageKey)
-  const pickerMapUrl =
-    activeVillage?.coords && activeVillage.serverBase
-      ? buildMapUrl(activeVillage.serverBase, activeVillage.coords.x, activeVillage.coords.y)
-      : null
 
   const dismissMarketExpandHint = (permanent) => {
     if (permanent) {
@@ -498,6 +523,137 @@ export default function CropTimelineCalculator() {
         </div>
       )}
 
+      {showVillagePickModal && villageList.length > 0 && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="village-pick-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 110,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+            background: 'rgba(0,0,0,0.72)',
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setShowVillagePickModal(false)
+          }}
+        >
+          <div
+            style={{
+              position: 'relative',
+              maxWidth: 460,
+              width: '100%',
+              background: C.surface,
+              border: `2px solid ${C.gold}`,
+              borderRadius: 12,
+              padding: '22px 20px 18px',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.45)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => setShowVillagePickModal(false)}
+              style={{
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                background: 'transparent',
+                border: 'none',
+                color: C.muted,
+                cursor: 'pointer',
+                padding: 4,
+                lineHeight: 0,
+              }}
+            >
+              <X size={18} />
+            </button>
+            <h2
+              id="village-pick-title"
+              style={{
+                fontFamily: 'Cinzel, serif',
+                color: C.gold,
+                fontSize: '1.05rem',
+                margin: '0 28px 10px 0',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Which village is this?
+            </h2>
+            <p style={{ color: C.text, fontSize: '0.88rem', lineHeight: 1.55, margin: '0 0 14px' }}>
+              {parsedSnapshot?.villageNameMissing
+                ? 'The village name was not copied from Travian (empty line in the footer). Pick the village for this marketplace view — the report will generate after you confirm.'
+                : 'We could not match this marketplace paste to a village. Choose one from your account list below.'}
+            </p>
+            <select
+              id="crop-village-modal-picker"
+              value={modalVillageKey}
+              onChange={(e) => setModalVillageKey(e.target.value)}
+              style={{
+                width: '100%',
+                background: C.surface2,
+                border: `1px solid ${modalVillageKey ? C.goldDim : C.lose}`,
+                borderRadius: 6,
+                color: C.text,
+                fontSize: '0.9rem',
+                padding: '10px 12px',
+                fontFamily: 'inherit',
+                marginBottom: 16,
+              }}
+            >
+              <option value="">— choose village —</option>
+              {villageList.map((v) => (
+                <option key={villageListKey(v)} value={villageListKey(v)}>
+                  {v.name} ({v.x}|{v.y})
+                </option>
+              ))}
+            </select>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setShowVillagePickModal(false)}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 6,
+                  border: `1px solid ${C.border}`,
+                  background: C.surface2,
+                  color: C.text,
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!modalVillageKey}
+                onClick={confirmVillagePick}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 6,
+                  border: 'none',
+                  background: modalVillageKey
+                    ? `linear-gradient(180deg, ${C.gold} 0%, ${C.goldDim} 100%)`
+                    : C.border,
+                  color: modalVillageKey ? '#0f0c09' : C.muted,
+                  cursor: modalVillageKey ? 'pointer' : 'not-allowed',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  fontFamily: 'Cinzel, serif',
+                }}
+              >
+                Generate report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <Wheat size={24} color={C.gold} />
         <h1
@@ -553,6 +709,8 @@ export default function CropTimelineCalculator() {
               setSelectedVillageKey('')
               setParseNotes([])
               setMapUrl(null)
+              setShowVillagePickModal(false)
+              setModalVillageKey('')
             }
           }}
           onBlur={() => {
@@ -583,84 +741,6 @@ export default function CropTimelineCalculator() {
           </ul>
         )}
 
-        {showVillagePicker && (
-          <div
-            style={{
-              marginTop: 14,
-              padding: 12,
-              borderRadius: 6,
-              border: `1px solid ${selectedVillageKey ? C.goldDim : C.lose}`,
-              background: '#0f0c09',
-            }}
-          >
-            <label
-              htmlFor="crop-village-picker"
-              style={{
-                display: 'block',
-                color: parsedSnapshot?.villageNameMissing ? C.lose : C.gold,
-                fontSize: '0.78rem',
-                marginBottom: 8,
-                fontFamily: 'Cinzel, serif',
-              }}
-            >
-              {parsedSnapshot?.villageNameMissing
-                ? 'Village name not in paste — which village is this?'
-                : 'Select village for this report'}
-            </label>
-            <select
-              id="crop-village-picker"
-              value={selectedVillageKey}
-              onChange={(e) => {
-                const key = e.target.value
-                setSelectedVillageKey(key)
-                setReport('')
-                setSimulation(null)
-                setHourlyOverview([])
-                const active = resolveActiveVillage(parsedSnapshot, key)
-                setMapUrl(
-                  active?.coords && active.serverBase
-                    ? buildMapUrl(active.serverBase, active.coords.x, active.coords.y)
-                    : null,
-                )
-              }}
-              style={{
-                width: '100%',
-                background: C.surface2,
-                border: `1px solid ${C.border}`,
-                borderRadius: 6,
-                color: C.text,
-                fontSize: '0.85rem',
-                padding: '8px 10px',
-                fontFamily: 'inherit',
-              }}
-            >
-              <option value="">— choose village —</option>
-              {villageList.map((v) => (
-                <option key={villageListKey(v)} value={villageListKey(v)}>
-                  {v.name} ({v.x}|{v.y})
-                </option>
-              ))}
-            </select>
-            {pickerMapUrl && activeVillage?.name && (
-              <a
-                href={pickerMapUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  color: C.gold,
-                  fontSize: '0.72rem',
-                  marginTop: 8,
-                }}
-              >
-                <ExternalLink size={12} />
-                Map: {activeVillage.name}
-              </a>
-            )}
-          </div>
-        )}
       </div>
 
       <div

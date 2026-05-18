@@ -625,23 +625,62 @@ export function parseVillageCoords(text, villageName) {
     if (m) return { x: parseInt(m[1], 10), y: parseInt(m[2], 10) }
   }
 
-  return parseCoordsInput(norm)
+  return null
 }
 
-/** Village name from paste footer, e.g. "Moula" + "00 Vysočany". */
+const POPULATION_FOOTER_RE =
+  /(?:Obyvatelé|Population|Einwohner|Inwoners|Populācija|Gyventojų skaičius)\s*:+/i
+
+const VILLAGE_NAME_LINE_RE = /^(\d{2}\s+\S.+)$/
+
+/** Lines in the footer block immediately before population / loyalty stats. */
+function linesBeforePopulationFooter(norm) {
+  const foot = norm.slice(-4500)
+  const m = foot.match(POPULATION_FOOTER_RE)
+  if (!m || m.index == null) return []
+  return foot
+    .slice(0, m.index)
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+}
+
+/** Village name from paste footer, e.g. "Moula" + "00 Vysočany" or LT "Mateushas" + "02 Juodžiai". */
 export function parseVillageNameFromPaste(text) {
   const norm = normalizeTravianText(text)
-  const m = norm.match(
+
+  const classic = norm.match(
     /(?:^|\n)([^\n:]+)\n(\d{2}\s+[^\n]+)\n(?:Obyvatelé|Population|Einwohner|Inwoners|Populācija|Gyventojų skaičius)\s*:+/im,
   )
-  if (!m) return null
-  const village = (m[2] ?? '').trim()
-  return village || null
+  if (classic) {
+    const village = (classic[2] ?? '').trim()
+    if (village && VILLAGE_NAME_LINE_RE.test(village)) return village
+  }
+
+  const beforePop = linesBeforePopulationFooter(norm)
+  for (let i = beforePop.length - 1; i >= 0; i--) {
+    const m = beforePop[i].match(VILLAGE_NAME_LINE_RE)
+    if (m) return m[1].trim()
+  }
+
+  return null
+}
+
+/** True when footer has population stats but no "02 Name" line before them (blank row in UI). */
+export function isVillageNameMissingFromFooter(text) {
+  if (!POPULATION_FOOTER_RE.test(normalizeTravianText(text))) return false
+  if (parseVillageNameFromPaste(text)) return false
+  const beforePop = linesBeforePopulationFooter(normalizeTravianText(text))
+  return beforePop.length > 0
+}
+
+export function villageListKey(v) {
+  return `${v.name}|${v.x}|${v.y}`
 }
 
 export function parseVillageFromPaste(text) {
   const name = parseVillageNameFromPaste(text)
-  const coords = parseVillageCoords(text, name)
+  const coords = name ? parseVillageCoords(text, name) : null
   const serverBase = parseServerBaseFromPaste(text)
   const mapUrl = coords ? buildMapUrl(serverBase, coords.x, coords.y) : null
   return { name, coords, serverBase, mapUrl }
@@ -652,6 +691,8 @@ export function parseMarketplacePaste(text) {
   const granary = parseGranaryFromPaste(text)
   const incoming = parseIncomingDeliveries(text, serverTime)
   const village = parseVillageFromPaste(text)
+  const villageList = parseVillageListFromPaste(text)
+  const villageNameMissing = isVillageNameMissingFromFooter(text)
 
   return {
     serverTime,
@@ -662,5 +703,7 @@ export function parseMarketplacePaste(text) {
     villageCoords: village.coords,
     serverBase: village.serverBase,
     mapUrl: village.mapUrl,
+    villageList,
+    villageNameMissing,
   }
 }

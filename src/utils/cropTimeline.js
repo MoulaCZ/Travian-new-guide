@@ -380,7 +380,6 @@ export function buildDiscordReport({
   balancePerHour,
   serverTimeLabel = '',
   hourlyOverview = [],
-  simulation = null,
   incomingDeliveries: _incomingDeliveries = [],
 }) {
   const lines = []
@@ -418,23 +417,6 @@ export function buildDiscordReport({
         "Covered an hour? React with that row's emoji so others know it's handled.",
       )
       lines.push('')
-    }
-  }
-
-  if (simulation) {
-    if (balancePerHour < 0 && simulation.minStock > 0) {
-      lines.push(
-        `📉 Minimum stock: ${formatNum(simulation.minStock)} at +${formatDuration(simulation.minAt)}`,
-      )
-    }
-    if (balancePerHour < 0 && simulation.emptyAt == null && stockStart > 0) {
-      const roughH = stockStart / Math.abs(balancePerHour)
-      lines.push(`⏳ ~${formatDuration(roughH * 60)} to empty (linear, no extra crop)`)
-    }
-    if (capacity && (simulation.totalDiscarded ?? 0) > 0) {
-      lines.push(
-        `📦 Surplus crop discarded when deliveries exceeded granary capacity (model total ≈ ${formatNum(simulation.totalDiscarded)}).`,
-      )
     }
   }
 

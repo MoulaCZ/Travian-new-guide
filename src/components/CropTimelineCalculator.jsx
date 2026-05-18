@@ -56,30 +56,32 @@ function cropBalancePerHour(sign, digitsRaw) {
 function resolveActiveVillage(parsed, selectedVillageKey) {
   if (!parsed) return null
 
-  if (parsed.villageName) {
-    const coords =
-      parsed.villageCoords ??
-      (parsed.villageList?.length
-        ? (() => {
-            const match = parsed.villageList.find((v) => villageNamesMatch(v.name, parsed.villageName))
-            return match ? { x: match.x, y: match.y } : null
-          })()
-        : null)
-    return {
-      name: parsed.villageName,
-      coords,
-      serverBase: parsed.serverBase,
+  // User pick from modal (or prior session) wins over a parsed name without coords.
+  if (selectedVillageKey && parsed.villageList?.length) {
+    const picked = parsed.villageList.find((entry) => villageListKey(entry) === selectedVillageKey)
+    if (picked) {
+      return {
+        name: picked.name,
+        coords: { x: picked.x, y: picked.y },
+        serverBase: parsed.serverBase,
+      }
     }
   }
 
-  if (!selectedVillageKey || !parsed.villageList?.length) return null
-  const v = parsed.villageList.find((entry) => villageListKey(entry) === selectedVillageKey)
-  if (!v) return null
-  return {
-    name: v.name,
-    coords: { x: v.x, y: v.y },
-    serverBase: parsed.serverBase,
+  if (parsed.villageName) {
+    const listMatch = parsed.villageList?.find((v) => villageNamesMatch(v.name, parsed.villageName))
+    const coords =
+      parsed.villageCoords ?? (listMatch ? { x: listMatch.x, y: listMatch.y } : null)
+    if (coords) {
+      return {
+        name: parsed.villageName,
+        coords,
+        serverBase: parsed.serverBase,
+      }
+    }
   }
+
+  return null
 }
 
 /** Open village picker when name or coords are missing but the paste lists villages. */
@@ -188,7 +190,7 @@ export default function CropTimelineCalculator() {
     setMapUrl(url)
     setParseNotes(notes)
     return { parsed, coords, mapUrl: url }
-  }, [])
+  }, [selectedVillageKey])
 
   const runFullReport = useCallback(
     (parsed, villageKey, pasteText) => {
@@ -321,8 +323,29 @@ export default function CropTimelineCalculator() {
   const confirmVillagePick = () => {
     if (!modalVillageKey || !parsedSnapshot) return
     const text = paste.trim()
+    const picked = parsedSnapshot.villageList?.find((v) => villageListKey(v) === modalVillageKey)
+    if (!picked) return
+
+    const enriched = {
+      ...parsedSnapshot,
+      villageName: picked.name,
+      villageCoords: { x: picked.x, y: picked.y },
+      villageNameMissing: false,
+      mapUrl: buildMapUrl(parsedSnapshot.serverBase, picked.x, picked.y),
+    }
+
+    setSelectedVillageKey(modalVillageKey)
+    setParsedSnapshot(enriched)
     setShowVillagePickModal(false)
-    runFullReport(parsedSnapshot, modalVillageKey, text)
+
+    const ok = runFullReport(enriched, modalVillageKey, text)
+    if (!ok) {
+      setReport(
+        '⚠️ Could not generate report for the selected village — check crop stock in paste and net crop/h.',
+      )
+      setSimulation(null)
+      setHourlyOverview([])
+    }
   }
 
   const handleCopy = async (wrapCodeBlock = false) => {

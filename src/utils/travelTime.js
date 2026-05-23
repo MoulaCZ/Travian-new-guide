@@ -4,11 +4,22 @@ import {
   TOURNAMENT_SQUARE_MIN_DISTANCE,
 } from '../data/travelUnits.js'
 
-/** Euclidean distance in fields (Travian map). */
+/**
+ * Travian Legends map is toroidal: column +200 wraps to -200 (and the same on Y).
+ * Standard map spans -200..200 inclusive → 401 positions per axis.
+ */
+export const TRAVIAN_MAP_SIZE = 401
+
+function wrapDelta(d, size = TRAVIAN_MAP_SIZE) {
+  const abs = Math.abs(d)
+  return Math.min(abs, size - abs)
+}
+
+/** Euclidean distance in fields, respecting toroidal wrap on both axes. */
 export function fieldDistance(from, to) {
   if (!from || !to) return NaN
-  const dx = to.x - from.x
-  const dy = to.y - from.y
+  const dx = wrapDelta(to.x - from.x)
+  const dy = wrapDelta(to.y - from.y)
   return Math.hypot(dx, dy)
 }
 

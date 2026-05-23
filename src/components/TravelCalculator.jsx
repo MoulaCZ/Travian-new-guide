@@ -97,7 +97,7 @@ export default function TravelCalculator() {
   const [parseNotes, setParseNotes] = useState([])
   const [copied, setCopied] = useState(false)
   const [nextTargetId, setNextTargetId] = useState(2)
-  const [showPreset, setShowPreset] = useState(false)
+  const [showPreset, setShowPreset] = useState(true)
 
   useEffect(() => {
     setDefPreset(loadPreset(tribe))
@@ -229,21 +229,55 @@ export default function TravelCalculator() {
 
   const buildCopyReport = useCallback(() => {
     if (!marchRows.length) return ''
-    const header = ['From', 'To', 'Unit', 'Amount', 'Time']
-    const cols = [header]
+
+    // Group by source village, then by target — one block per village.
+    const byVillage = new Map()
     for (const r of marchRows) {
-      cols.push([
-        r.from,
-        `${r.to} ${formatCoordsForInput(r.toCoords)}`,
-        r.unitLabel,
-        String(r.amount),
-        formatTravelTime(r.seconds),
-      ])
+      const key = `${r.from}|${r.fromCoords?.x ?? ''}|${r.fromCoords?.y ?? ''}`
+      if (!byVillage.has(key)) {
+        byVillage.set(key, { from: r.from, fromCoords: r.fromCoords, targets: new Map() })
+      }
+      const entry = byVillage.get(key)
+      const tKey = `${r.to}|${r.toCoords?.x ?? ''}|${r.toCoords?.y ?? ''}`
+      if (!entry.targets.has(tKey)) {
+        entry.targets.set(tKey, {
+          to: r.to,
+          toCoords: r.toCoords,
+          distance: r.distance,
+          slowestSeconds: r.slowestSeconds,
+          units: [],
+        })
+      }
+      entry.targets.get(tKey).units.push({
+        label: r.unitLabel,
+        amount: r.amount,
+        seconds: r.seconds,
+      })
     }
-    const widths = header.map((_, i) => Math.max(...cols.map((row) => row[i].length)))
-    return cols
-      .map((row) => row.map((cell, i) => cell.padEnd(widths[i], ' ')).join('  '))
-      .join('\n')
+
+    const lines = []
+    lines.push('**Defense incoming**')
+    lines.push('```')
+    for (const v of byVillage.values()) {
+      const vCoords = v.fromCoords ? ` (${formatCoordsForInput(v.fromCoords)})` : ''
+      lines.push(`${v.from}${vCoords}`)
+      for (const t of v.targets.values()) {
+        const tCoords = t.toCoords ? ` ${formatCoordsForInput(t.toCoords)}` : ''
+        const distance = Number.isFinite(t.distance) ? ` · ${t.distance.toFixed(1)}f` : ''
+        lines.push(`  → ${t.to}${tCoords}${distance} — ETA ${formatTravelTime(t.slowestSeconds)}`)
+        // Sort units by speed (slowest first matches the ETA).
+        const sorted = [...t.units].sort((a, b) => b.seconds - a.seconds)
+        for (const u of sorted) {
+          const amount = u.amount.toLocaleString('en-US')
+          lines.push(`      ${u.label.padEnd(18, ' ')} ${amount.padStart(7, ' ')}   ${formatTravelTime(u.seconds)}`)
+        }
+      }
+      lines.push('')
+    }
+    // Drop trailing blank line before closing fence.
+    if (lines[lines.length - 1] === '') lines.pop()
+    lines.push('```')
+    return lines.join('\n')
   }, [marchRows])
 
   const copyReport = async () => {
@@ -365,13 +399,20 @@ export default function TravelCalculator() {
         )}
 
         <label className="text-xs uppercase tracking-wider block" style={{ color: C.muted }}>
-          Paste — Village overview → Units → Own units (full Ctrl+A)
+          Paste — Village overview → Units → <strong>Jednotky ve vesnicích</strong> (Units in
+          villages) — Ctrl+A
         </label>
+        <p className="text-[11px] -mt-1" style={{ color: C.muted }}>
+          Use "Units in villages" so units away (raiding / reinforcing) are <em>not</em> counted.
+          Only the first unit table per village (matching your tribe) is read — reinforcements from
+          other tribes and captured nature are ignored. The older "Vlastní jednotky" wide-table
+          paste still works as a fallback.
+        </p>
         <textarea
           value={paste}
           onChange={(e) => setPaste(e.target.value)}
           rows={6}
-          placeholder="Ctrl+A on the Own units table (include footer with village coordinates), then paste here."
+          placeholder="Ctrl+A on the Units in villages page (include the village list in the footer for coordinates), then paste here."
           className="w-full rounded-lg border px-3 py-2 text-sm font-mono resize-y"
           style={{ background: C.bg, borderColor: C.border, color: C.text }}
         />

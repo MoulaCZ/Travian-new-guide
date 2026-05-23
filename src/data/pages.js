@@ -20,4 +20,5 @@ export const pages = [
   { id: 'good-to-know',    title: 'Good to Know',          icon: 'Lightbulb',  content: goodToKnowMd    },
   { id: 'calculator',      title: 'Battle Calculator',     icon: 'Calculator', component: 'BattleCalculator' },
   { id: 'crop-timeline',   title: 'Crop Timeline',         icon: 'LineChart',  component: 'CropTimelineCalculator' },
+  { id: 'defense-travel',  title: 'Defense Travel',        icon: 'Route',      component: 'TravelCalculator' },
 ]

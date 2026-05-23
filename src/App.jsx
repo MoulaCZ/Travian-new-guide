@@ -9,10 +9,12 @@ import SuggestEdit from './components/SuggestEdit'
 import { pages } from './data/pages'
 
 import CropTimelineCalculator from './components/CropTimelineCalculator'
+import TravelCalculator from './components/TravelCalculator'
 
 const COMPONENTS = {
   BattleCalculator,
   CropTimelineCalculator,
+  TravelCalculator,
 }
 
 export default function App() {

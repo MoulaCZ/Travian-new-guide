@@ -135,6 +135,32 @@ If the incoming is just a **raid** (no catapults, no chiefs in the report-time /
 
 ---
 
+## Before or After — timing edge cases
+
+A handful of things in Travian only check their condition **at the moment a battle / action lands**, not at the moment you set them up. Knowing which is which saves you from over-preparing — or from skipping a step because "it's too late".
+
+**Chiefing — Large Celebration counts at landing time, not when you send the chief.**
+A Large Celebration in your village reduces enemy loyalty by an extra 5% per chief (and an enemy Large Celebration cancels yours). Per the official [Celebrations and Town Hall guide](https://support.travian.com/en/support/solutions/articles/7000070669-celebrations-and-town-hall): *"These loyalty effects apply to all battles that take place during the celebration, regardless of when troops were sent."* → Start the celebration **after** sending your chiefs as long as it is **running when the waves hit**. Same for the defender: if you only realise chiefs are inbound after they were sent, start a Large Celebration before they land — still works.
+
+**Chiefing — Culture Points are checked at landing time.**
+You do **not** need enough CP to chief when you press send. Per the official [Culture Points guide](https://support.travian.com/en/support/solutions/articles/7000065115-culture-points-cp-): *"When conquering a village, you also need enough Culture Points at the time of the battle to lower enemy loyalty successfully."* → If your chief travels 2 h and you'll have the CP in 1 h 55 min, send the chief now. (Note: **settlers** are different — CP is checked both when sent **and** on arrival.)
+
+**Smithy upgrades apply to units already on the road.**
+Smithy weapon level is read at the moment of battle, not at the moment of dispatch. → If the upgrade finishes a second before the attack lands, your army fights with the new bonus — even though it left the village at the old level.
+
+**Residence / Palace in build queue does NOT protect a village from chiefing.**
+Only a **standing** Residence or Palace blocks loyalty reduction. Per [Travian's preventing-conquering guide](https://support.travian.com/en/support/solutions/articles/7000060247-preventing-conquering), the admin building "must be destroyed first". → A Residence sitting in the construction queue does nothing — until the timer hits 0 and the building physically exists, the village can be chiefed. The same goes for re-building after a catapult wave: queue ≠ protection.
+
+**Tournament Square built while your troops are travelling does NOT speed them up.**
+Units already on the way have a locked arrival time. Tournament Square (and Hero speed items) only affect **new** marches. → No point catapulting your TS up mid-defence-call hoping the defence already in flight arrives faster.
+
+**Cages can be equipped on a hero that is already moving.**
+Most hero items can be changed at any time — the only exception is **travel-speed items** (boots, horse, standards), which are locked while the hero is in transit. Per the official [Hero Equipment guide](https://support.kingdoms.com/en/articles/45-hero-equipment-overview): *"You can change your hero's equipment at any time. Exception: items that influence travel speed can only be changed if your hero is not traveling."* → If you sent your hero to an oasis and only now see elephants spawned there, drop **cages** into the inventory — they still take effect on arrival.
+
+How cages work (per the [Hero Consumable Items guide](https://support.travian.com/en/support/solutions/articles/7000063372-hero-consumable-items)): *"Cages are consumed left to right, one per animal type at a time."* → Cages rotate through the animal types one by one. Example: an oasis with **10 mice / 4 tigers / 2 elephants**, you bring **6 cages** → you catch **2 mice, 2 tigers, 2 elephants** (cage 1 → mouse, cage 2 → tiger, cage 3 → elephant, cage 4 → mouse, cage 5 → tiger, cage 6 → elephant). Plan accordingly when the oasis you want to clear has a few rats and one big monster — you only need 2 cages, not 12.
+
+---
+
 ## Economy & Trade
 
 **Q: How do Trade Routes work?**

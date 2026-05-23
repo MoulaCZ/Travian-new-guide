@@ -111,6 +111,45 @@ No. For the same resource cost, run 3 normal Barracks across 3 villages. You tri
 **Q: What is troop evasion and when should I use it?**
 Troop Evasion (Gold Club feature) lets you send all your troops away from a capital village just before an attack lands — they simply aren't home when it hits. Use it when you see a large incoming attack you can't defend.
 
+**Q: What does the Rally Point actually do for me as a defender, and what's the deal with fakes?**
+
+The Rally Point has **two completely different jobs** — one for the attacker, one for the defender.
+
+**As the attacker — it unlocks catapult targeting.** Without a Rally Point above a certain level you cannot point a catapult at a specific building. Per the official Travian: Legends catapult guide:
+
+| RP level | What you can target with catapults |
+|----------|------------------------------------|
+| **1** | Random target only |
+| **3** | Warehouse, Granary |
+| **5** | + resource fields, Brickyard, Iron Foundry, Sawmill, Grain Mill, Bakery |
+| **10** | Any building except Cranny, Stonemason's Lodge, Trapper |
+| **20** | **Two targets in one attack** (needs ≥ 20 catapults; damage is split) |
+
+> Stonemason's Lodge is always hit **last**, and if you pick the same target twice at RP 20 the damage is split — leave the second slot empty if you only want to hit one building.
+
+**As the defender — it shows you what's coming.** With a Rally Point built you see, for every incoming attack: **origin village, arrival time, and who is reinforcing you**, and you can return reinforcements. Without one, you only see the arrival time of the next hit.
+
+What you can **actually see about the attacking army** is normally just **the number of waves and timings, with question marks instead of unit types and counts**. You only learn *what* is in the wave if the attacker is unlucky enough that you have the **Eagle Eyes** artefact (which reveals troop counts in the first N waves).
+
+This is why fakes work — and why the standard alliance-grade fake is **1 catapult + 19 cheapest infantry per wave**:
+
+- The **catapult** forces the whole stack down to catapult speed (4 fields/h). A real cat wave moves at 4 f/h, so the fake's travel time looks identical — you cannot rule it out by speed.
+- **19 + 1 = 20 units**, which is the assumed defender RP level. Per the official "Real Attacks and Fakes" guide: *"Always assume the defender has Rally Point 20 — your fakes must contain at least 20 units."* Anything smaller can be filtered out on special servers (alliance attack notifications hide attacks with fewer troops than the target's RP level), and it stops looking like a real wave.
+- For 4 waves × 4 fake targets you therefore need to keep **at least 304 cheap infantry + 16 catapults** in reserve after your real attack leaves. ([Travian official guide](https://support.travian.com/en/support/solutions/articles/7000092497-real-attacks-and-fakes))
+
+The flip side as a defender: if you see "?" everywhere and the wave is moving at ~4 f/h, **assume it's real until proven otherwise** — that's exactly what a good faker wants you to second-guess.
+
+**Q: An attack is incoming and I have way more resources than my Cranny holds — how do I hide them?**
+
+If the incoming is just a **raid** (no catapults, no chiefs in the report-time / no big siege stack), the attacker only takes loot — your buildings and village are safe, but every resource above your Cranny limit is gone. You usually have a few hours to burn off the excess. Four standard tricks, in roughly the order people try them:
+
+1. **Queue buildings.** Open every village that needs upgrades and start as many builds as you can — wood/clay/iron drains into the construction site immediately. Field upgrades and warehouses/granaries swallow huge amounts. Anything you queue can be cancelled later and you get the resources back.
+2. **Queue troops.** Stack the Barracks / Stable / Workshop with as many units as the queue allows. **Important:** units already in your village will still be home when the attack lands and may die — send your existing army out (visit an oasis, send to a friend, or send to a far coordinate) a few seconds before impact so they're "on the road" when the raid hits, then call them straight back. Newly queued troops have not finished training yet, so they cannot be lost in the fight either way.
+3. **Ship to the alliance bonus** (if your alliance runs alliance bonuses fed by contributions). Donating to the bonus instantly removes resources from your village and helps the team — pure win.
+4. **The marketplace trick.** Marketplace → Offer resources → put up an **intentionally bad trade**: offer the resource you cannot burn (typically wood or clay) at **maximum amount**, ask for a different resource in return (anything *except* the one you have a surplus of, e.g. ask for iron, **not** crop), at a **very unfavourable ratio** — e.g. 2 : 1 against you. Nobody will take it because the deal is terrible, but the resources are now **locked in the marketplace** and not in the warehouse, so the raider cannot loot them. **After the attack lands, cancel the offer** and the resources come back into your warehouse untouched.
+
+> ⚠️ All four tricks assume it's a **raid** (loot only). If the incoming wave includes catapults or chiefs you have a different problem — call defence, follow alliance instructions, and use Troop Evasion on the capital if you have Gold Club. Hiding resources is irrelevant if the village itself is the target.
+
 ---
 
 ## Economy & Trade

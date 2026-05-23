@@ -3,7 +3,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import TopBar from './components/TopBar'
 import MarkdownPage from './components/MarkdownPage'
-import BattleCalculator from './components/BattleCalculator'
 import Onboarding, { useOnboarding } from './components/Onboarding'
 import SuggestEdit from './components/SuggestEdit'
 import { pages } from './data/pages'
@@ -12,7 +11,6 @@ import CropTimelineCalculator from './components/CropTimelineCalculator'
 import TravelCalculator from './components/TravelCalculator'
 
 const COMPONENTS = {
-  BattleCalculator,
   CropTimelineCalculator,
   TravelCalculator,
 }

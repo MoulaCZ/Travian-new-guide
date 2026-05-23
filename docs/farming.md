@@ -73,12 +73,14 @@ The best raiding troop depends on your tribe. Key stats: **carry capacity** (res
 | Tribe | Unit | Carry | Speed | Notes |
 |-------|------|-------|-------|-------|
 | Teutons | Clubswinger | 60 | 7 f/h | Best early raider — cheap, fast to mass-produce |
-| Teutons | Teutonic Knight | 80 | 12 f/h | Mid-game upgrade, higher carry |
+| Teutons | Paladin | 110 | 10 f/h | Mid-game pick: solid def stats on its own, so it earns its keep at home **and** raids well — units can double as defence between raids |
 | Gauls | Theutates Thunder | 75 | 19 f/h | Best speed; excellent for nearby farms |
 | Romans | Equites Imperatoris | 100 | 14 f/h | High carry, expensive — not ideal for massing |
 | Romans | Legionnaire | 50 | 6 f/h | Poor raider — slow, low carry, avoid if possible |
 
 **Teutons** are the best farming tribe overall. Clubswinger is the most efficient early raider by cost-to-carry ratio — mass-produce them immediately. The Teuton hero also partially bypasses cranny protection and adds +20% plunder.
+
+For the mid-game cavalry pick, **prefer Paladins over Teutonic Knights** as a defensive player. Paladins are a real def unit on their own (high def vs. infantry), so the cavalry you trained sits at home as actual defence between raids instead of being a pure attack tax. Teutonic Knights raid harder, but on a DEF account they are dead weight when not on the road.
 
 **Gauls** farm efficiently mid-game thanks to Theutates Thunder's speed. Fast round trips mean more cycles per day.
 

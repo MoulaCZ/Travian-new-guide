@@ -126,10 +126,10 @@ Two jobs:
 
 If the incoming is just a **raid** (no catapults, no chiefs in the report-time / no big siege stack), the attacker only takes loot — your buildings and village are safe, but every resource above your Cranny limit is gone. You usually have a few hours to burn off the excess. Four standard tricks, in roughly the order people try them:
 
-1. **Queue buildings.** Open every village that needs upgrades and start as many builds as you can — wood/clay/iron drains into the construction site immediately. Field upgrades and warehouses/granaries swallow huge amounts. Anything you queue can be cancelled later and you get the resources back.
-2. **Queue troops.** Stack the Barracks / Stable / Workshop with as many units as the queue allows. **Important:** units already in your village will still be home when the attack lands and may die — send your existing army out (visit an oasis, send to a friend, or send to a far coordinate) a few seconds before impact so they're "on the road" when the raid hits, then call them straight back. Newly queued troops have not finished training yet, so they cannot be lost in the fight either way.
+1. **Queue buildings.** Open every village that needs upgrades and start as many builds as you can — wood/clay/iron drains into the construction site immediately. Field upgrades and warehouses/granaries swallow huge amounts.
+2. **Queue troops.** Stack the Barracks / Stable / Workshop with as many units as the queue allows. **Important:** units already in your village will still be home when the attack lands and may die — send your existing army out (visit an oasis, send to a friend, or send to a near coordinate) a few seconds before impact so they're "on the road" when the raid hits, then call them straight back. Newly queued troops have not finished training yet, so they cannot be lost in the fight either way.
 3. **Ship to the alliance bonus** (if your alliance runs alliance bonuses fed by contributions). Donating to the bonus instantly removes resources from your village and helps the team — pure win.
-4. **The marketplace trick.** Marketplace → Offer resources → put up an **intentionally bad trade**: offer the resource you cannot burn (typically wood or clay) at **maximum amount**, ask for a different resource in return (anything *except* the one you have a surplus of, e.g. ask for iron, **not** crop), at a **very unfavourable ratio** — e.g. 2 : 1 against you. Nobody will take it because the deal is terrible, but the resources are now **locked in the marketplace** and not in the warehouse, so the raider cannot loot them. **After the attack lands, cancel the offer** and the resources come back into your warehouse untouched.
+4. **The marketplace trick.** Marketplace → Offer resources → put up an **intentionally bad trade**: offer the resource you cannot burn (typically wood or clay) at **maximum amount**, ask for a different resource in return, at a **very favourable ratio** — e.g. 2 : 1 for you. Nobody will take it because the deal is terrible, but the resources are now **locked in the marketplace** and not in the warehouse, so the raider cannot loot them. **After the attack lands, cancel the offer** and the resources come back into your warehouse untouched.
 
 > ⚠️ All four tricks assume it's a **raid** (loot only). If the incoming wave includes catapults or chiefs you have a different problem — call defence, follow alliance instructions, and use Troop Evasion on the capital if you have Gold Club. Hiding resources is irrelevant if the village itself is the target.
 
@@ -152,8 +152,8 @@ Typical pattern: **feeders → anvil** for wood/clay/iron/crop. You can also mov
 
 **Recovery levers:** ship crop from other villages, hero inventory, marketplace buys, **temporary troop cuts** (send extras home or to alliance storage if offered), rebuild fields, and get **trade routes** feeding the starving village before queues idle for days.
 
-**Q: My Marketplace merchants are too slow — what helps?**
-- Upgrade the **Trade Office** — each level increases merchant carry capacity and speed
+**Q: My Marketplace merchants are too small — what helps?**
+- Upgrade the **Trade Office** — each level increases merchant carry capacity
 - You should **build** your feeder villages closer to the anvil when choosing new tiles
 
 **Q: When should I use the NPC Merchant?**

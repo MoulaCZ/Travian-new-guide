@@ -709,6 +709,29 @@ export default function CropTimelineCalculator() {
           background: C.surface,
           border: `1px solid ${C.border}`,
           borderRadius: 8,
+          padding: '10px 14px',
+          fontSize: '0.78rem',
+          lineHeight: 1.5,
+          color: C.muted,
+        }}
+      >
+        <strong style={{ color: C.gold }}>Supported paste languages:</strong>{' '}
+        <span style={{ color: C.text }}>
+          Czech, English, German, Dutch, Latvian, Lithuanian
+        </span>
+        .{' '}
+        <span>
+          Missing your language? Open the{' '}
+          <strong style={{ color: C.text }}>Suggest edit</strong> button (bottom-left of the
+          sidebar) and paste an example from the marketplace — we will add the keywords.
+        </span>
+      </div>
+
+      <div
+        style={{
+          background: C.surface,
+          border: `1px solid ${C.border}`,
+          borderRadius: 8,
           padding: 14,
         }}
       >

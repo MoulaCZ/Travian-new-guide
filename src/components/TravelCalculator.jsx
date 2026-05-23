@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo, useEffect, Fragment } from 'react'
-import { Shield, Copy, Check, ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
+import { Shield, Copy, Check, Plus, Trash2, Settings2 } from 'lucide-react'
 import { parseCoordsInput, formatCoordsForInput } from '../utils/coordParse'
 import { parseOwnUnitsPaste } from '../utils/travelPasteParser'
 import {
@@ -13,7 +13,6 @@ import { TRIBE_LABELS } from '../data/units.js'
 import {
   computeMarchTimes,
   formatTravelTime,
-  formatDistance,
 } from '../utils/travelTime.js'
 
 const C = {
@@ -25,6 +24,7 @@ const C = {
   text: '#d4c4a8',
   muted: '#7a6a55',
   win: '#4ade80',
+  bad: '#f87171',
 }
 
 const TRIBE_OPTIONS = [
@@ -35,6 +35,7 @@ const TRIBE_OPTIONS = [
 
 const PRESET_LS = 'travian-travel-def-preset-v1'
 const TRIBE_LS = 'travian-travel-tribe-v1'
+const HERO_LS = 'travian-travel-hero-standard-v1'
 
 function villageKey(v) {
   return `${v.name}|${v.coords?.x ?? ''}|${v.coords?.y ?? ''}`
@@ -84,13 +85,19 @@ export default function TravelCalculator() {
   })
   const [defPreset, setDefPreset] = useState(() => loadPreset('teuton'))
   const [targets, setTargets] = useState([{ id: 1, label: 'Target A', raw: '' }])
-  const [tournamentLevel, setTournamentLevel] = useState(0)
-  const [heroStandard, setHeroStandard] = useState(0)
+  const [heroStandard, setHeroStandard] = useState(() => {
+    try {
+      const v = parseInt(localStorage.getItem(HERO_LS) ?? '0', 10)
+      return Number.isFinite(v) ? v : 0
+    } catch {
+      return 0
+    }
+  })
   const [villages, setVillages] = useState([])
   const [parseNotes, setParseNotes] = useState([])
-  const [expandedVillage, setExpandedVillage] = useState(null)
   const [copied, setCopied] = useState(false)
   const [nextTargetId, setNextTargetId] = useState(2)
+  const [showPreset, setShowPreset] = useState(false)
 
   useEffect(() => {
     setDefPreset(loadPreset(tribe))
@@ -101,19 +108,25 @@ export default function TravelCalculator() {
     }
   }, [tribe])
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(HERO_LS, String(heroStandard))
+    } catch {
+      /* ignore */
+    }
+  }, [heroStandard])
+
   const unitColumns = TRIBE_UNIT_COLUMNS[tribe] ?? []
   const heroPct = HERO_STANDARD_OPTIONS.find((o) => o.id === heroStandard)?.pct ?? 0
-  const bonuses = useMemo(
-    () => ({ tournamentLevel, heroBonusPct: heroPct }),
-    [tournamentLevel, heroPct],
-  )
 
-  const parsedTargets = useMemo(() => {
-    return targets.map((t) => {
-      const coords = parseCoordsInput(t.raw)
-      return { ...t, coords }
-    })
-  }, [targets])
+  const parsedTargets = useMemo(
+    () =>
+      targets.map((t) => ({
+        ...t,
+        coords: parseCoordsInput(t.raw),
+      })),
+    [targets],
+  )
 
   const activeUnitIds = useMemo(
     () => unitColumns.filter((id) => defPreset[id]),
@@ -125,17 +138,17 @@ export default function TravelCalculator() {
     const preset = loadPreset(tribe)
     const withState = parsed.map((v) => {
       const defTotal = sumDefUnits(v.counts, preset)
-      const enabled = defTotal >= MIN_DEF_UNITS_THRESHOLD && !!v.coords
       return {
         ...v,
-        enabled,
+        enabled: defTotal >= MIN_DEF_UNITS_THRESHOLD && !!v.coords,
         counts: { ...v.counts },
         defTotal,
+        tournamentLevel: 0,
+        heroHere: false,
       }
     })
     setVillages(withState)
     setParseNotes(notes)
-    setExpandedVillage(null)
   }, [paste, tribe])
 
   const togglePreset = (unitId) => {
@@ -146,12 +159,17 @@ export default function TravelCalculator() {
         rows.map((v) => ({
           ...v,
           defTotal: sumDefUnits(v.counts, next),
-          enabled:
-            sumDefUnits(v.counts, next) >= MIN_DEF_UNITS_THRESHOLD && !!v.coords,
+          enabled: sumDefUnits(v.counts, next) >= MIN_DEF_UNITS_THRESHOLD && !!v.coords,
         })),
       )
       return next
     })
+  }
+
+  const patchVillage = (vKey, patch) => {
+    setVillages((rows) =>
+      rows.map((v) => (villageKey(v) === vKey ? { ...v, ...patch } : v)),
+    )
   }
 
   const updateCount = (vKey, unitId, value) => {
@@ -160,70 +178,73 @@ export default function TravelCalculator() {
       rows.map((v) => {
         if (villageKey(v) !== vKey) return v
         const counts = { ...v.counts, [unitId]: n }
-        const defTotal = sumDefUnits(counts, defPreset)
-        return { ...v, counts, defTotal }
+        return { ...v, counts, defTotal: sumDefUnits(counts, defPreset) }
       }),
     )
   }
 
-  const toggleVillage = (vKey) => {
+  const setVillageHeroExclusive = (vKey, on) => {
     setVillages((rows) =>
-      rows.map((v) => (villageKey(v) === vKey ? { ...v, enabled: !v.enabled } : v)),
+      rows.map((v) => {
+        if (villageKey(v) === vKey) return { ...v, heroHere: on }
+        if (on && v.heroHere) return { ...v, heroHere: false }
+        return v
+      }),
     )
   }
 
-  const results = useMemo(() => {
+  const marchRows = useMemo(() => {
     const enabled = villages.filter((v) => v.enabled && v.coords)
     const validTargets = parsedTargets.filter((t) => t.coords)
-    if (!enabled.length || !validTargets.length) return []
+    if (!enabled.length || !validTargets.length || !activeUnitIds.length) return []
 
-    return enabled.map((v) => {
-      const perTarget = validTargets.map((t) => {
+    const rows = []
+    for (const v of enabled) {
+      const bonuses = {
+        tournamentLevel: v.tournamentLevel ?? 0,
+        heroBonusPct: v.heroHere ? heroPct : 0,
+      }
+      for (const t of validTargets) {
         const march = computeMarchTimes(v.counts, activeUnitIds, v.coords, t.coords, bonuses)
-        return {
-          targetId: t.id,
-          label: t.label,
-          coords: t.coords,
-          ...march,
-        }
-      })
-      return { village: v, perTarget }
-    })
-  }, [villages, parsedTargets, activeUnitIds, bonuses])
-
-  const buildCopyReport = useCallback(() => {
-    const lines = []
-    lines.push(`Defense travel — ${TRIBE_LABELS[tribe] ?? tribe}`)
-    if (tournamentLevel > 0) {
-      lines.push(`Tournament square L${tournamentLevel} (+${tournamentLevel * 20}% speed if >20 fields)`)
-    }
-    if (heroPct > 0) lines.push(`Hero alliance standard +${heroPct}%`)
-    lines.push('')
-
-    for (const t of parsedTargets) {
-      if (!t.coords) continue
-      lines.push(`${t.label}: ${formatCoordsForInput(t.coords)}`)
-    }
-    lines.push('')
-
-    for (const row of results) {
-      const v = row.village
-      const coordStr = v.coords ? ` (${formatCoordsForInput(v.coords)})` : ''
-      lines.push(`${v.name}${coordStr} | def ${v.defTotal.toLocaleString('en-US')}`)
-      for (const pt of row.perTarget) {
-        lines.push(
-          `  → ${pt.label} ${formatCoordsForInput(pt.coords)} | ${formatDistance(pt.distance)} fields | ${formatTravelTime(pt.totalSeconds)}`,
-        )
-        for (const u of pt.unitTimes) {
-          lines.push(
-            `      ${getUnitLabel(tribe, u.unitId)} ×${u.count}: ${formatTravelTime(u.seconds)}`,
-          )
+        for (const u of march.unitTimes) {
+          rows.push({
+            from: v.name,
+            fromCoords: v.coords,
+            to: t.label,
+            toCoords: t.coords,
+            unitId: u.unitId,
+            unitLabel: getUnitLabel(tribe, u.unitId),
+            amount: u.count,
+            seconds: u.seconds,
+            slowestSeconds: march.totalSeconds,
+            distance: march.distance,
+            heroApplied: v.heroHere && heroPct > 0,
+            tournamentLevel: v.tournamentLevel ?? 0,
+          })
         }
       }
-      lines.push('')
     }
-    return lines.join('\n').trim()
-  }, [results, tribe, tournamentLevel, heroPct, parsedTargets])
+    return rows
+  }, [villages, parsedTargets, activeUnitIds, heroPct, tribe])
+
+  const buildCopyReport = useCallback(() => {
+    if (!marchRows.length) return ''
+    const header = ['From', 'To', 'Unit', 'Amount', 'Time']
+    const cols = [header]
+    for (const r of marchRows) {
+      cols.push([
+        r.from,
+        `${r.to} ${formatCoordsForInput(r.toCoords)}`,
+        r.unitLabel,
+        String(r.amount),
+        formatTravelTime(r.seconds),
+      ])
+    }
+    const widths = header.map((_, i) => Math.max(...cols.map((row) => row[i].length)))
+    return cols
+      .map((row) => row.map((cell, i) => cell.padEnd(widths[i], ' ')).join('  '))
+      .join('\n')
+  }, [marchRows])
 
   const copyReport = async () => {
     const text = buildCopyReport()
@@ -268,25 +289,26 @@ export default function TravelCalculator() {
             Defense Travel
           </h1>
           <p className="text-sm" style={{ color: C.muted }}>
-            Paste own units from all villages → times to one or more targets (Legends).
+            Paste own units → pick targets → travel times per unit, per village (Legends).
           </p>
         </div>
       </div>
 
+      {/* 1. Tribe + paste */}
       <section
         className="rounded-xl border p-4 space-y-3"
         style={{ background: C.surface, borderColor: C.border }}
       >
-        <label className="text-xs uppercase tracking-wider" style={{ color: C.muted }}>
-          Tribe
-        </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-xs uppercase tracking-wider" style={{ color: C.muted }}>
+            Tribe:
+          </span>
           {TRIBE_OPTIONS.map((opt) => (
             <button
               key={opt.id}
               type="button"
               onClick={() => setTribe(opt.id)}
-              className="px-3 py-1.5 rounded-lg border text-sm transition-colors"
+              className="px-3 py-1 rounded-lg border text-sm transition-colors"
               style={{
                 borderColor: tribe === opt.id ? C.gold : C.border,
                 background: tribe === opt.id ? C.gold + '22' : C.surface2,
@@ -296,27 +318,62 @@ export default function TravelCalculator() {
               {opt.label}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setShowPreset((s) => !s)}
+            className="ml-auto flex items-center gap-1 text-xs px-2 py-1 rounded border"
+            style={{ borderColor: C.border, color: C.muted }}
+          >
+            <Settings2 className="w-3.5 h-3.5" />
+            {showPreset ? 'Hide def preset' : 'Edit def preset'}
+          </button>
         </div>
-      </section>
 
-      <section
-        className="rounded-xl border p-4 space-y-3"
-        style={{ background: C.surface, borderColor: C.border }}
-      >
+        {showPreset && (
+          <div
+            className="rounded-lg border p-3"
+            style={{ borderColor: C.border, background: C.bg }}
+          >
+            <p className="text-xs mb-2" style={{ color: C.muted }}>
+              Checked types count toward the {MIN_DEF_UNITS_THRESHOLD} def threshold and travel
+              time (slowest selected unit wins).
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {unitColumns
+                .filter((id) => id !== 'hero')
+                .map((id) => (
+                  <label
+                    key={id}
+                    className="flex items-center gap-1.5 px-2 py-1 rounded border text-xs cursor-pointer"
+                    style={{
+                      borderColor: defPreset[id] ? C.gold + '66' : C.border,
+                      background: defPreset[id] ? C.gold + '12' : 'transparent',
+                      color: C.text,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!!defPreset[id]}
+                      onChange={() => togglePreset(id)}
+                      className="accent-[#f0a820]"
+                    />
+                    {getUnitLabel(tribe, id)}
+                  </label>
+                ))}
+            </div>
+          </div>
+        )}
+
         <label className="text-xs uppercase tracking-wider block" style={{ color: C.muted }}>
-          Paste — Village overview → Units → Own units
+          Paste — Village overview → Units → Own units (full Ctrl+A)
         </label>
         <textarea
           value={paste}
           onChange={(e) => setPaste(e.target.value)}
-          rows={8}
+          rows={6}
           placeholder="Ctrl+A on the Own units table (include footer with village coordinates), then paste here."
           className="w-full rounded-lg border px-3 py-2 text-sm font-mono resize-y"
-          style={{
-            background: C.bg,
-            borderColor: C.border,
-            color: C.text,
-          }}
+          style={{ background: C.bg, borderColor: C.border, color: C.text }}
         />
         <button
           type="button"
@@ -336,158 +393,258 @@ export default function TravelCalculator() {
         )}
       </section>
 
+      {/* 2. Targets */}
       <section
         className="rounded-xl border p-4 space-y-3"
         style={{ background: C.surface, borderColor: C.border }}
       >
-        <p className="text-xs uppercase tracking-wider" style={{ color: C.muted }}>
-          Defense unit preset ({TRIBE_LABELS[tribe]})
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs uppercase tracking-wider" style={{ color: C.muted }}>
+            Targets — paste Travian map URL or type coordinates
+          </p>
+          <button
+            type="button"
+            onClick={addTarget}
+            className="flex items-center gap-1 text-xs px-2 py-1 rounded border"
+            style={{ borderColor: C.border, color: C.gold }}
+          >
+            <Plus className="w-3 h-3" /> Add target
+          </button>
+        </div>
+        <p className="text-[11px]" style={{ color: C.muted }}>
+          Accepted formats: <code>-196|-33</code> · <code>(−196 | −33)</code> ·{' '}
+          <code>X: -196 Y: -33</code> · <code>https://…/karte.php?x=-196&y=-33</code>
         </p>
-        <p className="text-xs" style={{ color: C.muted }}>
-          Checked types count toward the {MIN_DEF_UNITS_THRESHOLD} def threshold and travel time (slowest
-          selected unit wins).
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {unitColumns
-            .filter((id) => id !== 'hero')
-            .map((id) => (
-              <label
-                key={id}
-                className="flex items-center gap-1.5 px-2 py-1 rounded border text-xs cursor-pointer"
+        {targets.map((t) => {
+          const parsed = parseCoordsInput(t.raw)
+          return (
+            <div key={t.id} className="flex flex-wrap gap-2 items-center">
+              <input
+                type="text"
+                value={t.label}
+                onChange={(e) =>
+                  setTargets((rows) =>
+                    rows.map((r) => (r.id === t.id ? { ...r, label: e.target.value } : r)),
+                  )
+                }
+                className="w-32 rounded border px-2 py-1 text-sm"
+                style={{ background: C.bg, borderColor: C.border, color: C.text }}
+              />
+              <input
+                type="text"
+                value={t.raw}
+                onChange={(e) =>
+                  setTargets((rows) =>
+                    rows.map((r) => (r.id === t.id ? { ...r, raw: e.target.value } : r)),
+                  )
+                }
+                placeholder="-196|-33  or  https://…/karte.php?x=-196&y=-33"
+                className="flex-1 min-w-[220px] rounded border px-2 py-1 text-sm font-mono"
                 style={{
-                  borderColor: defPreset[id] ? C.gold + '66' : C.border,
-                  background: defPreset[id] ? C.gold + '12' : 'transparent',
+                  background: C.bg,
+                  borderColor: t.raw ? (parsed ? C.border : C.bad) : C.border,
                   color: C.text,
                 }}
+              />
+              <span
+                className="text-xs font-mono w-24 text-center"
+                style={{ color: parsed ? C.win : C.muted }}
               >
-                <input
-                  type="checkbox"
-                  checked={!!defPreset[id]}
-                  onChange={() => togglePreset(id)}
-                  className="accent-[#f0a820]"
-                />
-                {getUnitLabel(tribe, id)}
-              </label>
-            ))}
-        </div>
+                {parsed ? formatCoordsForInput(parsed) : t.raw ? 'invalid' : '—'}
+              </span>
+              {targets.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeTarget(t.id)}
+                  className="p-1.5 rounded border"
+                  style={{ borderColor: C.border, color: C.muted }}
+                  aria-label="Remove target"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          )
+        })}
       </section>
 
+      {/* 3. Hero standard */}
       <section
-        className="rounded-xl border p-4 space-y-3"
+        className="rounded-xl border p-4 space-y-2"
         style={{ background: C.surface, borderColor: C.border }}
       >
         <p className="text-xs uppercase tracking-wider" style={{ color: C.muted }}>
-          Bonuses
+          Hero alliance standard (one hero across the account)
         </p>
-        <div className="flex flex-wrap gap-4 items-end">
-          <label className="text-sm space-y-1">
-            <span style={{ color: C.muted }}>Tournament square level</span>
-            <input
-              type="number"
-              min={0}
-              max={20}
-              value={tournamentLevel}
-              onChange={(e) =>
-                setTournamentLevel(Math.min(20, Math.max(0, parseInt(e.target.value, 10) || 0)))
-              }
-              className="block w-20 rounded border px-2 py-1"
-              style={{ background: C.bg, borderColor: C.border, color: C.text }}
-            />
-            <span className="text-xs" style={{ color: C.muted }}>
-              +20% speed/level if distance &gt; 20 fields
-            </span>
-          </label>
-          <label className="text-sm space-y-1">
-            <span style={{ color: C.muted }}>Hero alliance standard</span>
-            <select
-              value={heroStandard}
-              onChange={(e) => setHeroStandard(parseInt(e.target.value, 10))}
-              className="block rounded border px-2 py-1"
-              style={{ background: C.bg, borderColor: C.border, color: C.text }}
-            >
-              {HERO_STANDARD_OPTIONS.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </section>
-
-      <section
-        className="rounded-xl border p-4 space-y-3"
-        style={{ background: C.surface, borderColor: C.border }}
-      >
-        <p className="text-xs uppercase tracking-wider" style={{ color: C.muted }}>
-          Targets (coordinates)
-        </p>
-        {targets.map((t) => (
-          <div key={t.id} className="flex flex-wrap gap-2 items-center">
-            <input
-              type="text"
-              value={t.label}
-              onChange={(e) =>
-                setTargets((rows) =>
-                  rows.map((r) => (r.id === t.id ? { ...r, label: e.target.value } : r)),
-                )
-              }
-              className="w-28 rounded border px-2 py-1 text-sm"
-              style={{ background: C.bg, borderColor: C.border, color: C.text }}
-            />
-            <input
-              type="text"
-              value={t.raw}
-              onChange={(e) =>
-                setTargets((rows) =>
-                  rows.map((r) => (r.id === t.id ? { ...r, raw: e.target.value } : r)),
-                )
-              }
-              placeholder="-196|-33"
-              className="flex-1 min-w-[140px] rounded border px-2 py-1 text-sm font-mono"
+        <div className="flex flex-wrap gap-2">
+          {HERO_STANDARD_OPTIONS.map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => setHeroStandard(o.id)}
+              className="px-3 py-1 rounded border text-xs"
               style={{
-                background: C.bg,
-                borderColor: t.coords ? C.border : '#7f1d1d',
-                color: C.text,
+                borderColor: heroStandard === o.id ? C.gold : C.border,
+                background: heroStandard === o.id ? C.gold + '22' : C.surface2,
+                color: heroStandard === o.id ? C.gold : C.text,
               }}
-            />
-            {targets.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeTarget(t.id)}
-                className="p-1.5 rounded border"
-                style={{ borderColor: C.border, color: C.muted }}
-                aria-label="Remove target"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={addTarget}
-          className="flex items-center gap-1 text-xs px-2 py-1 rounded border"
-          style={{ borderColor: C.border, color: C.gold }}
-        >
-          <Plus className="w-3 h-3" /> Add target
-        </button>
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-[11px]" style={{ color: C.muted }}>
+          Then tick the village where the hero physically is — only that village gets the speed bonus.
+        </p>
       </section>
 
+      {/* 4. Villages */}
       {villages.length > 0 && (
         <section
           className="rounded-xl border overflow-hidden"
           style={{ background: C.surface, borderColor: C.border }}
         >
-          <div className="px-4 py-3 border-b flex flex-wrap items-center justify-between gap-2" style={{ borderColor: C.border }}>
+          <div
+            className="px-4 py-3 border-b flex flex-wrap items-center justify-between gap-2"
+            style={{ borderColor: C.border }}
+          >
             <span className="text-sm font-medium" style={{ color: C.text }}>
-              {villages.length} villages — default off if &lt; {MIN_DEF_UNITS_THRESHOLD} def units
+              {villages.length} villages — default off if &lt; {MIN_DEF_UNITS_THRESHOLD} def units.
+              Set TS level + hero per village.
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr style={{ color: C.muted, borderBottom: `1px solid ${C.border}` }}>
+                  <th className="text-left p-2 w-8">Send</th>
+                  <th className="text-left p-2">Village</th>
+                  <th className="text-right p-2">Def</th>
+                  <th className="text-center p-2 w-20">TS lvl</th>
+                  <th className="text-center p-2 w-16">Hero</th>
+                  <th className="text-left p-2">Unit counts (editable)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {villages.map((v) => {
+                  const vKey = villageKey(v)
+                  return (
+                    <tr
+                      key={vKey}
+                      style={{
+                        borderBottom: `1px solid ${C.border}`,
+                        opacity: v.enabled ? 1 : 0.55,
+                      }}
+                    >
+                      <td className="p-2">
+                        <input
+                          type="checkbox"
+                          checked={v.enabled}
+                          onChange={() => patchVillage(vKey, { enabled: !v.enabled })}
+                          disabled={!v.coords}
+                          className="accent-[#f0a820]"
+                        />
+                      </td>
+                      <td className="p-2" style={{ color: C.text }}>
+                        {v.name}
+                        {v.coords && (
+                          <span className="text-xs font-mono ml-1" style={{ color: C.muted }}>
+                            ({formatCoordsForInput(v.coords)})
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-2 text-right font-mono" style={{ color: C.muted }}>
+                        {v.defTotal.toLocaleString('en-US')}
+                      </td>
+                      <td className="p-2 text-center">
+                        <input
+                          type="number"
+                          min={0}
+                          max={20}
+                          value={v.tournamentLevel ?? 0}
+                          onChange={(e) =>
+                            patchVillage(vKey, {
+                              tournamentLevel: Math.min(
+                                20,
+                                Math.max(0, parseInt(e.target.value, 10) || 0),
+                              ),
+                            })
+                          }
+                          className="w-14 rounded border px-1 py-0.5 font-mono text-right"
+                          style={{ background: C.bg, borderColor: C.border, color: C.text }}
+                          title="Tournament square level (+20% per level if distance > 20 fields)"
+                        />
+                      </td>
+                      <td className="p-2 text-center">
+                        <input
+                          type="checkbox"
+                          checked={!!v.heroHere}
+                          onChange={(e) => setVillageHeroExclusive(vKey, e.target.checked)}
+                          disabled={heroPct === 0}
+                          className="accent-[#f0a820]"
+                          title={
+                            heroPct === 0
+                              ? 'Pick a hero standard above first'
+                              : `Apply +${heroPct}% hero bonus to this village`
+                          }
+                        />
+                      </td>
+                      <td className="p-2">
+                        <div className="flex flex-wrap gap-1.5">
+                          {unitColumns
+                            .filter((id) => id !== 'hero' && defPreset[id])
+                            .map((id) => (
+                              <label
+                                key={id}
+                                className="flex items-center gap-1 text-[11px]"
+                                style={{ color: C.muted }}
+                              >
+                                <span className="truncate max-w-[80px]">
+                                  {getUnitLabel(tribe, id)}
+                                </span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  value={v.counts[id] ?? 0}
+                                  onChange={(e) => updateCount(vKey, id, e.target.value)}
+                                  className="w-16 rounded border px-1 py-0.5 font-mono text-right text-xs"
+                                  style={{
+                                    background: C.bg,
+                                    borderColor: C.border,
+                                    color: C.text,
+                                  }}
+                                />
+                              </label>
+                            ))}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* 5. Results */}
+      {marchRows.length > 0 && (
+        <section
+          className="rounded-xl border overflow-hidden"
+          style={{ background: C.surface, borderColor: C.border }}
+        >
+          <div
+            className="px-4 py-3 border-b flex flex-wrap items-center justify-between gap-2"
+            style={{ borderColor: C.border }}
+          >
+            <span className="text-sm font-medium" style={{ color: C.text }}>
+              Travel times ({marchRows.length} rows)
             </span>
             <button
               type="button"
               onClick={copyReport}
-              disabled={!results.length}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs disabled:opacity-40"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs"
               style={{ borderColor: C.border, color: C.gold }}
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -499,143 +656,54 @@ export default function TravelCalculator() {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ color: C.muted, borderBottom: `1px solid ${C.border}` }}>
-                  <th className="text-left p-2 w-8" />
-                  <th className="text-left p-2">Village</th>
-                  <th className="text-right p-2">Def</th>
-                  {parsedTargets.map((t) => (
-                        <th key={t.id} className="text-center p-2 min-w-[120px]">
-                          <div>{t.label}</div>
-                          <div
-                            className="text-[10px] font-mono font-normal"
-                            style={{ color: t.coords ? C.muted : '#f87171' }}
-                          >
-                            {t.coords ? formatCoordsForInput(t.coords) : 'invalid coords'}
-                          </div>
-                        </th>
-                  ))}
+                  <th className="text-left p-2">From</th>
+                  <th className="text-left p-2">To</th>
+                  <th className="text-left p-2">Unit</th>
+                  <th className="text-right p-2">Amount</th>
+                  <th className="text-right p-2">Time</th>
                 </tr>
               </thead>
               <tbody>
-                {villages.map((v) => {
-                  const vKey = villageKey(v)
-                  const rowResult = results.find((r) => villageKey(r.village) === vKey)
-                  const isOpen = expandedVillage === vKey
+                {marchRows.map((r, i) => {
+                  const isSlowest = r.seconds === r.slowestSeconds
                   return (
-                    <Fragment key={vKey}>
-                      <tr
+                    <tr
+                      key={i}
+                      style={{ borderBottom: `1px solid ${C.border}` }}
+                    >
+                      <td className="p-2" style={{ color: C.text }}>
+                        {r.from}
+                      </td>
+                      <td className="p-2" style={{ color: C.text }}>
+                        {r.to}{' '}
+                        <span className="text-xs font-mono" style={{ color: C.muted }}>
+                          {formatCoordsForInput(r.toCoords)}
+                        </span>
+                      </td>
+                      <td className="p-2" style={{ color: C.text }}>
+                        {r.unitLabel}
+                      </td>
+                      <td className="p-2 text-right font-mono" style={{ color: C.text }}>
+                        {r.amount.toLocaleString('en-US')}
+                      </td>
+                      <td
+                        className="p-2 text-right font-mono"
                         style={{
-                          borderBottom: `1px solid ${C.border}`,
-                          opacity: v.enabled ? 1 : 0.45,
+                          color: isSlowest ? C.win : C.text,
+                          fontWeight: isSlowest ? 700 : 400,
                         }}
+                        title={isSlowest ? 'Slowest unit — whole stack moves at this speed' : ''}
                       >
-                        <td className="p-2">
-                          <input
-                            type="checkbox"
-                            checked={v.enabled}
-                            onChange={() => toggleVillage(vKey)}
-                            disabled={!v.coords}
-                            className="accent-[#f0a820]"
-                          />
-                        </td>
-                        <td className="p-2">
-                          <button
-                            type="button"
-                            className="flex items-center gap-1 text-left"
-                            style={{ color: C.text }}
-                            onClick={() => setExpandedVillage(isOpen ? null : vKey)}
-                          >
-                            {isOpen ? (
-                              <ChevronDown className="w-3.5 h-3.5 flex-shrink-0" />
-                            ) : (
-                              <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
-                            )}
-                            <span>
-                              {v.name}
-                              {v.coords && (
-                                <span className="text-xs font-mono ml-1" style={{ color: C.muted }}>
-                                  ({formatCoordsForInput(v.coords)})
-                                </span>
-                              )}
-                            </span>
-                          </button>
-                        </td>
-                        <td className="p-2 text-right font-mono" style={{ color: C.muted }}>
-                          {v.defTotal.toLocaleString('en-US')}
-                        </td>
-                        {parsedTargets.map((t) => {
-                          if (!t.coords) {
-                            return (
-                              <td key={t.id} className="p-2 text-center" style={{ color: C.muted }}>
-                                —
-                              </td>
-                            )
-                          }
-                          const cell = rowResult?.perTarget.find((p) => p.targetId === t.id)
-                          if (!v.enabled || !cell) {
-                            return (
-                              <td key={t.id} className="p-2 text-center" style={{ color: C.muted }}>
-                                —
-                              </td>
-                            )
-                          }
-                          return (
-                            <td key={t.id} className="p-2 text-center">
-                              <div className="font-mono font-semibold" style={{ color: C.win }}>
-                                {formatTravelTime(cell.totalSeconds)}
-                              </div>
-                              <div className="text-[10px]" style={{ color: C.muted }}>
-                                {formatDistance(cell.distance)} fld
-                              </div>
-                            </td>
-                          )
-                        })}
-                      </tr>
-                      {isOpen && (
-                        <tr key={`${vKey}-detail`}>
-                          <td colSpan={3 + parsedTargets.length} className="p-3" style={{ background: C.bg }}>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                              {unitColumns
-                                .filter((id) => id !== 'hero')
-                                .map((id) => (
-                                  <label
-                                    key={id}
-                                    className="flex items-center gap-2 text-xs"
-                                    style={{ color: defPreset[id] ? C.text : C.muted }}
-                                  >
-                                    <span className="w-24 truncate">{getUnitLabel(tribe, id)}</span>
-                                    <input
-                                      type="number"
-                                      min={0}
-                                      value={v.counts[id] ?? 0}
-                                      onChange={(e) => updateCount(vKey, id, e.target.value)}
-                                      className="w-20 rounded border px-1 py-0.5 font-mono text-right"
-                                      style={{
-                                        background: C.surface,
-                                        borderColor: C.border,
-                                        color: C.text,
-                                      }}
-                                    />
-                                  </label>
-                                ))}
-                            </div>
-                            {rowResult?.perTarget.map((pt) => (
-                              <div key={pt.targetId} className="mt-3 text-xs" style={{ color: C.muted }}>
-                                <span style={{ color: C.gold }}>{pt.label}</span>
-                                {pt.unitTimes.map((u) => (
-                                  <span key={u.unitId} className="ml-3 font-mono">
-                                    {getUnitLabel(tribe, u.unitId)}: {formatTravelTime(u.seconds)}
-                                  </span>
-                                ))}
-                              </div>
-                            ))}
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
+                        {formatTravelTime(r.seconds)}
+                      </td>
+                    </tr>
                   )
                 })}
               </tbody>
             </table>
+          </div>
+          <div className="px-4 py-2 text-[11px]" style={{ color: C.muted }}>
+            Bold green = slowest unit in that march (whole army moves at this speed).
           </div>
         </section>
       )}

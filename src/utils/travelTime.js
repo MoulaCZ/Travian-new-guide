@@ -24,27 +24,48 @@ export function fieldDistance(from, to) {
 }
 
 /**
- * Effective movement speed (fields/h) after bonuses.
- * @param {number} baseSpeed
- * @param {{ distance: number, tournamentLevel?: number, heroBonusPct?: number }} bonuses
+ * Travel duration in seconds with the proper segmented Travian formula:
+ *
+ *   - Hero's alliance standard is a flat speed multiplier for the whole journey.
+ *   - Tournament Square gives +20% per level, BUT only on the part of the journey
+ *     that exceeds 20 fields. The first 20 fields always move at base × hero speed.
+ *
+ *   t(d) = min(d, 20) / (base × hero) + max(0, d − 20) / (base × hero × ts)
+ *
+ * Verified against in-game arrival time: 9 844 spearmen, 05 Brno (-189|-56) →
+ * (-192|-124) = 68.07 fields, TS lvl 7, no hero standard → 5:43:06 (matches).
+ *
+ * @param {number} distance fields
+ * @param {number} baseSpeed fields/h
+ * @param {{ tournamentLevel?: number, heroBonusPct?: number }} bonuses
  */
-export function effectiveSpeed(baseSpeed, { distance, tournamentLevel = 0, heroBonusPct = 0 }) {
-  if (!Number.isFinite(baseSpeed) || baseSpeed <= 0) return 0
-  let speed = baseSpeed
-  if (distance > TOURNAMENT_SQUARE_MIN_DISTANCE && tournamentLevel > 0) {
-    speed *= 1 + TOURNAMENT_SQUARE_BONUS_PER_LEVEL * tournamentLevel
+export function travelTimeSeconds(distance, baseSpeed, bonuses = {}) {
+  const { tournamentLevel = 0, heroBonusPct = 0 } = bonuses
+  if (!Number.isFinite(distance) || distance <= 0) return 0
+  if (!Number.isFinite(baseSpeed) || baseSpeed <= 0) return Infinity
+
+  const heroMult = 1 + Math.max(0, heroBonusPct) / 100
+  const baseHeroSpeed = baseSpeed * heroMult
+
+  const threshold = TOURNAMENT_SQUARE_MIN_DISTANCE
+  if (tournamentLevel <= 0 || distance <= threshold) {
+    return (distance / baseHeroSpeed) * 3600
   }
-  if (heroBonusPct > 0) {
-    speed *= 1 + heroBonusPct / 100
-  }
-  return speed
+
+  const tsMult = 1 + TOURNAMENT_SQUARE_BONUS_PER_LEVEL * tournamentLevel
+  const firstSeg = threshold / baseHeroSpeed
+  const restSeg = (distance - threshold) / (baseHeroSpeed * tsMult)
+  return (firstSeg + restSeg) * 3600
 }
 
-/** Travel duration in seconds. */
-export function travelTimeSeconds(distance, speedFieldsPerHour) {
-  if (!Number.isFinite(distance) || distance <= 0) return 0
-  if (!Number.isFinite(speedFieldsPerHour) || speedFieldsPerHour <= 0) return Infinity
-  return (distance / speedFieldsPerHour) * 3600
+/**
+ * Effective average speed over the whole march (fields/h) — convenience for UI.
+ * For TS-bonus marches this is < base × ts because of the first-20-fields segment.
+ */
+export function effectiveSpeed(baseSpeed, { distance, tournamentLevel = 0, heroBonusPct = 0 }) {
+  const sec = travelTimeSeconds(distance, baseSpeed, { tournamentLevel, heroBonusPct })
+  if (!Number.isFinite(sec) || sec <= 0) return 0
+  return (distance / sec) * 3600
 }
 
 /**
@@ -61,9 +82,9 @@ export function computeMarchTimes(counts, activeUnitIds, from, to, bonuses) {
     if (n <= 0) continue
     const base = getUnitSpeed(unitId)
     if (base == null) continue
-    const speed = effectiveSpeed(base, { distance, ...bonuses })
-    const sec = travelTimeSeconds(distance, speed)
-    unitTimes.push({ unitId, count: n, baseSpeed: base, effectiveSpeed: speed, seconds: sec })
+    const sec = travelTimeSeconds(distance, base, bonuses)
+    const avgSpeed = sec > 0 ? (distance / sec) * 3600 : 0
+    unitTimes.push({ unitId, count: n, baseSpeed: base, effectiveSpeed: avgSpeed, seconds: sec })
     if (sec > slowestSec) slowestSec = sec
   }
 

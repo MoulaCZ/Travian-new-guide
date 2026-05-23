@@ -162,6 +162,11 @@ function parseInVillagesFormat(text, tribe, unitIds) {
     if (!m) continue
     // Village names never contain a tab — guard against numeric rows like "24\t9833\t..." matching.
     if (line.includes('\t')) continue
+    // Village names must contain at least one letter — guard against resource production
+    // rows like "12 900" or "91 800" that also look like "\d{2}\s+...".
+    if (!/\p{L}/u.test(line)) continue
+    // Skip upkeep lines like "13 567  na hodinu" / "705 per hour".
+    if (PER_HOUR_RE.test(line)) continue
     // Exclude village list entries: those have the coord parens on same or next line.
     if (/\(\s*-?\d+\s*[|,;]\s*-?\d+\s*\)/.test(line)) continue
     const next = lines[i + 1] ?? ''

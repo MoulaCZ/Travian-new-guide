@@ -111,33 +111,16 @@ No. For the same resource cost, run 3 normal Barracks across 3 villages. You tri
 **Q: What is troop evasion and when should I use it?**
 Troop Evasion (Gold Club feature) lets you send all your troops away from a capital village just before an attack lands — they simply aren't home when it hits. Use it when you see a large incoming attack you can't defend.
 
-**Q: What does the Rally Point actually do for me as a defender, and what's the deal with fakes?**
+**Q: Why does Rally Point level matter for reading incoming attacks?**
 
-The Rally Point has **two completely different jobs** — one for the attacker, one for the defender.
+Two jobs:
 
-**As the attacker — it unlocks catapult targeting.** Without a Rally Point above a certain level you cannot point a catapult at a specific building. Per the official Travian: Legends catapult guide:
+- **As attacker** — Rally Point level unlocks catapult targeting (RP 1 random only, RP 3 Warehouse/Granary, RP 5 + resource fields, RP 10 almost any building, RP 20 = two targets per wave with ≥ 20 catapults). Full table in the [official catapults guide](https://support.travian.com/en/support/solutions/articles/7000065985-catapults).
+- **As defender** — Rally Point level works as a **fake filter**. With a low Rally Point, an incoming "X units arriving in hh:mm:ss" tells you nothing about size — could be **5 farmers or 5,000 hammers** and you have to assume worst case and ping the alliance every time.
 
-| RP level | What you can target with catapults |
-|----------|------------------------------------|
-| **1** | Random target only |
-| **3** | Warehouse, Granary |
-| **5** | + resource fields, Brickyard, Iron Foundry, Sawmill, Grain Mill, Bakery |
-| **10** | Any building except Cranny, Stonemason's Lodge, Trapper |
-| **20** | **Two targets in one attack** (needs ≥ 20 catapults; damage is split) |
+  With a higher Rally Point, waves smaller than that level show only question marks instead of the unit type / count. Example: **Rally Point 10**, incoming wave of **5 units** — you see "?" for unit type and immediately know the wave is **smaller than 10 units → it's a fake**, no need to wake the alliance or scramble defence. With Rally Point 1 the same wave looks identical to a real hammer and you can't tell them apart.
 
-> Stonemason's Lodge is always hit **last**, and if you pick the same target twice at RP 20 the damage is split — leave the second slot empty if you only want to hit one building.
-
-**As the defender — it shows you what's coming.** With a Rally Point built you see, for every incoming attack: **origin village, arrival time, and who is reinforcing you**, and you can return reinforcements. Without one, you only see the arrival time of the next hit.
-
-What you can **actually see about the attacking army** is normally just **the number of waves and timings, with question marks instead of unit types and counts**. You only learn *what* is in the wave if the attacker is unlucky enough that you have the **Eagle Eyes** artefact (which reveals troop counts in the first N waves).
-
-This is why fakes work — and why the standard alliance-grade fake is **1 catapult + 19 cheapest infantry per wave**:
-
-- The **catapult** forces the whole stack down to catapult speed (4 fields/h). A real cat wave moves at 4 f/h, so the fake's travel time looks identical — you cannot rule it out by speed.
-- **19 + 1 = 20 units**, which is the assumed defender RP level. Per the official "Real Attacks and Fakes" guide: *"Always assume the defender has Rally Point 20 — your fakes must contain at least 20 units."* Anything smaller can be filtered out on special servers (alliance attack notifications hide attacks with fewer troops than the target's RP level), and it stops looking like a real wave.
-- For 4 waves × 4 fake targets you therefore need to keep **at least 304 cheap infantry + 16 catapults** in reserve after your real attack leaves. ([Travian official guide](https://support.travian.com/en/support/solutions/articles/7000092497-real-attacks-and-fakes))
-
-The flip side as a defender: if you see "?" everywhere and the wave is moving at ~4 f/h, **assume it's real until proven otherwise** — that's exactly what a good faker wants you to second-guess.
+  That's why a defensive account keeps Rally Point high in every village — it filters trivial fakes automatically and saves you from over-reacting.
 
 **Q: An attack is incoming and I have way more resources than my Cranny holds — how do I hide them?**
 

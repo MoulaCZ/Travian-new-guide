@@ -16,7 +16,7 @@ export const GLOSSARY = {
   'Hospital': 'Saves a portion of wounded troops after battle instead of letting them die permanently.',
   'Workshop': 'Required to train siege weapons — catapults and rams.',
   'Marketplace': 'Enables trading resources between your villages using Merchants.',
-  'Trade Office': 'Increases merchant carry capacity and speed. Essential for feeder logistics.',
+  'Trade Office': 'Increases merchant carry capacity (each level carries more per trip). Does NOT make merchants faster. Essential for feeder logistics.',
   'Hero\'s Mansion': 'Required to occupy oases. Higher levels allow occupying more oases per village.',
 
   /* ── Resource fields ─── */

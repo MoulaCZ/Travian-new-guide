@@ -81,7 +81,7 @@ Add these buildings once the village produces enough resources to spare:
 | Academy | High CP |
 | Embassy | High CP |
 | Town Hall | Run small celebrations for extra CP |
-| Trade Office | Faster merchant trips |
+| Trade Office | Bigger merchant loads (more capacity per trip) |
 
 > A fully developed resource village reaches **~1,000 CP/day** and exports a surplus to your capital and military villages.
 
@@ -100,25 +100,32 @@ While MB levels up:
 - Upgrade **Warehouse** and **Granary** just enough to hold incoming resources
 - **Send resources from other villages** via trade routes — don't wait for self-sufficiency
 
-### Final Build — target state (order matters)
+### Final Build — 1,000 CP feeder (target state, 22/22 slots)
 
-| Priority | Building | Target level | Why |
-|----------|----------|--------------|-----|
+This is the end-state layout that maximises CP while keeping enough storage for incoming
+shipments. Levels are targets — build order is "whatever gives the most CP per resource next".
+
+| # | Building | Target level | Why |
+|---|----------|--------------|-----|
 | 1 | Main Building | 20 | Faster everything |
-| 2 | Rally Point | 20 | Cheap CP |
-| 3 | Academy | 20 | High CP |
-| 4 | Embassy | 20 | High CP |
-| 5 | Marketplace | 20 | CP + trade |
-| 6 | Trade Office | 5 | Faster merchants |
-| 7 | Town Hall | 13 | Parties → CP |
-| 8 | Stable | 20 | CP |
-| 9 | Warehouse | 20 | Storage |
-| 10 | Granary | 20 | Storage |
-| 11 | Residence | 10 | Needed if sending settlers later |
-| 12 | Hero's Mansion | 10 | Oasis slots |
-| 13 | Wall / Palisade | 10 | Defence |
-| 14 | Workshop | 1 | Slot filler |
-| 15 | Resource buildings (Mill, Bakery, Sawmill, Brickyard, Iron Foundry) | 4–5 | +% production |
+| 1 | Rally Point | 20 | Cheap CP |
+| 2 | Warehouse | 20 | Storage for incoming shipments |
+| 3 | Granary | 20 | Grain storage — feeders ship a lot of crop |
+| 1 | Marketplace | 20 | CP + trade capacity |
+| 1 | Trade Office | 20 | Bigger merchant loads (more capacity per trip) |
+| 1 | Stable | 20 | High CP |
+| 1 | Workshop | 20 | CP |
+| 1 | Academy | 20 | High CP |
+| 1 | Embassy | 20 | High CP |
+| 1 | Residence | 20 | CP (and settlers if expanding later) |
+| 1 | Hero's Mansion | 20 | Oasis slots + CP |
+| 1 | Town Hall | 20 | Large Celebrations → CP |
+| 5 | Resource buildings (Sawmill, Brickyard, Iron Foundry, Mill, Bakery) | 5 (Bakery 4) | +% production |
+| 1 | Palisade | 20 | Defence + CP |
+
+**Slot count:** 1 MB + 1 RP + **2 Warehouse** + **3 Granary** + 1 Marketplace + 1 Trade Office +
+1 Stable + 1 Workshop + 1 Academy + 1 Embassy + 1 Residence + 1 Hero's Mansion + 1 Town Hall +
+5 resource buildings + 1 Palisade = **22/22**.
 
 ### Resource Fields
 

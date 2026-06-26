@@ -22,7 +22,9 @@ const C = {
 }
 
 const PLACEHOLDER =
-  'Rally Point → Farm List tab: expand each farm list you want included, then Ctrl+A, Ctrl+C, paste here.'
+  'Ctrl+V here — full page source from View page source (Ctrl+U) after expanding every farm list.'
+
+const FARM_LIST_EXPAND_IMG = `${import.meta.env.BASE_URL}images/farm-list-expand.png`
 
 function ResourceRow({ label, value, color }) {
   return (
@@ -215,6 +217,7 @@ export default function CropFarmSimulator() {
   const [startHour, setStartHour] = useState('6')
   const [endHour, setEndHour] = useState('22')
   const [expandedLists, setExpandedLists] = useState(() => new Set())
+  const [howToOpen, setHowToOpen] = useState(true)
   const [copied, setCopied] = useState(false)
 
   const parsed = useMemo(() => (paste.trim() ? parseFarmListPaste(paste) : null), [paste])
@@ -292,11 +295,69 @@ export default function CropFarmSimulator() {
       </div>
 
       <div
+        className="rounded-xl border overflow-hidden"
+        style={{ background: C.surface, borderColor: C.border }}
+      >
+        <button
+          type="button"
+          onClick={() => setHowToOpen((o) => !o)}
+          className="w-full flex items-center gap-3 px-4 sm:px-5 py-3 text-left hover:bg-[#241d14] transition-colors"
+        >
+          {howToOpen ? (
+            <ChevronDown className="w-4 h-4 flex-shrink-0" style={{ color: C.gold }} />
+          ) : (
+            <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: C.muted }} />
+          )}
+          <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: C.muted }}>
+            How to use
+          </span>
+        </button>
+
+        {howToOpen && (
+          <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-4 border-t" style={{ borderColor: C.border }}>
+            <ol className="text-sm space-y-2 list-decimal list-inside pt-4" style={{ color: C.text }}>
+              <li>
+                In Travian, open <strong>Rally Point</strong> → <strong>Farm List</strong> tab.
+              </li>
+              <li>
+                For <strong>each</strong> farm list, click the arrow on the right to expand it (arrows
+                in the red circles in the screenshot).
+              </li>
+              <li>
+                Open the <strong>page source</strong>: right-click → <em>View page source</em>, or
+                press <kbd className="px-1.5 py-0.5 rounded text-xs border" style={{ borderColor: C.border, background: C.bg }}>Ctrl+U</kbd>
+                {' '}(<kbd className="px-1.5 py-0.5 rounded text-xs border" style={{ borderColor: C.border, background: C.bg }}>⌘+Option+U</kbd> on Mac).
+              </li>
+              <li>
+                In the source view: <kbd className="px-1.5 py-0.5 rounded text-xs border" style={{ borderColor: C.border, background: C.bg }}>Ctrl+A</kbd>
+                {' → '}
+                <kbd className="px-1.5 py-0.5 rounded text-xs border" style={{ borderColor: C.border, background: C.bg }}>Ctrl+C</kbd>
+                , then paste here with{' '}
+                <kbd className="px-1.5 py-0.5 rounded text-xs border" style={{ borderColor: C.border, background: C.bg }}>Ctrl+V</kbd>
+                .
+              </li>
+            </ol>
+            <figure className="space-y-2">
+              <img
+                src={FARM_LIST_EXPAND_IMG}
+                alt="Travian Farm List — expand every list using the arrow on the right of each row"
+                className="w-full max-w-2xl rounded-lg border"
+                style={{ borderColor: C.border }}
+              />
+              <figcaption className="text-xs" style={{ color: C.muted }}>
+                Expand all farm lists, then View page source and copy from there.
+              </figcaption>
+            </figure>
+          </div>
+        )}
+      </div>
+
+      <div
         className="rounded-xl border p-4 space-y-3"
         style={{ background: C.surface, borderColor: C.border }}
       >
         <label className="block text-sm font-medium" style={{ color: C.text }}>
-          Farm List HTML paste
+          Paste copied HTML
         </label>
         <textarea
           value={paste}

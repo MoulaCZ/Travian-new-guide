@@ -122,7 +122,7 @@ export function parseFarmListPaste(text) {
     extractJsonObjectAfterMarker(raw, '"viewData":')
 
   if (!viewDataJson) {
-    notes.push('Could not find viewData JSON in the paste. Open Farm List (tt=99), expand lists you care about, then Ctrl+A and paste.')
+    notes.push('Could not find viewData JSON in the paste. Open Farm List (tt=99), expand all lists, View page source (Ctrl+U), then Ctrl+A and paste.')
     return { timestamp: null, farmLists: [], grandTotals: { ...EMPTY_RESOURCES }, notes }
   }
 

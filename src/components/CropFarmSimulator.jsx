@@ -11,14 +11,20 @@ const C = {
   bg: '#0f0c09',
   surface: '#1a1510',
   surface2: '#241d14',
-  border: '#3e3226',
+  surfaceLift: '#2c241a',
+  border: '#4a3d30',
   gold: '#f0a820',
-  text: '#d4c4a8',
-  muted: '#7a6a55',
-  crop: '#f0a820',
-  lumber: '#8b5e3c',
-  clay: '#d97706',
-  iron: '#94a3b8',
+  text: '#e8dcc8',
+  muted: '#a89880',
+  heading: '#f0e6d0',
+}
+
+/** Resource colors tuned for dark backgrounds — labels dim, values bright */
+const R = {
+  lumber: { label: 'Lumber', value: '#e8c4a0', dim: '#c4a070' },
+  clay: { label: 'Clay', value: '#fb923c', dim: '#ea580c' },
+  iron: { label: 'Iron', value: '#7dd3fc', dim: '#38bdf8' },
+  crop: { label: 'Crop', value: '#fde047', dim: '#facc15' },
 }
 
 const PLACEHOLDER =
@@ -26,11 +32,14 @@ const PLACEHOLDER =
 
 const FARM_LIST_EXPAND_IMG = `${import.meta.env.BASE_URL}images/farm-list-expand.png`
 
-function ResourceRow({ label, value, color }) {
+function ResourceRow({ resourceKey, value }) {
+  const res = R[resourceKey]
   return (
-    <div className="flex justify-between gap-4 text-sm">
-      <span style={{ color: C.muted }}>{label}</span>
-      <span className="tabular-nums font-medium" style={{ color: color ?? C.text }}>
+    <div className="flex justify-between gap-4 text-sm py-0.5">
+      <span className="font-medium" style={{ color: res.dim }}>
+        {res.label}
+      </span>
+      <span className="tabular-nums font-semibold" style={{ color: res.value }}>
         {formatNum(value)}
       </span>
     </div>
@@ -41,21 +50,21 @@ function ResourceBlock({ title, resources, accent }) {
   const total = resourceTotal(resources)
   return (
     <div
-      className="rounded-lg border p-4 space-y-2"
-      style={{ background: C.surface2, borderColor: C.border }}
+      className="rounded-lg border p-4 space-y-1.5"
+      style={{ background: C.surfaceLift, borderColor: C.border }}
     >
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="text-xs uppercase tracking-wide" style={{ color: C.muted }}>
+      <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b" style={{ borderColor: C.border }}>
+        <span className="text-xs uppercase tracking-wide font-semibold" style={{ color: C.muted }}>
           {title}
         </span>
-        <span className="text-sm font-semibold tabular-nums" style={{ color: accent ?? C.gold }}>
+        <span className="text-sm font-bold tabular-nums" style={{ color: accent ?? C.gold }}>
           Σ {formatNum(total)}
         </span>
       </div>
-      <ResourceRow label="Lumber" value={resources.lumber} color={C.lumber} />
-      <ResourceRow label="Clay" value={resources.clay} color={C.clay} />
-      <ResourceRow label="Iron" value={resources.iron} color={C.iron} />
-      <ResourceRow label="Crop" value={resources.crop} color={C.crop} />
+      <ResourceRow resourceKey="lumber" value={resources.lumber} />
+      <ResourceRow resourceKey="clay" value={resources.clay} />
+      <ResourceRow resourceKey="iron" value={resources.iron} />
+      <ResourceRow resourceKey="crop" value={resources.crop} />
     </div>
   )
 }
@@ -98,10 +107,10 @@ function FarmListCard({ list, schedule, expanded, onToggle }) {
           </div>
         </div>
         <div className="text-right flex-shrink-0">
-          <div className="text-sm font-semibold tabular-nums" style={{ color: C.crop }}>
+          <div className="text-sm font-bold tabular-nums" style={{ color: R.crop.value }}>
             {formatNum(list.perRaidTotals.crop)} crop
           </div>
-          <div className="text-xs tabular-nums" style={{ color: C.muted }}>
+          <div className="text-xs tabular-nums font-medium" style={{ color: C.muted }}>
             {formatNum(resourceTotal(list.perRaidTotals))} / raid
           </div>
         </div>
@@ -112,7 +121,7 @@ function FarmListCard({ list, schedule, expanded, onToggle }) {
           <div className="grid sm:grid-cols-3 gap-3 pt-4">
             <ResourceBlock title="Per click (last raids)" resources={projection.perClick} />
             <ResourceBlock title="Per active hour" resources={projection.perHour} accent={C.gold} />
-            <ResourceBlock title="Per day" resources={projection.perDay} accent={C.crop} />
+            <ResourceBlock title="Per day" resources={projection.perDay} accent={R.crop.value} />
           </div>
 
           {list.slots.length > 0 && (
@@ -138,18 +147,30 @@ function FarmListCard({ list, schedule, expanded, onToggle }) {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr style={{ background: C.surface2, color: C.muted }}>
-                        <th className="text-left px-3 py-2 font-medium">Target</th>
-                        <th className="text-right px-3 py-2 font-medium">Dist</th>
-                        <th className="text-right px-3 py-2 font-medium">Lumber</th>
-                        <th className="text-right px-3 py-2 font-medium">Clay</th>
-                        <th className="text-right px-3 py-2 font-medium">Iron</th>
-                        <th className="text-right px-3 py-2 font-medium">Crop</th>
+                      <tr style={{ background: C.surfaceLift }}>
+                        <th className="text-left px-3 py-2 font-semibold" style={{ color: C.text }}>
+                          Target
+                        </th>
+                        <th className="text-right px-3 py-2 font-semibold" style={{ color: C.muted }}>
+                          Dist
+                        </th>
+                        <th className="text-right px-3 py-2 font-semibold" style={{ color: R.lumber.dim }}>
+                          Lumber
+                        </th>
+                        <th className="text-right px-3 py-2 font-semibold" style={{ color: R.clay.dim }}>
+                          Clay
+                        </th>
+                        <th className="text-right px-3 py-2 font-semibold" style={{ color: R.iron.dim }}>
+                          Iron
+                        </th>
+                        <th className="text-right px-3 py-2 font-semibold" style={{ color: R.crop.dim }}>
+                          Crop
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {list.slots.map((slot) => {
-                        const r = slot.raidedResources
+                        const loot = slot.raidedResources
                         const inactive = !slot.isActive
                         return (
                           <tr
@@ -157,44 +178,47 @@ function FarmListCard({ list, schedule, expanded, onToggle }) {
                             className="border-t"
                             style={{
                               borderColor: C.border,
-                              opacity: inactive ? 0.55 : 1,
-                              color: C.text,
+                              opacity: inactive ? 0.5 : 1,
+                              background: inactive ? undefined : 'rgba(44, 36, 26, 0.35)',
                             }}
                           >
-                            <td className="px-3 py-2">
-                              <div className="truncate max-w-[200px]">{slot.targetName}</div>
+                            <td className="px-3 py-2" style={{ color: C.text }}>
+                              <div className="truncate max-w-[200px] font-medium">{slot.targetName}</div>
                               {slot.coords && (
                                 <div className="text-xs" style={{ color: C.muted }}>
                                   ({slot.coords.x}|{slot.coords.y})
                                 </div>
                               )}
                             </td>
-                            <td className="px-3 py-2 text-right tabular-nums">
+                            <td
+                              className="px-3 py-2 text-right tabular-nums font-medium"
+                              style={{ color: C.muted }}
+                            >
                               {slot.distance != null ? slot.distance.toFixed(1) : '—'}
                             </td>
                             <td
-                              className="px-3 py-2 text-right tabular-nums"
-                              style={{ color: r ? C.lumber : undefined }}
+                              className="px-3 py-2 text-right tabular-nums font-semibold"
+                              style={{ color: loot ? R.lumber.value : C.muted }}
                             >
-                              {r ? formatNum(r.lumber) : '—'}
+                              {loot ? formatNum(loot.lumber) : '—'}
                             </td>
                             <td
-                              className="px-3 py-2 text-right tabular-nums"
-                              style={{ color: r ? C.clay : undefined }}
+                              className="px-3 py-2 text-right tabular-nums font-semibold"
+                              style={{ color: loot ? R.clay.value : C.muted }}
                             >
-                              {r ? formatNum(r.clay) : '—'}
+                              {loot ? formatNum(loot.clay) : '—'}
                             </td>
                             <td
-                              className="px-3 py-2 text-right tabular-nums"
-                              style={{ color: r ? C.iron : undefined }}
+                              className="px-3 py-2 text-right tabular-nums font-semibold"
+                              style={{ color: loot ? R.iron.value : C.muted }}
                             >
-                              {r ? formatNum(r.iron) : '—'}
+                              {loot ? formatNum(loot.iron) : '—'}
                             </td>
                             <td
-                              className="px-3 py-2 text-right tabular-nums"
-                              style={{ color: r ? C.crop : undefined }}
+                              className="px-3 py-2 text-right tabular-nums font-semibold"
+                              style={{ color: loot ? R.crop.value : C.muted }}
                             >
-                              {r ? formatNum(r.crop) : '—'}
+                              {loot ? formatNum(loot.crop) : '—'}
                             </td>
                           </tr>
                         )
@@ -283,7 +307,7 @@ export default function CropFarmSimulator() {
           <Sprout className="w-6 h-6" style={{ color: C.gold }} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold mb-1" style={{ color: '#f0e6d0' }}>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: C.heading }}>
             Crop Farm Simulator
           </h1>
           <p className="text-sm leading-relaxed" style={{ color: C.muted }}>
@@ -443,7 +467,7 @@ export default function CropFarmSimulator() {
       {parsed && parsed.farmLists.length > 0 && grandProjection && (
         <>
           <div className="flex items-center justify-between gap-4">
-            <h2 className="text-lg font-semibold" style={{ color: '#f0e6d0' }}>
+            <h2 className="text-lg font-semibold" style={{ color: C.heading }}>
               Totals (all lists)
             </h2>
             <button
@@ -460,11 +484,11 @@ export default function CropFarmSimulator() {
           <div className="grid sm:grid-cols-3 gap-4">
             <ResourceBlock title="Per click" resources={grandProjection.perClick} />
             <ResourceBlock title="Per active hour" resources={grandProjection.perHour} accent={C.gold} />
-            <ResourceBlock title="Per day" resources={grandProjection.perDay} accent={C.crop} />
+            <ResourceBlock title="Per day" resources={grandProjection.perDay} accent={R.crop.value} />
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-lg font-semibold" style={{ color: '#f0e6d0' }}>
+            <h2 className="text-lg font-semibold" style={{ color: C.heading }}>
               Farm lists
             </h2>
             {parsed.farmLists.map((list) => (

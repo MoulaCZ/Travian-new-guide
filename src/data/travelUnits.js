@@ -109,13 +109,50 @@ export function getUnitSpeed(unitId) {
   return SPEED_BY_ID[unitId] ?? null
 }
 
-/** @param {TravelTribe} tribe */
-export function getUnitLabel(tribe, unitId) {
+/** @param {string} unitId */
+export function getUnitLabel(tribe, unitId, locale = 'en') {
+  if (locale === 'fr') {
+    const fr = FRENCH_UNIT_LABELS[unitId]
+    if (fr) return fr
+  }
   const u = UNITS[tribe]?.find((x) => x.id === unitId)
   if (u) return u.name
-  if (unitId === 'scout') return 'Scout'
-  if (unitId === 'hero') return 'Hero'
+  if (unitId === 'scout') return locale === 'fr' ? 'Éclaireur' : 'Scout'
+  if (unitId === 'settler') return locale === 'fr' ? 'Colon' : 'Settler'
+  if (unitId === 'hero') return locale === 'fr' ? 'Héros' : 'Hero'
   return unitId
+}
+
+/** French in-game names keyed by unit id (all tribes). */
+const FRENCH_UNIT_LABELS = {
+  legionnaire: 'Légionnaire',
+  praetorian: 'Praetorien',
+  imperian: 'Imperian',
+  equites_legati: 'Equites Legati',
+  equites_imperatoris: 'Equites Imperatoris',
+  equites_caesaris: 'Equites Caesaris',
+  battering_ram: 'Bélier',
+  fire_catapult: 'Catapulte',
+  senator: 'Sénateur',
+  clubswinger: 'Frondeur',
+  spearman: 'Lancier',
+  axeman: 'Hache',
+  scout: 'Éclaireur',
+  paladin: 'Paladin',
+  teutonic_knight: 'Chevalier teutonique',
+  ram: 'Bélier',
+  catapult: 'Catapulte',
+  chief: 'Chef',
+  phalanx: 'Phalange',
+  swordsman: 'Epéiste',
+  pathfinder: 'Éclaireur',
+  theutates_thunder: 'Thunder de Theutates',
+  druidrider: 'Cavalier druide',
+  haeduan: 'Haeduan',
+  gaul_ram: 'Bélier',
+  trebuchet: 'Trébuchet',
+  chieftain: 'Chef',
+  settler: 'Colon',
 }
 
 export const MIN_DEF_UNITS_THRESHOLD = 200

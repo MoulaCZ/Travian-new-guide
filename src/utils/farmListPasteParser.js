@@ -71,21 +71,105 @@ function scaleResources(r, factor) {
 
 const EMPTY_RESOURCES = { lumber: 0, clay: 0, iron: 0, crop: 0 }
 
-const TEUTON_SHORT = ['', 'Leg', 'Praet', 'Imp', 'EL', 'EI', 'EC', 'Ram', 'Cat', 'Sen', 'Set']
-const GAUL_SHORT = ['', 'P', 'S', 'Path', 'TT', 'Druid', 'Hae', 'Ram', 'Tre', 'Chieft', 'Set']
-const ROMAN_SHORT = ['', 'Leg', 'Praet', 'Imp', 'EL', 'EI', 'EC', 'Ram', 'Cat', 'Sen', 'Set']
-
-/** @param {number|null} tribeId */
-function unitShortNames(tribeId) {
-  if (tribeId === 2) return TEUTON_SHORT
-  if (tribeId === 3) return GAUL_SHORT
-  return ROMAN_SHORT
+const TEUTON_UNITS = {
+  en: [
+    '',
+    'Legionnaire',
+    'Praetorian',
+    'Imperian',
+    'Equites Legati',
+    'Equites Imperatoris',
+    'Equites Caesaris',
+    'Battering Ram',
+    'Fire Catapult',
+    'Senator',
+    'Settler',
+  ],
+  fr: [
+    '',
+    'Légionnaire',
+    'Praetorien',
+    'Imperian',
+    'Equites Legati',
+    'Equites Imperatoris',
+    'Equites Caesaris',
+    'Bélier',
+    'Catapulte',
+    'Sénateur',
+    'Colon',
+  ],
 }
 
-/** @param {Record<string, number>|null|undefined} troop @param {number|null} tribeId */
-export function formatTroopShort(troop, tribeId) {
+const GAUL_UNITS = {
+  en: [
+    '',
+    'Phalanx',
+    'Swordsman',
+    'Pathfinder',
+    'Theutates Thunder',
+    'Druidrider',
+    'Haeduan',
+    'Ram',
+    'Trebuchet',
+    'Chieftain',
+    'Settler',
+  ],
+  fr: [
+    '',
+    'Phalange',
+    'Epéiste',
+    'Éclaireur',
+    'Thunder de Theutates',
+    'Cavalier druide',
+    'Haeduan',
+    'Bélier',
+    'Trébuchet',
+    'Chef',
+    'Colon',
+  ],
+}
+
+const ROMAN_UNITS = {
+  en: [
+    '',
+    'Legionnaire',
+    'Praetorian',
+    'Imperian',
+    'Equites Legati',
+    'Equites Imperatoris',
+    'Equites Caesaris',
+    'Battering Ram',
+    'Fire Catapult',
+    'Senator',
+    'Settler',
+  ],
+  fr: [
+    '',
+    'Légionnaire',
+    'Praetorien',
+    'Imperian',
+    'Equites Legati',
+    'Equites Imperatoris',
+    'Equites Caesaris',
+    'Bélier',
+    'Catapulte',
+    'Sénateur',
+    'Colon',
+  ],
+}
+
+/** @param {number|null} tribeId @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} locale */
+function unitNames(tribeId, locale) {
+  const loc = locale === 'fr' ? 'fr' : 'en'
+  if (tribeId === 2) return TEUTON_UNITS[loc]
+  if (tribeId === 3) return GAUL_UNITS[loc]
+  return ROMAN_UNITS[loc]
+}
+
+/** @param {Record<string, number>|null|undefined} troop @param {number|null} tribeId @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en'] */
+export function formatTroopShort(troop, tribeId, locale = 'en') {
   if (!troop) return '—'
-  const names = unitShortNames(tribeId)
+  const names = unitNames(tribeId, locale)
   const parts = []
   for (let i = 1; i <= 10; i++) {
     const n = troop[`t${i}`] ?? 0
@@ -435,7 +519,7 @@ export function parseFarmListPaste(text, locale = 'en') {
         distance: slot.distance ?? null,
         isActive: Boolean(slot.isActive),
         troop,
-        troopLabel: formatTroopShort(troop, tribeId),
+        troopLabel: formatTroopShort(troop, tribeId, loc),
         raidedResources: slot.lastRaid?.raidedResources
           ? { ...slot.lastRaid.raidedResources }
           : null,

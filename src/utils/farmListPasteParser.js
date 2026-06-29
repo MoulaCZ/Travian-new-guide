@@ -3,6 +3,16 @@
  * Loot data lives in embedded viewData JSON inside Travian.React.FarmList.render(...).
  */
 
+import {
+  formatCropNum,
+  formatCropSignedNum,
+  getCropFarmStrings,
+  normalizeCropFarmLocale,
+} from '../i18n/cropFarmSimulator.js'
+
+const FARM_LIST_PAGE_RE =
+  /FarmList\.render|farmLists|rallyPointFarmList|Pillages|Listes de pillage|listes de pillage/i
+
 /** @param {string} html */
 function extractJsonObjectAfterMarker(html, marker) {
   const idx = html.indexOf(marker)
@@ -176,8 +186,11 @@ export function analyzeSlotEfficiency(slot) {
 
 /**
  * @param {import('./farmListPasteParser').FarmListSlotSummary[]} slots
+ * @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en']
  */
-export function buildSlotRecommendations(slots) {
+export function buildSlotRecommendations(slots, locale = 'en') {
+  const loc = normalizeCropFarmLocale(locale)
+  const t = getCropFarmStrings(loc)
   return slots
     .map((slot) => {
       const { utilization, stolenTotal, recommendation } = analyzeSlotEfficiency(slot)
@@ -185,12 +198,12 @@ export function buildSlotRecommendations(slots) {
       const coords =
         slot.coords != null ? `(${slot.coords.x}|${slot.coords.y})` : ''
       const utilPct = utilization != null ? Math.round(utilization * 100) : null
-      let message = ''
-      if (recommendation === 'increase') {
-        message = `Raid capped at ${utilPct}% capacity (${formatNum(stolenTotal)}/${formatNum(slot.bootyMax)}) — increase troops.`
-      } else {
-        message = `Only ${utilPct}% of carry used (${formatNum(stolenTotal)}/${formatNum(slot.bootyMax)}) — consider fewer troops.`
-      }
+      const stolen = formatNum(stolenTotal, loc)
+      const max = formatNum(slot.bootyMax, loc)
+      const message =
+        recommendation === 'increase'
+          ? t.recIncrease(utilPct, stolen, max)
+          : t.recDecrease(utilPct, stolen, max)
       return {
         slotId: slot.id,
         targetName: slot.targetName,
@@ -204,9 +217,7 @@ export function buildSlotRecommendations(slots) {
         recommendation,
         message,
         natarWarning:
-          slot.isNatar && recommendation === 'decrease'
-            ? 'Natars can build walls/residence — lowering troops may cause losses.'
-            : null,
+          slot.isNatar && recommendation === 'decrease' ? t.natarWarning : null,
       }
     })
     .filter(Boolean)
@@ -312,16 +323,19 @@ export function parseCropBalanceFromPaste(text) {
 
 /**
  * @param {string} text
+ * @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en']
  * @returns {FarmListParseResult|null}
  */
-export function parseFarmListPaste(text) {
+export function parseFarmListPaste(text, locale = 'en') {
   const raw = String(text ?? '').trim()
   if (!raw) return null
 
+  const loc = normalizeCropFarmLocale(locale)
+  const t = getCropFarmStrings(loc)
   const notes = []
 
-  if (!/FarmList\.render|farmLists|rallyPointFarmList/i.test(raw)) {
-    notes.push('Paste does not look like a Farm List page (Rally Point → Farm List tab).')
+  if (!FARM_LIST_PAGE_RE.test(raw)) {
+    notes.push(t.parserNotes.notFarmList)
   }
 
   const viewDataJson =
@@ -331,7 +345,7 @@ export function parseFarmListPaste(text) {
   const cropBalanceFromPaste = parseCropBalanceFromPaste(raw)
 
   if (!viewDataJson) {
-    notes.push('Could not find viewData JSON in the paste. Open Farm List (tt=99), expand all lists, View page source (Ctrl+U), then Ctrl+A and paste.')
+    notes.push(t.parserNotes.noViewData)
     return {
       timestamp: null,
       tribeId: null,
@@ -348,7 +362,7 @@ export function parseFarmListPaste(text) {
   try {
     viewData = JSON.parse(viewDataJson)
   } catch {
-    notes.push('viewData JSON is truncated or invalid — try copying the page again.')
+    notes.push(t.parserNotes.invalidViewData)
     return {
       timestamp: null,
       tribeId: null,
@@ -405,9 +419,9 @@ export function parseFarmListPaste(text) {
     const slotsMissingLoot = Math.max(0, configuredSlots - slotsWithLoot)
 
     if (!list.isExpanded && configuredSlots > 0) {
-      notes.push(`"${list.name}" is collapsed — expand it on Travian and re-paste to include per-village loot.`)
+      notes.push(t.parserNotes.listCollapsed(list.name))
     } else if (list.isExpanded && slotsMissingLoot > 0) {
-      notes.push(`"${list.name}": ${slotsMissingLoot} slot(s) have no last-raid loot in the paste.`)
+      notes.push(t.parserNotes.slotsMissingLoot(list.name, slotsMissingLoot))
     }
 
     const perRaidTotals = aggregateSlots(slots)
@@ -433,7 +447,7 @@ export function parseFarmListPaste(text) {
   }
 
   if (!farmLists.length) {
-    notes.push('No farm lists found in viewData.')
+    notes.push(t.parserNotes.noLists)
   }
 
   return {
@@ -448,15 +462,14 @@ export function parseFarmListPaste(text) {
   }
 }
 
-export function formatNum(n) {
-  if (!Number.isFinite(n)) return '—'
-  return Math.round(n).toLocaleString('en-US')
+/** @param {number} n @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en'] */
+export function formatNum(n, locale = 'en') {
+  return formatCropNum(n, normalizeCropFarmLocale(locale))
 }
 
-export function formatSignedNum(n) {
-  if (!Number.isFinite(n)) return '—'
-  const sign = n > 0 ? '+' : ''
-  return `${sign}${formatNum(n)}`
+/** @param {number} n @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en'] */
+export function formatSignedNum(n, locale = 'en') {
+  return formatCropSignedNum(n, normalizeCropFarmLocale(locale))
 }
 
 export function resourceTotal(r) {

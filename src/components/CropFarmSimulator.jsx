@@ -23,6 +23,7 @@ import {
   buildSlotRecommendations,
   analyzeSlotEfficiency,
 } from '../utils/farmListPasteParser'
+import { getCropFarmStrings } from '../i18n/cropFarmSimulator'
 
 const C = {
   bg: '#0f0c09',
@@ -40,32 +41,65 @@ const C = {
 }
 
 const R = {
-  lumber: { label: 'Lumber', value: '#e8c4a0', dim: '#c4a070' },
-  clay: { label: 'Clay', value: '#fb923c', dim: '#ea580c' },
-  iron: { label: 'Iron', value: '#7dd3fc', dim: '#38bdf8' },
-  crop: { label: 'Crop', value: '#fde047', dim: '#facc15' },
+  lumber: { value: '#e8c4a0', dim: '#c4a070' },
+  clay: { value: '#fb923c', dim: '#ea580c' },
+  iron: { value: '#7dd3fc', dim: '#38bdf8' },
+  crop: { value: '#fde047', dim: '#facc15' },
 }
-
-const PLACEHOLDER =
-  'Ctrl+V here — full page source from View page source (Ctrl+U) after expanding every farm list.'
 
 const FARM_LIST_EXPAND_IMG = `${import.meta.env.BASE_URL}images/farm-list-expand.png`
 
-function ResourceRow({ resourceKey, value }) {
+function LangToggle({ lang, onChange }) {
+  const t = getCropFarmStrings(lang)
+  const btn =
+    'w-9 h-9 rounded-lg border flex items-center justify-center text-lg transition-colors hover:bg-[#241d14]'
+  return (
+    <div className="flex gap-1.5 flex-shrink-0">
+      <button
+        type="button"
+        className={btn}
+        style={{
+          borderColor: lang === 'en' ? `${C.gold}80` : C.border,
+          background: lang === 'en' ? `${C.gold}15` : C.bg,
+        }}
+        onClick={() => onChange('en')}
+        title={t.switchToEn}
+        aria-label={t.switchToEn}
+      >
+        🇬🇧
+      </button>
+      <button
+        type="button"
+        className={btn}
+        style={{
+          borderColor: lang === 'fr' ? `${C.gold}80` : C.border,
+          background: lang === 'fr' ? `${C.gold}15` : C.bg,
+        }}
+        onClick={() => onChange('fr')}
+        title={t.switchToFr}
+        aria-label={t.switchToFr}
+      >
+        🇫🇷
+      </button>
+    </div>
+  )
+}
+
+function ResourceRow({ resourceKey, value, label, lang }) {
   const res = R[resourceKey]
   return (
     <div className="flex justify-between gap-4 text-sm py-0.5">
       <span className="font-medium" style={{ color: res.dim }}>
-        {res.label}
+        {label}
       </span>
       <span className="tabular-nums font-semibold" style={{ color: res.value }}>
-        {formatNum(value)}
+        {formatNum(value, lang)}
       </span>
     </div>
   )
 }
 
-function ResourceBlock({ title, resources, accent }) {
+function ResourceBlock({ title, resources, accent, labels, lang }) {
   const total = resourceTotal(resources)
   return (
     <div
@@ -80,13 +114,13 @@ function ResourceBlock({ title, resources, accent }) {
           {title}
         </span>
         <span className="text-sm font-bold tabular-nums" style={{ color: accent ?? C.gold }}>
-          Σ {formatNum(total)}
+          Σ {formatNum(total, lang)}
         </span>
       </div>
-      <ResourceRow resourceKey="lumber" value={resources.lumber} />
-      <ResourceRow resourceKey="clay" value={resources.clay} />
-      <ResourceRow resourceKey="iron" value={resources.iron} />
-      <ResourceRow resourceKey="crop" value={resources.crop} />
+      <ResourceRow resourceKey="lumber" value={resources.lumber} label={labels.lumber} lang={lang} />
+      <ResourceRow resourceKey="clay" value={resources.clay} label={labels.clay} lang={lang} />
+      <ResourceRow resourceKey="iron" value={resources.iron} label={labels.iron} lang={lang} />
+      <ResourceRow resourceKey="crop" value={resources.crop} label={labels.crop} lang={lang} />
     </div>
   )
 }
@@ -104,15 +138,14 @@ function UtilBadge({ utilization, recommendation }) {
   )
 }
 
-function FeedingBalancePanel({ feeding, schedule }) {
+function FeedingBalancePanel({ feeding, schedule, t, lang }) {
   if (!feeding?.ok) {
     return (
       <div
         className="rounded-xl border p-4 text-sm"
         style={{ background: C.surface2, borderColor: C.border, color: C.muted }}
       >
-        Enter net crop/h above (from your village stock bar) to see whether farming covers troop
-        upkeep.
+        {t.feedingEnterBalance}
       </div>
     )
   }
@@ -120,6 +153,7 @@ function FeedingBalancePanel({ feeding, schedule }) {
   const ok = feeding.activeHourOk && feeding.dayOk
   const borderColor = ok ? `${C.ok}55` : `${C.bad}55`
   const bg = ok ? 'rgba(74, 222, 128, 0.08)' : 'rgba(248, 113, 113, 0.08)'
+  const listWord = feeding.selectedListCount === 1 ? t.list : t.lists
 
   return (
     <div className="rounded-xl border p-4 space-y-4" style={{ background: bg, borderColor }}>
@@ -131,37 +165,41 @@ function FeedingBalancePanel({ feeding, schedule }) {
         )}
         <div className="space-y-2 text-sm">
           <p className="font-semibold" style={{ color: ok ? C.ok : C.bad }}>
-            {ok
-              ? 'Farming covers your crop burn during active raiding.'
-              : 'Farming does not fully cover your crop burn.'}
+            {ok ? t.feedingOk : t.feedingBad}
           </p>
           <p style={{ color: C.text }}>
-            Village balance:{' '}
-            <strong className="tabular-nums">{formatSignedNum(feeding.cropBalancePerHour)}</strong>{' '}
-            crop/h
+            {t.villageBalance}:{' '}
+            <strong className="tabular-nums">
+              {formatSignedNum(feeding.cropBalancePerHour, lang)}
+            </strong>{' '}
+            {t.cropPerHour}
             {feeding.tradeRoutesPerHour > 0 && (
               <>
-                {' '}
-                · Trade routes:{' '}
+                {' · '}
+                {t.tradeRoutes}:{' '}
                 <strong className="tabular-nums" style={{ color: C.ok }}>
-                  +{formatNum(feeding.tradeRoutesPerHour)}
+                  +{formatNum(feeding.tradeRoutesPerHour, lang)}
                 </strong>{' '}
-                crop/h
+                {t.cropPerHour}
               </>
             )}
             {feeding.tradeRoutesPerHour > 0 && (
               <>
-                {' '}
-                → base{' '}
-                <strong className="tabular-nums">{formatSignedNum(feeding.baseCropPerHour)}</strong>{' '}
-                crop/h
+                {' → '}
+                {t.base}{' '}
+                <strong className="tabular-nums">
+                  {formatSignedNum(feeding.baseCropPerHour, lang)}
+                </strong>{' '}
+                {t.cropPerHour}
               </>
             )}
             {' · '}
-            Raids:{' '}
-            <strong className="tabular-nums">{formatNum(feeding.raidCropPerActiveHour)}</strong>{' '}
-            crop/h ({feeding.selectedListCount} list
-            {feeding.selectedListCount !== 1 ? 's' : ''}, {feeding.selectedSlotCount} slots)
+            {t.raids}:{' '}
+            <strong className="tabular-nums">
+              {formatNum(feeding.raidCropPerActiveHour, lang)}
+            </strong>{' '}
+            {t.cropPerHour} ({feeding.selectedListCount} {listWord},{' '}
+            {feeding.selectedSlotCount} {t.slots})
           </p>
         </div>
       </div>
@@ -172,32 +210,29 @@ function FeedingBalancePanel({ feeding, schedule }) {
           style={{ background: C.surface, borderColor: C.border }}
         >
           <div className="text-xs uppercase tracking-wide mb-1" style={{ color: C.muted }}>
-            Net during active hours ({schedule.startHour}:00–{schedule.endHour}:00)
+            {t.netActiveHours(schedule.startHour, schedule.endHour)}
           </div>
           <div
             className="text-xl font-bold tabular-nums"
             style={{ color: feeding.netActiveHour >= 0 ? C.ok : C.bad }}
           >
-            {formatSignedNum(feeding.netActiveHour)} crop/h
+            {formatSignedNum(feeding.netActiveHour, lang)} {t.cropPerHour}
           </div>
           {feeding.netActiveHour >= 0 ? (
             <p className="text-xs mt-2" style={{ color: C.muted }}>
-              Surplus while clicking — you can support about{' '}
-              <strong style={{ color: C.ok }}>{formatNum(feeding.netActiveHour)}</strong> crop/h of
-              extra troop upkeep during your {feeding.activeHours}h window.
+              {t.surplusActive(
+                formatNum(feeding.netActiveHour, lang),
+                feeding.activeHours,
+              )}
             </p>
           ) : (
             <p className="text-xs mt-2" style={{ color: C.muted }}>
-              Need <strong style={{ color: C.bad }}>{formatNum(feeding.gapActiveHour)}</strong>{' '}
-              more crop/h while raiding
-              {feeding.extraSlotsForActiveHour != null && feeding.avgCropPerSlotPerClick > 0 && (
-                <>
-                  {' '}
-                  — roughly <strong>{feeding.extraSlotsForActiveHour}</strong> more target
-                  {feeding.extraSlotsForActiveHour !== 1 ? 's' : ''} at ~
-                  {formatNum(feeding.avgCropPerSlotPerClick)} crop/click each
-                </>
-              )}
+              {t.needActive(formatNum(feeding.gapActiveHour, lang))}
+              {feeding.extraSlotsForActiveHour != null && feeding.avgCropPerSlotPerClick > 0 &&
+                t.moreTargetsActive(
+                  feeding.extraSlotsForActiveHour,
+                  formatNum(feeding.avgCropPerSlotPerClick, lang),
+                )}
               .
             </p>
           )}
@@ -208,34 +243,29 @@ function FeedingBalancePanel({ feeding, schedule }) {
           style={{ background: C.surface, borderColor: C.border }}
         >
           <div className="text-xs uppercase tracking-wide mb-1" style={{ color: C.muted }}>
-            Net over full day (base × 24 + raids)
+            {t.netFullDay}
           </div>
           <div
             className="text-xl font-bold tabular-nums"
             style={{ color: feeding.netDay >= 0 ? C.ok : C.bad }}
           >
-            {formatSignedNum(feeding.netDay)} crop/day
+            {formatSignedNum(feeding.netDay, lang)} {t.cropPerDay}
           </div>
           {feeding.netDay >= 0 ? (
             <p className="text-xs mt-2" style={{ color: C.muted }}>
-              Full-day surplus — village production
-              {feeding.tradeRoutesPerHour > 0 ? ', trade routes,' : ''} and farming nets{' '}
-              <strong style={{ color: C.ok }}>{formatNum(feeding.netDay)}</strong> crop/day (raids
-              only run in your active window; production runs 24h).
+              {feeding.tradeRoutesPerHour > 0
+                ? t.surplusDay(formatNum(feeding.netDay, lang))
+                : t.surplusDayNoRoutes(formatNum(feeding.netDay, lang))}
             </p>
           ) : (
             <p className="text-xs mt-2" style={{ color: C.muted }}>
-              Need <strong style={{ color: C.bad }}>{formatNum(feeding.gapDay)}</strong> more
-              crop/day
-              {feeding.extraSlotsForDay != null && feeding.avgCropPerSlotPerClick > 0 && (
-                <>
-                  {' '}
-                  — add ~<strong>{feeding.extraSlotsForDay}</strong> target
-                  {feeding.extraSlotsForDay !== 1 ? 's' : ''} (~
-                  {formatNum(feeding.avgCropPerSlotPerClick)} crop/click,{' '}
-                  {feeding.raidsPerDay} clicks/day)
-                </>
-              )}
+              {t.needDay(formatNum(feeding.gapDay, lang))}
+              {feeding.extraSlotsForDay != null && feeding.avgCropPerSlotPerClick > 0 &&
+                t.moreTargetsDay(
+                  feeding.extraSlotsForDay,
+                  formatNum(feeding.avgCropPerSlotPerClick, lang),
+                  feeding.raidsPerDay,
+                )}
               .
             </p>
           )}
@@ -245,7 +275,16 @@ function FeedingBalancePanel({ feeding, schedule }) {
   )
 }
 
-function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInSelection }) {
+function FarmListCard({
+  list,
+  schedule,
+  expanded,
+  onToggle,
+  advanceMode,
+  showInSelection,
+  t,
+  lang,
+}) {
   const [targetsOpen, setTargetsOpen] = useState(false)
 
   useEffect(() => {
@@ -281,18 +320,19 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
             {list.name}
           </div>
           <div className="text-xs truncate" style={{ color: C.muted }}>
-            {list.ownerVillageName ?? 'Unknown village'}
-            {list.slotsAmount != null && ` · ${list.slotsWithLoot}/${list.slotsAmount} slots with loot`}
-            {!list.isExpanded && list.slotsAmount > 0 && ' · collapsed in paste'}
-            {advanceMode && showInSelection === false && ' · not selected'}
+            {list.ownerVillageName ?? t.unknownVillage}
+            {list.slotsAmount != null &&
+              ` · ${t.slotsWithLoot(list.slotsWithLoot, list.slotsAmount)}`}
+            {!list.isExpanded && list.slotsAmount > 0 && ` · ${t.collapsedInPaste}`}
+            {advanceMode && showInSelection === false && ` · ${t.notSelected}`}
           </div>
         </div>
         <div className="text-right flex-shrink-0">
           <div className="text-sm font-bold tabular-nums" style={{ color: R.crop.value }}>
-            {formatNum(list.perRaidTotals.crop)} crop
+            {formatNum(list.perRaidTotals.crop, lang)} {t.resources.crop.toLowerCase()}
           </div>
           <div className="text-xs tabular-nums font-medium" style={{ color: C.muted }}>
-            {formatNum(resourceTotal(list.perRaidTotals))} / raid
+            {formatNum(resourceTotal(list.perRaidTotals), lang)} {t.perRaid}
           </div>
         </div>
       </button>
@@ -300,9 +340,26 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
       {expanded && (
         <div className="px-4 pb-4 space-y-4 border-t" style={{ borderColor: C.border }}>
           <div className="grid sm:grid-cols-3 gap-3 pt-4">
-            <ResourceBlock title="Per click (last raids)" resources={projection.perClick} />
-            <ResourceBlock title="Per active hour" resources={projection.perHour} accent={C.gold} />
-            <ResourceBlock title="Per day" resources={projection.perDay} accent={R.crop.value} />
+            <ResourceBlock
+              title={t.perClickLastRaids}
+              resources={projection.perClick}
+              labels={t.resources}
+              lang={lang}
+            />
+            <ResourceBlock
+              title={t.perActiveHour}
+              resources={projection.perHour}
+              accent={C.gold}
+              labels={t.resources}
+              lang={lang}
+            />
+            <ResourceBlock
+              title={t.perDay}
+              resources={projection.perDay}
+              accent={R.crop.value}
+              labels={t.resources}
+              lang={lang}
+            />
           </div>
 
           {list.slots.length > 0 && (
@@ -318,7 +375,7 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
                 ) : (
                   <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: C.muted }} />
                 )}
-                <span className="font-medium">Targets</span>
+                <span className="font-medium">{t.targets}</span>
                 <span className="text-xs" style={{ color: C.muted }}>
                   ({list.slots.length})
                 </span>
@@ -330,10 +387,10 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
                     <thead>
                       <tr style={{ background: C.surfaceLift }}>
                         <th className="text-left px-3 py-2 font-semibold" style={{ color: C.text }}>
-                          Target
+                          {t.target}
                         </th>
                         <th className="text-right px-3 py-2 font-semibold" style={{ color: C.muted }}>
-                          Dist
+                          {t.dist}
                         </th>
                         {advanceMode && (
                           <>
@@ -341,27 +398,27 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
                               className="text-left px-3 py-2 font-semibold min-w-[120px]"
                               style={{ color: C.muted }}
                             >
-                              Troops
+                              {t.troops}
                             </th>
                             <th className="text-right px-3 py-2 font-semibold" style={{ color: C.muted }}>
-                              Loot / max
+                              {t.lootMax}
                             </th>
                             <th className="text-right px-3 py-2 font-semibold" style={{ color: C.muted }}>
-                              Util
+                              {t.util}
                             </th>
                           </>
                         )}
                         <th className="text-right px-3 py-2 font-semibold" style={{ color: R.lumber.dim }}>
-                          Lumber
+                          {t.resources.lumber}
                         </th>
                         <th className="text-right px-3 py-2 font-semibold" style={{ color: R.clay.dim }}>
-                          Clay
+                          {t.resources.clay}
                         </th>
                         <th className="text-right px-3 py-2 font-semibold" style={{ color: R.iron.dim }}>
-                          Iron
+                          {t.resources.iron}
                         </th>
                         <th className="text-right px-3 py-2 font-semibold" style={{ color: R.crop.dim }}>
-                          Crop
+                          {t.resources.crop}
                         </th>
                       </tr>
                     </thead>
@@ -386,7 +443,7 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
                                   <AlertTriangle
                                     className="w-3.5 h-3.5 flex-shrink-0"
                                     style={{ color: '#fbbf24' }}
-                                    title="Natars"
+                                    title={t.natars}
                                   />
                                 )}
                                 <span className="truncate">{slot.targetName}</span>
@@ -400,11 +457,12 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
                                 <div
                                   className="text-xs mt-0.5 font-medium"
                                   style={{
-                                    color:
-                                      recommendation === 'increase' ? C.ok : '#fbbf24',
+                                    color: recommendation === 'increase' ? C.ok : '#fbbf24',
                                   }}
                                 >
-                                  {recommendation === 'increase' ? '↑ increase troops' : '↓ reduce troops'}
+                                  {recommendation === 'increase'
+                                    ? t.increaseTroops
+                                    : t.reduceTroops}
                                 </div>
                               )}
                             </td>
@@ -428,11 +486,14 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
                                   style={{ color: C.text }}
                                 >
                                   {loot && slot.bootyMax
-                                    ? `${formatNum(resourceTotal(loot))} / ${formatNum(slot.bootyMax)}`
+                                    ? `${formatNum(resourceTotal(loot), lang)} / ${formatNum(slot.bootyMax, lang)}`
                                     : '—'}
                                 </td>
                                 <td className="px-3 py-2 text-right">
-                                  <UtilBadge utilization={utilization} recommendation={recommendation} />
+                                  <UtilBadge
+                                    utilization={utilization}
+                                    recommendation={recommendation}
+                                  />
                                 </td>
                               </>
                             )}
@@ -440,25 +501,25 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
                               className="px-3 py-2 text-right tabular-nums font-semibold"
                               style={{ color: loot ? R.lumber.value : C.muted }}
                             >
-                              {loot ? formatNum(loot.lumber) : '—'}
+                              {loot ? formatNum(loot.lumber, lang) : '—'}
                             </td>
                             <td
                               className="px-3 py-2 text-right tabular-nums font-semibold"
                               style={{ color: loot ? R.clay.value : C.muted }}
                             >
-                              {loot ? formatNum(loot.clay) : '—'}
+                              {loot ? formatNum(loot.clay, lang) : '—'}
                             </td>
                             <td
                               className="px-3 py-2 text-right tabular-nums font-semibold"
                               style={{ color: loot ? R.iron.value : C.muted }}
                             >
-                              {loot ? formatNum(loot.iron) : '—'}
+                              {loot ? formatNum(loot.iron, lang) : '—'}
                             </td>
                             <td
                               className="px-3 py-2 text-right tabular-nums font-semibold"
                               style={{ color: loot ? R.crop.value : C.muted }}
                             >
-                              {loot ? formatNum(loot.crop) : '—'}
+                              {loot ? formatNum(loot.crop, lang) : '—'}
                             </td>
                           </tr>
                         )
@@ -476,6 +537,9 @@ function FarmListCard({ list, schedule, expanded, onToggle, advanceMode, showInS
 }
 
 export default function CropFarmSimulator() {
+  const [lang, setLang] = useState('en')
+  const t = useMemo(() => getCropFarmStrings(lang), [lang])
+
   const [paste, setPaste] = useState('')
   const [intervalMinutes, setIntervalMinutes] = useState('30')
   const [startHour, setStartHour] = useState('6')
@@ -492,7 +556,10 @@ export default function CropFarmSimulator() {
   const [selectedListIds, setSelectedListIds] = useState(() => new Set())
   const [listSelectionTouched, setListSelectionTouched] = useState(false)
 
-  const parsed = useMemo(() => (paste.trim() ? parseFarmListPaste(paste) : null), [paste])
+  const parsed = useMemo(
+    () => (paste.trim() ? parseFarmListPaste(paste, lang) : null),
+    [paste, lang],
+  )
 
   const schedule = useMemo(() => {
     const interval = Math.max(1, parseInt(intervalMinutes, 10) || 30)
@@ -585,8 +652,8 @@ export default function CropFarmSimulator() {
       parsed.farmLists,
       selectedListIds.size > 0 ? selectedListIds : new Set(parsed.farmLists.map((l) => l.id)),
     )
-    return buildSlotRecommendations(slots)
-  }, [advanceMode, parsed, selectedListIds])
+    return buildSlotRecommendations(slots, lang)
+  }, [advanceMode, parsed, selectedListIds, lang])
 
   const toggleList = useCallback((id) => {
     setExpandedLists((prev) => {
@@ -601,37 +668,43 @@ export default function CropFarmSimulator() {
     if (!parsed || !grandProjection) return
     const scope =
       advanceMode && selectedListIds.size > 0
-        ? `${selectedListIds.size} selected list(s)`
-        : 'all lists'
+        ? t.copy.scopeSelected(selectedListIds.size)
+        : t.copy.scopeAll
+    const res = t.resources
     const lines = [
-      `Farm loot simulator — ${schedule.startHour}:00–${schedule.endHour}:00, every ${schedule.intervalMinutes} min (${scope})`,
-      `Raids per day: ${grandProjection.raidsPerDay} (${grandProjection.raidsPerActiveHour.toFixed(1)}/h active)`,
+      t.copy.title(
+        schedule.startHour,
+        schedule.endHour,
+        schedule.intervalMinutes,
+        scope,
+      ),
+      t.copy.raidsPerDay(
+        grandProjection.raidsPerDay,
+        grandProjection.raidsPerActiveHour.toFixed(1),
+      ),
       '',
-      'Per click (sum of last raids):',
-      `  lumber ${formatNum(grandProjection.perClick.lumber)} | clay ${formatNum(grandProjection.perClick.clay)} | iron ${formatNum(grandProjection.perClick.iron)} | crop ${formatNum(grandProjection.perClick.crop)}`,
+      t.copy.perClick,
+      `  ${res.lumber.toLowerCase()} ${formatNum(grandProjection.perClick.lumber, lang)} | ${res.clay.toLowerCase()} ${formatNum(grandProjection.perClick.clay, lang)} | ${res.iron.toLowerCase()} ${formatNum(grandProjection.perClick.iron, lang)} | ${res.crop.toLowerCase()} ${formatNum(grandProjection.perClick.crop, lang)}`,
       '',
-      'Per active hour:',
-      `  lumber ${formatNum(grandProjection.perHour.lumber)} | clay ${formatNum(grandProjection.perHour.clay)} | iron ${formatNum(grandProjection.perHour.iron)} | crop ${formatNum(grandProjection.perHour.crop)}`,
+      t.copy.perActiveHour,
+      `  ${res.lumber.toLowerCase()} ${formatNum(grandProjection.perHour.lumber, lang)} | ${res.clay.toLowerCase()} ${formatNum(grandProjection.perHour.clay, lang)} | ${res.iron.toLowerCase()} ${formatNum(grandProjection.perHour.iron, lang)} | ${res.crop.toLowerCase()} ${formatNum(grandProjection.perHour.crop, lang)}`,
       '',
-      'Per day:',
-      `  lumber ${formatNum(grandProjection.perDay.lumber)} | clay ${formatNum(grandProjection.perDay.clay)} | iron ${formatNum(grandProjection.perDay.iron)} | crop ${formatNum(grandProjection.perDay.crop)}`,
+      t.copy.perDay,
+      `  ${res.lumber.toLowerCase()} ${formatNum(grandProjection.perDay.lumber, lang)} | ${res.clay.toLowerCase()} ${formatNum(grandProjection.perDay.clay, lang)} | ${res.iron.toLowerCase()} ${formatNum(grandProjection.perDay.iron, lang)} | ${res.crop.toLowerCase()} ${formatNum(grandProjection.perDay.crop, lang)}`,
     ]
     if (feeding?.ok) {
-      lines.push(
-        '',
-        `Feeding balance: village ${formatSignedNum(feeding.cropBalancePerHour)} crop/h`,
-      )
+      lines.push('', t.copy.feeding(formatSignedNum(feeding.cropBalancePerHour, lang)))
       if (feeding.tradeRoutesPerHour > 0) {
-        lines.push(`  Trade routes: +${formatNum(feeding.tradeRoutesPerHour)} crop/h`)
-        lines.push(`  Base (village + routes): ${formatSignedNum(feeding.baseCropPerHour)} crop/h`)
+        lines.push(t.copy.tradeRoutes(formatNum(feeding.tradeRoutesPerHour, lang)))
+        lines.push(t.copy.base(formatSignedNum(feeding.baseCropPerHour, lang)))
       }
       lines.push(
-        `  Net active hour: ${formatSignedNum(feeding.netActiveHour)} crop/h`,
-        `  Net full day: ${formatSignedNum(feeding.netDay)} crop/day`,
+        t.copy.netActive(formatSignedNum(feeding.netActiveHour, lang)),
+        t.copy.netDay(formatSignedNum(feeding.netDay, lang)),
       )
     }
     if (recommendations.length) {
-      lines.push('', 'Slot recommendations:')
+      lines.push('', t.copy.slotRecs)
       recommendations.forEach((r) => {
         lines.push(`  ${r.targetName} ${r.coords}: ${r.message}`)
         if (r.natarWarning) lines.push(`    ⚠ ${r.natarWarning}`)
@@ -639,19 +712,19 @@ export default function CropFarmSimulator() {
     }
     lines.push(
       '',
-      'By farm list (crop / total per click):',
+      t.copy.byList,
       ...parsed.farmLists
         .filter((l) => !advanceMode || selectedListIds.size === 0 || selectedListIds.has(l.id))
         .map(
           (l) =>
-            `  ${l.name}: crop ${formatNum(l.perRaidTotals.crop)}, total ${formatNum(resourceTotal(l.perRaidTotals))}`,
+            `  ${l.name}: ${res.crop.toLowerCase()} ${formatNum(l.perRaidTotals.crop, lang)}, total ${formatNum(resourceTotal(l.perRaidTotals), lang)}`,
         ),
     )
     navigator.clipboard.writeText(lines.join('\n')).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
-  }, [parsed, grandProjection, schedule, advanceMode, selectedListIds, feeding, recommendations])
+  }, [parsed, grandProjection, schedule, advanceMode, selectedListIds, feeding, recommendations, t, lang])
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
@@ -662,15 +735,15 @@ export default function CropFarmSimulator() {
         >
           <Sprout className="w-6 h-6" style={{ color: C.gold }} />
         </div>
-        <div>
-          <h1 className="text-2xl font-bold mb-1" style={{ color: C.heading }}>
-            Crop Farm Simulator
-          </h1>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-2xl font-bold mb-1" style={{ color: C.heading }}>
+              {t.title}
+            </h1>
+            <LangToggle lang={lang} onChange={setLang} />
+          </div>
           <p className="text-sm leading-relaxed" style={{ color: C.muted }}>
-            Paste your Farm List page. The tool sums loot from each slot&apos;s{' '}
-            <em>last raid</em> per list, then estimates haul per click, per active hour, and per
-            day from your raid interval and playing window. Enable <strong>Advance mode</strong> to
-            check crop feeding balance and troop efficiency per target.
+            {t.intro}
           </p>
         </div>
       </div>
@@ -690,34 +763,21 @@ export default function CropFarmSimulator() {
             <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: C.muted }} />
           )}
           <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: C.muted }}>
-            How to use
+            {t.howTo}
           </span>
         </button>
 
         {howToOpen && (
           <div className="px-4 sm:px-5 pb-4 sm:pb-5 space-y-4 border-t" style={{ borderColor: C.border }}>
             <ol className="text-sm space-y-2 list-decimal list-inside pt-4" style={{ color: C.text }}>
-              <li>
-                In Travian, open <strong>Rally Point</strong> → <strong>Farm List</strong> tab.
-              </li>
-              <li>
-                For <strong>each</strong> farm list, click the arrow on the right to expand it.
-              </li>
-              <li>
-                Open <strong>View page source</strong> (<kbd className="px-1.5 py-0.5 rounded text-xs border" style={{ borderColor: C.border, background: C.bg }}>Ctrl+U</kbd>
-                ).
-              </li>
-              <li>
-                <kbd className="px-1.5 py-0.5 rounded text-xs border" style={{ borderColor: C.border, background: C.bg }}>Ctrl+A</kbd>
-                {' → '}
-                <kbd className="px-1.5 py-0.5 rounded text-xs border" style={{ borderColor: C.border, background: C.bg }}>Ctrl+C</kbd>
-                , paste here.
-              </li>
+              {t.howToSteps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
             </ol>
             <figure className="space-y-2">
               <img
                 src={FARM_LIST_EXPAND_IMG}
-                alt="Travian Farm List — expand every list"
+                alt={t.howToImgAlt}
                 className="w-full max-w-2xl rounded-lg border"
                 style={{ borderColor: C.border }}
               />
@@ -731,7 +791,7 @@ export default function CropFarmSimulator() {
         style={{ background: C.surface, borderColor: C.border }}
       >
         <label className="block text-sm font-medium" style={{ color: C.text }}>
-          Paste copied HTML
+          {t.pasteLabel}
         </label>
         <textarea
           value={paste}
@@ -739,7 +799,7 @@ export default function CropFarmSimulator() {
             setPaste(e.target.value)
             setListSelectionTouched(false)
           }}
-          placeholder={PLACEHOLDER}
+          placeholder={t.pastePlaceholder}
           rows={8}
           className="w-full rounded-lg border px-3 py-2 text-sm font-mono resize-y focus:outline-none focus:ring-1"
           style={{ background: C.bg, borderColor: C.border, color: C.text }}
@@ -759,7 +819,7 @@ export default function CropFarmSimulator() {
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: C.muted }}>
-            Raid schedule
+            {t.raidSchedule}
           </h2>
           <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
             <input
@@ -768,16 +828,16 @@ export default function CropFarmSimulator() {
               onChange={(e) => setAdvanceMode(e.target.checked)}
               className="rounded"
             />
-            <span style={{ color: C.text }}>Advance mode</span>
+            <span style={{ color: C.text }}>{t.advanceMode}</span>
             <span className="text-xs" style={{ color: C.muted }}>
-              (feeding balance + troop efficiency)
+              {t.advanceModeHint}
             </span>
           </label>
         </div>
         <div className="grid sm:grid-cols-3 gap-4">
           <label className="block">
             <span className="text-xs mb-1 block" style={{ color: C.muted }}>
-              Interval (minutes)
+              {t.intervalMinutes}
             </span>
             <input
               type="number"
@@ -791,7 +851,7 @@ export default function CropFarmSimulator() {
           </label>
           <label className="block">
             <span className="text-xs mb-1 block" style={{ color: C.muted }}>
-              Active from (hour)
+              {t.activeFrom}
             </span>
             <input
               type="number"
@@ -805,7 +865,7 @@ export default function CropFarmSimulator() {
           </label>
           <label className="block">
             <span className="text-xs mb-1 block" style={{ color: C.muted }}>
-              Active until (hour)
+              {t.activeUntil}
             </span>
             <input
               type="number"
@@ -820,8 +880,11 @@ export default function CropFarmSimulator() {
         </div>
         {grandProjection && (
           <p className="text-xs" style={{ color: C.muted }}>
-            {grandProjection.activeHours}h window → ~{grandProjection.raidsPerDay} raid clicks/day
-            ({grandProjection.raidsPerActiveHour.toFixed(1)} per active hour)
+            {t.scheduleHint(
+              grandProjection.activeHours,
+              grandProjection.raidsPerDay,
+              grandProjection.raidsPerActiveHour.toFixed(1),
+            )}
           </p>
         )}
       </div>
@@ -832,19 +895,19 @@ export default function CropFarmSimulator() {
           style={{ background: C.surface, borderColor: `${C.gold}40` }}
         >
           <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: C.gold }}>
-            Advance — crop feeding
+            {t.advanceFeeding}
           </h2>
 
           <div className="grid sm:grid-cols-2 gap-4 max-w-2xl">
             <div>
               <label className="block text-xs mb-2" style={{ color: C.muted }}>
-                Net crop/h from village stock bar (production − upkeep)
+                {t.cropBalanceLabel}
               </label>
               <div className="flex gap-2">
                 <select
                   value={cropBalanceSign}
                   onChange={(e) => setCropBalanceSign(e.target.value)}
-                  aria-label="Surplus or deficit"
+                  aria-label={t.cropBalanceLabel}
                   className="rounded-lg border px-3 py-2 text-sm"
                   style={{
                     background: C.bg,
@@ -861,8 +924,8 @@ export default function CropFarmSimulator() {
                   autoComplete="off"
                   value={cropBalanceDigits}
                   onChange={(e) => setCropBalanceDigits(e.target.value.replace(/\D/g, ''))}
-                  placeholder="e.g. 5299"
-                  aria-label="Crop balance per hour"
+                  placeholder={t.cropBalancePlaceholder}
+                  aria-label={t.cropBalanceLabel}
                   className="flex-1 rounded-lg border px-3 py-2 text-sm tabular-nums"
                   style={{
                     background: C.bg,
@@ -872,13 +935,13 @@ export default function CropFarmSimulator() {
                 />
               </div>
               <span className="text-xs mt-1 block" style={{ color: C.muted }}>
-                Use − for deficit (red number in Travian). Auto-filled from paste when available.
+                {t.cropBalanceHint}
               </span>
             </div>
 
             <div>
               <label className="block text-xs mb-2" style={{ color: C.muted }}>
-                Trade routes crop/h (from other villages)
+                {t.tradeRoutesLabel}
               </label>
               <input
                 type="text"
@@ -886,8 +949,8 @@ export default function CropFarmSimulator() {
                 autoComplete="off"
                 value={tradeRoutesDigits}
                 onChange={(e) => setTradeRoutesDigits(e.target.value.replace(/\D/g, ''))}
-                placeholder="e.g. 15000"
-                aria-label="Trade routes crop per hour"
+                placeholder={t.tradeRoutesPlaceholder}
+                aria-label={t.tradeRoutesLabel}
                 className="w-full rounded-lg border px-3 py-2 text-sm tabular-nums"
                 style={{
                   background: C.bg,
@@ -896,8 +959,7 @@ export default function CropFarmSimulator() {
                 }}
               />
               <span className="text-xs mt-1 block" style={{ color: C.muted }}>
-                Sum of automated merchant deliveries to this village, expressed as crop/h (runs
-                24/7).
+                {t.tradeRoutesHint}
               </span>
             </div>
           </div>
@@ -905,7 +967,7 @@ export default function CropFarmSimulator() {
           {parsed.villages.length > 0 && (
             <div>
               <label className="block text-xs mb-2" style={{ color: C.muted }}>
-                Sending village
+                {t.sendingVillage}
               </label>
               <select
                 value={selectedVillageId}
@@ -924,7 +986,7 @@ export default function CropFarmSimulator() {
 
           <div>
             <div className="text-xs mb-2" style={{ color: C.muted }}>
-              Farm lists to include (defaults to lists from selected village)
+              {t.farmListsInclude}
             </div>
             <div className="flex flex-wrap gap-2">
               {parsed.farmLists.map((list) => {
@@ -946,7 +1008,7 @@ export default function CropFarmSimulator() {
                     />
                     <span className="truncate max-w-[200px]">{list.name}</span>
                     <span className="text-xs tabular-nums" style={{ color: R.crop.value }}>
-                      {formatNum(list.perRaidTotals.crop)}
+                      {formatNum(list.perRaidTotals.crop, lang)}
                     </span>
                   </label>
                 )
@@ -954,7 +1016,7 @@ export default function CropFarmSimulator() {
             </div>
           </div>
 
-          <FeedingBalancePanel feeding={feeding} schedule={schedule} />
+          <FeedingBalancePanel feeding={feeding} schedule={schedule} t={t} lang={lang} />
         </div>
       )}
 
@@ -962,7 +1024,7 @@ export default function CropFarmSimulator() {
         <>
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-lg font-semibold" style={{ color: C.heading }}>
-              Totals {advanceMode && selectedListIds.size > 0 ? '(selected lists)' : '(all lists)'}
+              {advanceMode && selectedListIds.size > 0 ? t.totalsSelected : t.totalsAll}
             </h2>
             <button
               type="button"
@@ -971,14 +1033,31 @@ export default function CropFarmSimulator() {
               style={{ borderColor: C.border, color: C.text }}
             >
               {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
-              {copied ? 'Copied' : 'Copy summary'}
+              {copied ? t.copied : t.copySummary}
             </button>
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4">
-            <ResourceBlock title="Per click" resources={grandProjection.perClick} />
-            <ResourceBlock title="Per active hour" resources={grandProjection.perHour} accent={C.gold} />
-            <ResourceBlock title="Per day" resources={grandProjection.perDay} accent={R.crop.value} />
+            <ResourceBlock
+              title={t.perClick}
+              resources={grandProjection.perClick}
+              labels={t.resources}
+              lang={lang}
+            />
+            <ResourceBlock
+              title={t.perActiveHour}
+              resources={grandProjection.perHour}
+              accent={C.gold}
+              labels={t.resources}
+              lang={lang}
+            />
+            <ResourceBlock
+              title={t.perDay}
+              resources={grandProjection.perDay}
+              accent={R.crop.value}
+              labels={t.resources}
+              lang={lang}
+            />
           </div>
 
           {advanceMode && recommendations.length > 0 && (
@@ -987,7 +1066,7 @@ export default function CropFarmSimulator() {
               style={{ background: C.surface, borderColor: C.border }}
             >
               <h2 className="text-lg font-semibold" style={{ color: C.heading }}>
-                Troop efficiency recommendations
+                {t.troopRecs}
               </h2>
               <ul className="space-y-2 text-sm">
                 {recommendations.map((rec) => (
@@ -1011,14 +1090,17 @@ export default function CropFarmSimulator() {
                           <span style={{ color: C.muted }}>{rec.coords}</span>
                           {rec.isNatar && (
                             <span className="ml-1 text-xs" style={{ color: '#fbbf24' }}>
-                              Natars
+                              {t.natars}
                             </span>
                           )}
                         </div>
                         <div style={{ color: C.muted }}>{rec.message}</div>
                         <div className="text-xs mt-1" style={{ color: C.muted }}>
-                          Troops: {rec.troopLabel} · {formatPercent(rec.utilization)} of{' '}
-                          {formatNum(rec.bootyMax)} carry
+                          {t.troopsCarry(
+                            rec.troopLabel,
+                            formatPercent(rec.utilization),
+                            formatNum(rec.bootyMax, lang),
+                          )}
                         </div>
                         {rec.natarWarning && (
                           <div
@@ -1039,7 +1121,7 @@ export default function CropFarmSimulator() {
 
           <div className="space-y-3">
             <h2 className="text-lg font-semibold" style={{ color: C.heading }}>
-              Farm lists
+              {t.farmLists}
             </h2>
             {parsed.farmLists.map((list) => (
               <FarmListCard
@@ -1054,6 +1136,8 @@ export default function CropFarmSimulator() {
                     ? selectedListIds.has(list.id)
                     : undefined
                 }
+                t={t}
+                lang={lang}
               />
             ))}
           </div>

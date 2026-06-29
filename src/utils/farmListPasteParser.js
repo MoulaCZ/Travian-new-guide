@@ -3,6 +3,16 @@
  * Loot data lives in embedded viewData JSON inside Travian.React.FarmList.render(...).
  */
 
+import {
+  formatCropNum,
+  formatCropSignedNum,
+  getCropFarmStrings,
+  normalizeCropFarmLocale,
+} from '../i18n/cropFarmSimulator.js'
+
+const FARM_LIST_PAGE_RE =
+  /FarmList\.render|farmLists|rallyPointFarmList|Pillages|Listes de pillage|listes de pillage/i
+
 /** @param {string} html */
 function extractJsonObjectAfterMarker(html, marker) {
   const idx = html.indexOf(marker)
@@ -61,6 +71,36 @@ function scaleResources(r, factor) {
 
 const EMPTY_RESOURCES = { lumber: 0, clay: 0, iron: 0, crop: 0 }
 
+const TEUTON_SHORT = ['', 'Leg', 'Praet', 'Imp', 'EL', 'EI', 'EC', 'Ram', 'Cat', 'Sen', 'Set']
+const GAUL_SHORT = ['', 'P', 'S', 'Path', 'TT', 'Druid', 'Hae', 'Ram', 'Tre', 'Chieft', 'Set']
+const ROMAN_SHORT = ['', 'Leg', 'Praet', 'Imp', 'EL', 'EI', 'EC', 'Ram', 'Cat', 'Sen', 'Set']
+
+/** @param {number|null} tribeId */
+function unitShortNames(tribeId) {
+  if (tribeId === 2) return TEUTON_SHORT
+  if (tribeId === 3) return GAUL_SHORT
+  return ROMAN_SHORT
+}
+
+/** @param {Record<string, number>|null|undefined} troop @param {number|null} tribeId */
+export function formatTroopShort(troop, tribeId) {
+  if (!troop) return '—'
+  const names = unitShortNames(tribeId)
+  const parts = []
+  for (let i = 1; i <= 10; i++) {
+    const n = troop[`t${i}`] ?? 0
+    if (n > 0) parts.push(`${n}× ${names[i] || `T${i}`}`)
+  }
+  return parts.length ? parts.join(', ') : '—'
+}
+
+/** @param {{ name?: string, type?: number }} target */
+export function isNatarTarget(target) {
+  if (!target) return false
+  const name = String(target.name ?? '')
+  return /natar/i.test(name)
+}
+
 /**
  * @param {{ intervalMinutes: number, startHour: number, endHour: number }} schedule
  */
@@ -84,6 +124,23 @@ export function projectFarmLoot(totals, schedule) {
   }
 }
 
+/** Signed crop/h from prefix and digits-only input */
+export function cropBalancePerHour(sign, digitsRaw) {
+  const digits = String(digitsRaw ?? '').replace(/\D/g, '')
+  if (!digits) return NaN
+  const n = parseInt(digits, 10)
+  if (!Number.isFinite(n)) return NaN
+  return sign === '-' ? -n : n
+}
+
+/** Non-negative crop/h from digits-only input (empty → 0) */
+export function tradeRoutesPerHour(digitsRaw) {
+  const digits = String(digitsRaw ?? '').replace(/\D/g, '')
+  if (!digits) return 0
+  const n = parseInt(digits, 10)
+  return Number.isFinite(n) ? n : 0
+}
+
 /**
  * @param {import('./farmListPasteParser').FarmListSlotSummary[]} slots
  */
@@ -97,45 +154,264 @@ function aggregateSlots(slots) {
 }
 
 /**
+ * @param {import('./farmListPasteParser').FarmListSummary[]} farmLists
+ * @param {Set<number>} selectedListIds
+ */
+export function aggregateSelectedLists(farmLists, selectedListIds) {
+  let totals = { ...EMPTY_RESOURCES }
+  /** @type {import('./farmListPasteParser').FarmListSlotSummary[]} */
+  const slots = []
+  for (const list of farmLists) {
+    if (!selectedListIds.has(list.id)) continue
+    totals = addResources(totals, list.perRaidTotals)
+    slots.push(...list.slots)
+  }
+  return { totals, slots }
+}
+
+/**
+ * @param {import('./farmListPasteParser').FarmListSlotSummary} slot
+ */
+export function analyzeSlotEfficiency(slot) {
+  if (!slot.raidedResources || !slot.bootyMax || slot.bootyMax <= 0) {
+    return { utilization: null, stolenTotal: null, recommendation: null }
+  }
+  const stolenTotal = resourceTotal(slot.raidedResources)
+  const utilization = stolenTotal / slot.bootyMax
+  let recommendation = null
+  if (utilization >= 0.95) recommendation = 'increase'
+  else if (utilization < 0.5) recommendation = 'decrease'
+  return { utilization, stolenTotal, recommendation }
+}
+
+/**
+ * Sort priority (descending): capped raids first, then big over-trooping, then small targets.
+ * @param {{ recommendation: string, utilization: number|null, bootyMax: number|null, stolenTotal: number|null }} rec
+ */
+export function getRecommendationPriority(rec) {
+  const bootyMax = rec.bootyMax ?? 0
+  const stolen = rec.stolenTotal ?? 0
+  const util = rec.utilization ?? 0
+  const waste = Math.max(0, bootyMax - stolen)
+
+  if (rec.recommendation === 'increase') {
+    // Tier 3: capped — highest priority (100% raids, add troops)
+    return 3_000_000 + util * 100_000 + bootyMax
+  }
+
+  if (rec.recommendation === 'decrease') {
+    // Tier 2: large carry, tiny loot (e.g. 1100 max, 30 stolen) — free troops
+    if (bootyMax > 350) {
+      return 2_000_000 + waste * 100 + bootyMax
+    }
+    // Tier 1: already near minimum practical troops (e.g. 220 max, 2×110) — low impact
+    return 1_000_000 + waste
+  }
+
+  return 0
+}
+
+/**
+ * @param {import('./farmListPasteParser').FarmListSlotSummary[]} slots
+ * @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en']
+ */
+export function buildSlotRecommendations(slots, locale = 'en') {
+  const loc = normalizeCropFarmLocale(locale)
+  const t = getCropFarmStrings(loc)
+  return slots
+    .map((slot) => {
+      const { utilization, stolenTotal, recommendation } = analyzeSlotEfficiency(slot)
+      if (!recommendation) return null
+      const coords =
+        slot.coords != null ? `(${slot.coords.x}|${slot.coords.y})` : ''
+      const utilPct = utilization != null ? Math.round(utilization * 100) : null
+      const stolen = formatNum(stolenTotal, loc)
+      const max = formatNum(slot.bootyMax, loc)
+      const message =
+        recommendation === 'increase'
+          ? t.recIncrease(utilPct, stolen, max)
+          : t.recDecrease(utilPct, stolen, max)
+      const item = {
+        slotId: slot.id,
+        targetName: slot.targetName,
+        coords,
+        isNatar: slot.isNatar,
+        troopLabel: slot.troopLabel,
+        utilization,
+        utilPct,
+        bootyMax: slot.bootyMax,
+        stolenTotal,
+        wastedCapacity: Math.max(0, (slot.bootyMax ?? 0) - (stolenTotal ?? 0)),
+        recommendation,
+        message,
+        natarWarning:
+          slot.isNatar && recommendation === 'decrease' ? t.natarWarning : null,
+      }
+      return item
+    })
+    .filter(Boolean)
+    .sort((a, b) => getRecommendationPriority(b) - getRecommendationPriority(a))
+}
+
+/**
+ * @param {number} cropBalancePerHour — village net crop/h (negative = deficit)
+ * @param {import('./farmListPasteParser').FarmListSummary[]} farmLists
+ * @param {Set<number>} selectedListIds
+ * @param {{ intervalMinutes: number, startHour: number, endHour: number }} schedule
+ * @param {number} [tradeRoutesCropPerHour=0] — incoming crop/h from automated trade routes
+ */
+export function computeFeedingBalance(
+  cropBalancePerHour,
+  farmLists,
+  selectedListIds,
+  schedule,
+  tradeRoutesCropPerHour = 0,
+) {
+  if (!Number.isFinite(cropBalancePerHour)) {
+    return { ok: false, reason: 'missing_balance' }
+  }
+
+  const tradeRoutes = Math.max(0, tradeRoutesCropPerHour || 0)
+  const baseCropPerHour = cropBalancePerHour + tradeRoutes
+
+  const { totals, slots } = aggregateSelectedLists(farmLists, selectedListIds)
+  const projection = projectFarmLoot(totals, schedule)
+
+  const raidCropPerActiveHour = projection.perHour.crop
+  const raidCropPerDay = projection.perDay.crop
+  const netActiveHour = baseCropPerHour + raidCropPerActiveHour
+  const netDay = baseCropPerHour * 24 + raidCropPerDay
+
+  const slotsWithCrop = slots.filter((s) => s.raidedResources && s.raidedResources.crop > 0)
+  const avgCropPerSlotPerClick =
+    slotsWithCrop.length > 0
+      ? slotsWithCrop.reduce((sum, s) => sum + (s.raidedResources?.crop ?? 0), 0) /
+        slotsWithCrop.length
+      : 0
+
+  const gapActiveHour = Math.max(0, -netActiveHour)
+  const gapDay = Math.max(0, -netDay)
+
+  const cropPerClickFromNewSlot = avgCropPerSlotPerClick
+  const cropPerDayFromNewSlot =
+    cropPerClickFromNewSlot * projection.raidsPerDay
+  const cropPerActiveHourFromNewSlot =
+    cropPerClickFromNewSlot * projection.raidsPerActiveHour
+
+  const extraSlotsForDay =
+    cropPerDayFromNewSlot > 0 ? Math.ceil(gapDay / cropPerDayFromNewSlot) : null
+  const extraSlotsForActiveHour =
+    cropPerActiveHourFromNewSlot > 0
+      ? Math.ceil(gapActiveHour / cropPerActiveHourFromNewSlot)
+      : null
+
+  return {
+    ok: true,
+    cropBalancePerHour,
+    tradeRoutesPerHour: tradeRoutes,
+    baseCropPerHour,
+    cropPerClick: totals.crop,
+    raidCropPerActiveHour,
+    raidCropPerDay,
+    netActiveHour,
+    netDay,
+    activeHours: projection.activeHours,
+    raidsPerDay: projection.raidsPerDay,
+    selectedListCount: selectedListIds.size,
+    selectedSlotCount: slots.length,
+    avgCropPerSlotPerClick,
+    gapActiveHour,
+    gapDay,
+    extraSlotsForDay,
+    extraSlotsForActiveHour,
+    activeHourOk: netActiveHour >= 0,
+    dayOk: netDay >= 0,
+  }
+}
+
+/** Try to read crop balance from stock bar script on same paste */
+export function parseCropBalanceFromPaste(text) {
+  const m = text.match(/production:\s*\{[^}]*"l4"\s*:\s*(-?\d+)/)
+  if (!m) return null
+  const n = parseInt(m[1], 10)
+  if (!Number.isFinite(n)) return null
+  return {
+    sign: n < 0 ? '-' : '+',
+    digits: String(Math.abs(n)),
+    value: n,
+  }
+}
+
+/**
  * @typedef {{ lumber: number, clay: number, iron: number, crop: number }} RaidedResources
- * @typedef {{ id: number, targetName: string, coords: { x: number, y: number }|null, distance: number, isActive: boolean, raidedResources: RaidedResources|null, lastRaidTime: number|null }} FarmListSlotSummary
+ * @typedef {{ t1: number, t2: number, t3: number, t4: number, t5: number, t6: number, t7: number, t8: number, t9: number, t10: number }} TroopCounts
+ * @typedef {{ id: number, targetName: string, coords: { x: number, y: number }|null, targetType: number|null, isNatar: boolean, distance: number, isActive: boolean, troop: TroopCounts|null, troopLabel: string, raidedResources: RaidedResources|null, bootyMax: number|null, lastRaidTime: number|null }} FarmListSlotSummary
  * @typedef {{ id: number, name: string, ownerVillageId: number|null, ownerVillageName: string|null, slotsAmount: number, runningRaidsAmount: number, isExpanded: boolean, slotsWithLoot: number, slotsMissingLoot: number, perRaidTotals: RaidedResources, slots: FarmListSlotSummary[] }} FarmListSummary
- * @typedef {{ timestamp: number|null, farmLists: FarmListSummary[], grandTotals: RaidedResources, notes: string[] }} FarmListParseResult
+ * @typedef {{ id: number, name: string }} VillageSummary
+ * @typedef {{ timestamp: number|null, tribeId: number|null, currentVillageId: number|null, villages: VillageSummary[], farmLists: FarmListSummary[], grandTotals: RaidedResources, cropBalanceFromPaste: ReturnType<typeof parseCropBalanceFromPaste>, notes: string[] }} FarmListParseResult
  */
 
 /**
  * @param {string} text
+ * @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en']
  * @returns {FarmListParseResult|null}
  */
-export function parseFarmListPaste(text) {
+export function parseFarmListPaste(text, locale = 'en') {
   const raw = String(text ?? '').trim()
   if (!raw) return null
 
+  const loc = normalizeCropFarmLocale(locale)
+  const t = getCropFarmStrings(loc)
   const notes = []
 
-  if (!/FarmList\.render|farmLists|rallyPointFarmList/i.test(raw)) {
-    notes.push('Paste does not look like a Farm List page (Rally Point → Farm List tab).')
+  if (!FARM_LIST_PAGE_RE.test(raw)) {
+    notes.push(t.parserNotes.notFarmList)
   }
 
   const viewDataJson =
     extractJsonObjectAfterMarker(raw, 'viewData:') ??
     extractJsonObjectAfterMarker(raw, '"viewData":')
 
+  const cropBalanceFromPaste = parseCropBalanceFromPaste(raw)
+
   if (!viewDataJson) {
-    notes.push('Could not find viewData JSON in the paste. Open Farm List (tt=99), expand all lists, View page source (Ctrl+U), then Ctrl+A and paste.')
-    return { timestamp: null, farmLists: [], grandTotals: { ...EMPTY_RESOURCES }, notes }
+    notes.push(t.parserNotes.noViewData)
+    return {
+      timestamp: null,
+      tribeId: null,
+      currentVillageId: null,
+      villages: [],
+      farmLists: [],
+      grandTotals: { ...EMPTY_RESOURCES },
+      cropBalanceFromPaste,
+      notes,
+    }
   }
 
   let viewData
   try {
     viewData = JSON.parse(viewDataJson)
   } catch {
-    notes.push('viewData JSON is truncated or invalid — try copying the page again.')
-    return { timestamp: null, farmLists: [], grandTotals: { ...EMPTY_RESOURCES }, notes }
+    notes.push(t.parserNotes.invalidViewData)
+    return {
+      timestamp: null,
+      tribeId: null,
+      currentVillageId: null,
+      villages: [],
+      farmLists: [],
+      grandTotals: { ...EMPTY_RESOURCES },
+      cropBalanceFromPaste,
+      notes,
+    }
   }
 
   const timestamp = viewData.bootstrapData?.timestamp ?? null
-  const villages = viewData.ownPlayer?.villages ?? []
+  const tribeId = viewData.ownPlayer?.village?.tribeId ?? null
+  const currentVillageId = viewData.ownPlayer?.village?.id ?? null
+  const villages = (viewData.ownPlayer?.villages ?? []).map((v) => ({
+    id: v.id,
+    name: v.name,
+  }))
   const villageById = new Map(villages.map((v) => [v.id, v.name]))
 
   /** @type {FarmListSummary[]} */
@@ -144,29 +420,38 @@ export function parseFarmListPaste(text) {
     const ownerVillageName = ownerVillageId != null ? villageById.get(ownerVillageId) ?? null : null
 
     /** @type {FarmListSlotSummary[]} */
-    const slots = (list.slots ?? []).map((slot) => ({
-      id: slot.id,
-      targetName: slot.target?.name ?? '—',
-      coords:
-        slot.target && Number.isFinite(slot.target.x) && Number.isFinite(slot.target.y)
-          ? { x: slot.target.x, y: slot.target.y }
+    const slots = (list.slots ?? []).map((slot) => {
+      const troop = slot.troop ? { ...slot.troop } : null
+      const target = slot.target ?? null
+      return {
+        id: slot.id,
+        targetName: target?.name ?? '—',
+        coords:
+          target && Number.isFinite(target.x) && Number.isFinite(target.y)
+            ? { x: target.x, y: target.y }
+            : null,
+        targetType: target?.type ?? null,
+        isNatar: isNatarTarget(target),
+        distance: slot.distance ?? null,
+        isActive: Boolean(slot.isActive),
+        troop,
+        troopLabel: formatTroopShort(troop, tribeId),
+        raidedResources: slot.lastRaid?.raidedResources
+          ? { ...slot.lastRaid.raidedResources }
           : null,
-      distance: slot.distance ?? null,
-      isActive: Boolean(slot.isActive),
-      raidedResources: slot.lastRaid?.raidedResources
-        ? { ...slot.lastRaid.raidedResources }
-        : null,
-      lastRaidTime: slot.lastRaid?.time ?? null,
-    }))
+        bootyMax: slot.lastRaid?.bootyMax ?? null,
+        lastRaidTime: slot.lastRaid?.time ?? null,
+      }
+    })
 
     const slotsWithLoot = slots.filter((s) => s.raidedResources).length
     const configuredSlots = list.slotsAmount ?? list.slotsStates?.length ?? slots.length
     const slotsMissingLoot = Math.max(0, configuredSlots - slotsWithLoot)
 
     if (!list.isExpanded && configuredSlots > 0) {
-      notes.push(`"${list.name}" is collapsed — expand it on Travian and re-paste to include per-village loot.`)
+      notes.push(t.parserNotes.listCollapsed(list.name))
     } else if (list.isExpanded && slotsMissingLoot > 0) {
-      notes.push(`"${list.name}": ${slotsMissingLoot} slot(s) have no last-raid loot in the paste.`)
+      notes.push(t.parserNotes.slotsMissingLoot(list.name, slotsMissingLoot))
     }
 
     const perRaidTotals = aggregateSlots(slots)
@@ -192,17 +477,36 @@ export function parseFarmListPaste(text) {
   }
 
   if (!farmLists.length) {
-    notes.push('No farm lists found in viewData.')
+    notes.push(t.parserNotes.noLists)
   }
 
-  return { timestamp, farmLists, grandTotals, notes: [...new Set(notes)] }
+  return {
+    timestamp,
+    tribeId,
+    currentVillageId,
+    villages,
+    farmLists,
+    grandTotals,
+    cropBalanceFromPaste,
+    notes: [...new Set(notes)],
+  }
 }
 
-export function formatNum(n) {
-  if (!Number.isFinite(n)) return '—'
-  return n.toLocaleString('en-US')
+/** @param {number} n @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en'] */
+export function formatNum(n, locale = 'en') {
+  return formatCropNum(n, normalizeCropFarmLocale(locale))
+}
+
+/** @param {number} n @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en'] */
+export function formatSignedNum(n, locale = 'en') {
+  return formatCropSignedNum(n, normalizeCropFarmLocale(locale))
 }
 
 export function resourceTotal(r) {
   return (r.lumber || 0) + (r.clay || 0) + (r.iron || 0) + (r.crop || 0)
+}
+
+export function formatPercent(fraction) {
+  if (fraction == null || !Number.isFinite(fraction)) return '—'
+  return `${Math.round(fraction * 100)}%`
 }

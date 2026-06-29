@@ -185,6 +185,33 @@ export function analyzeSlotEfficiency(slot) {
 }
 
 /**
+ * Sort priority (descending): capped raids first, then big over-trooping, then small targets.
+ * @param {{ recommendation: string, utilization: number|null, bootyMax: number|null, stolenTotal: number|null }} rec
+ */
+export function getRecommendationPriority(rec) {
+  const bootyMax = rec.bootyMax ?? 0
+  const stolen = rec.stolenTotal ?? 0
+  const util = rec.utilization ?? 0
+  const waste = Math.max(0, bootyMax - stolen)
+
+  if (rec.recommendation === 'increase') {
+    // Tier 3: capped — highest priority (100% raids, add troops)
+    return 3_000_000 + util * 100_000 + bootyMax
+  }
+
+  if (rec.recommendation === 'decrease') {
+    // Tier 2: large carry, tiny loot (e.g. 1100 max, 30 stolen) — free troops
+    if (bootyMax > 350) {
+      return 2_000_000 + waste * 100 + bootyMax
+    }
+    // Tier 1: already near minimum practical troops (e.g. 220 max, 2×110) — low impact
+    return 1_000_000 + waste
+  }
+
+  return 0
+}
+
+/**
  * @param {import('./farmListPasteParser').FarmListSlotSummary[]} slots
  * @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en']
  */
@@ -204,7 +231,7 @@ export function buildSlotRecommendations(slots, locale = 'en') {
         recommendation === 'increase'
           ? t.recIncrease(utilPct, stolen, max)
           : t.recDecrease(utilPct, stolen, max)
-      return {
+      const item = {
         slotId: slot.id,
         targetName: slot.targetName,
         coords,
@@ -214,13 +241,16 @@ export function buildSlotRecommendations(slots, locale = 'en') {
         utilPct,
         bootyMax: slot.bootyMax,
         stolenTotal,
+        wastedCapacity: Math.max(0, (slot.bootyMax ?? 0) - (stolenTotal ?? 0)),
         recommendation,
         message,
         natarWarning:
           slot.isNatar && recommendation === 'decrease' ? t.natarWarning : null,
       }
+      return item
     })
     .filter(Boolean)
+    .sort((a, b) => getRecommendationPriority(b) - getRecommendationPriority(a))
 }
 
 /**

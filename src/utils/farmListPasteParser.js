@@ -308,11 +308,17 @@ export function computeFeedingBalance(
       ? Math.ceil(gapActiveHour / cropPerActiveHourFromNewSlot)
       : null
 
+  const dailyBurn = baseCropPerHour < 0 ? Math.abs(baseCropPerHour) * 24 : 0
+  const feedingCoveragePct =
+    baseCropPerHour < 0 && dailyBurn > 0 ? (raidCropPerDay / dailyBurn) * 100 : null
+
   return {
     ok: true,
     cropBalancePerHour,
     tradeRoutesPerHour: tradeRoutes,
     baseCropPerHour,
+    dailyBurn,
+    feedingCoveragePct,
     cropPerClick: totals.crop,
     raidCropPerActiveHour,
     raidCropPerDay,

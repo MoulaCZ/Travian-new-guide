@@ -112,6 +112,16 @@ const en = {
   needDay: (amount) => `Need ${amount} more crop/day`,
   moreTargetsDay: (count, crop, clicks) =>
     ` — add ~${count} target${count !== 1 ? 's' : ''} (~${crop} crop/click, ${clicks} clicks/day)`,
+  feedingCoverageLabel: 'Feeding coverage',
+  feedingCoverageSurplus: 'Surplus',
+  feedingCoverageTooltipTitle: 'How feeding coverage is calculated',
+  feedingCoverageTooltipIntro:
+    'Share of your daily crop burn (after trade routes) covered by raid income over 24h.',
+  feedingCoverageStep1: '1. Base crop/h = village balance + trade routes',
+  feedingCoverageStep2: '2. Daily burn = |base| × 24',
+  feedingCoverageStep3: '3. Raid crop/day = crop per click × clicks per day',
+  feedingCoverageStep4: '4. Coverage % = raid crop/day ÷ daily burn × 100',
+  feedingCoverageNoDeficit: 'No crop deficit — coverage applies when base crop/h is negative.',
   switchToEn: 'Switch to English',
   switchToFr: 'Switch to French',
   parserNotes: {
@@ -245,6 +255,17 @@ const fr = {
   needDay: (amount) => `Il manque ${amount} céréales/jour`,
   moreTargetsDay: (count, crop, clicks) =>
     ` — ajoutez ~${count} cible${count !== 1 ? 's' : ''} (~${crop} céréales/clic, ${clicks} clics/jour)`,
+  feedingCoverageLabel: 'Couverture céréales',
+  feedingCoverageSurplus: 'Excédent',
+  feedingCoverageTooltipTitle: 'Calcul de la couverture',
+  feedingCoverageTooltipIntro:
+    'Part du besoin journalier en céréales (après routes commerciales) couverte par les pillages sur 24 h.',
+  feedingCoverageStep1: '1. Base céréales/h = solde village + routes commerciales',
+  feedingCoverageStep2: '2. Besoin journalier = |base| × 24',
+  feedingCoverageStep3: '3. Pillages/jour = céréales par clic × clics par jour',
+  feedingCoverageStep4: '4. Couverture % = pillages/jour ÷ besoin journalier × 100',
+  feedingCoverageNoDeficit:
+    'Pas de déficit — la couverture s\'applique quand la base céréales/h est négative.',
   switchToEn: 'Passer en anglais',
   switchToFr: 'Passer en français',
   parserNotes: {

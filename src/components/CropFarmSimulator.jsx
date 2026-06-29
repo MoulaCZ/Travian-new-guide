@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   TrendingUp,
   TrendingDown,
+  HelpCircle,
 } from 'lucide-react'
 import {
   parseFarmListPaste,
@@ -135,6 +136,95 @@ function UtilBadge({ utilization, recommendation }) {
     <span className="tabular-nums font-semibold" style={{ color }}>
       {pct}%
     </span>
+  )
+}
+
+function coverageColor(pct) {
+  if (pct == null) return C.muted
+  if (pct >= 100) return C.ok
+  if (pct >= 90) return '#fbbf24'
+  return C.bad
+}
+
+function FeedingCoverageBadge({ feeding, t, lang }) {
+  if (!feeding?.ok) return null
+
+  const hasDeficit = feeding.baseCropPerHour < 0
+  const pct = feeding.feedingCoveragePct
+  const displayPct = hasDeficit && pct != null ? `${pct.toFixed(1)}%` : t.feedingCoverageSurplus
+  const color = hasDeficit ? coverageColor(pct) : C.ok
+
+  const village = formatSignedNum(feeding.cropBalancePerHour, lang)
+  const routes =
+    feeding.tradeRoutesPerHour > 0
+      ? `+${formatNum(feeding.tradeRoutesPerHour, lang)}`
+      : formatNum(0, lang)
+  const base = formatSignedNum(feeding.baseCropPerHour, lang)
+  const dailyBurn = formatNum(feeding.dailyBurn, lang)
+  const raidDay = formatNum(feeding.raidCropPerDay, lang)
+  const result = hasDeficit && pct != null ? `${pct.toFixed(1)}%` : '—'
+
+  return (
+    <div className="flex flex-col items-end flex-shrink-0 text-right">
+      <span
+        className="text-[10px] sm:text-xs uppercase tracking-wider font-semibold"
+        style={{ color: C.muted }}
+      >
+        {t.feedingCoverageLabel}
+      </span>
+      <span
+        className="text-3xl sm:text-4xl font-bold tabular-nums leading-tight mt-0.5"
+        style={{ color }}
+      >
+        {displayPct}
+      </span>
+      <div className="relative group mt-1.5">
+        <button
+          type="button"
+          className="p-1 rounded-md border transition-colors hover:bg-[#241d14]"
+          style={{ borderColor: C.border, color: C.muted }}
+          aria-label={t.feedingCoverageTooltipTitle}
+        >
+          <HelpCircle className="w-4 h-4" />
+        </button>
+        <div
+          className="absolute right-0 top-full mt-2 w-[min(20rem,calc(100vw-2rem))] rounded-lg border p-3 text-left text-xs shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-opacity z-50 pointer-events-none group-hover:pointer-events-auto"
+          style={{
+            background: C.surfaceLift,
+            borderColor: C.border,
+            color: C.text,
+          }}
+          role="tooltip"
+        >
+          <p className="font-semibold mb-2" style={{ color: C.gold }}>
+            {t.feedingCoverageTooltipTitle}
+          </p>
+          {hasDeficit ? (
+            <div className="space-y-2 font-mono text-[11px] leading-relaxed" style={{ color: C.muted }}>
+              <p style={{ color: C.text }}>{t.feedingCoverageTooltipIntro}</p>
+              <p>{t.feedingCoverageStep1}</p>
+              <p className="pl-2 tabular-nums" style={{ color: C.text }}>
+                {village} + {routes} = {base} {t.cropPerHour}
+              </p>
+              <p>{t.feedingCoverageStep2}</p>
+              <p className="pl-2 tabular-nums" style={{ color: C.text }}>
+                |{base}| × 24 = {dailyBurn} {t.cropPerDay}
+              </p>
+              <p>{t.feedingCoverageStep3}</p>
+              <p className="pl-2 tabular-nums" style={{ color: C.text }}>
+                = {raidDay} {t.cropPerDay}
+              </p>
+              <p>{t.feedingCoverageStep4}</p>
+              <p className="pl-2 tabular-nums font-semibold" style={{ color }}>
+                {raidDay} ÷ {dailyBurn} × 100 = {result}
+              </p>
+            </div>
+          ) : (
+            <p style={{ color: C.muted }}>{t.feedingCoverageNoDeficit}</p>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -892,9 +982,12 @@ export default function CropFarmSimulator() {
           className="rounded-xl border p-4 space-y-4"
           style={{ background: C.surface, borderColor: `${C.gold}40` }}
         >
-          <h2 className="text-sm font-semibold uppercase tracking-wide" style={{ color: C.gold }}>
-            {t.advanceFeeding}
-          </h2>
+          <div className="flex items-start justify-between gap-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wide pt-1" style={{ color: C.gold }}>
+              {t.advanceFeeding}
+            </h2>
+            <FeedingCoverageBadge feeding={feeding} t={t} lang={lang} />
+          </div>
 
           <div className="flex flex-col gap-4 max-w-md">
             <div>

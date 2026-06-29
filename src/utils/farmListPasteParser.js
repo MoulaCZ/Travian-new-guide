@@ -123,6 +123,14 @@ export function cropBalancePerHour(sign, digitsRaw) {
   return sign === '-' ? -n : n
 }
 
+/** Non-negative crop/h from digits-only input (empty → 0) */
+export function tradeRoutesPerHour(digitsRaw) {
+  const digits = String(digitsRaw ?? '').replace(/\D/g, '')
+  if (!digits) return 0
+  const n = parseInt(digits, 10)
+  return Number.isFinite(n) ? n : 0
+}
+
 /**
  * @param {import('./farmListPasteParser').FarmListSlotSummary[]} slots
  */
@@ -209,19 +217,29 @@ export function buildSlotRecommendations(slots) {
  * @param {import('./farmListPasteParser').FarmListSummary[]} farmLists
  * @param {Set<number>} selectedListIds
  * @param {{ intervalMinutes: number, startHour: number, endHour: number }} schedule
+ * @param {number} [tradeRoutesCropPerHour=0] — incoming crop/h from automated trade routes
  */
-export function computeFeedingBalance(cropBalancePerHour, farmLists, selectedListIds, schedule) {
+export function computeFeedingBalance(
+  cropBalancePerHour,
+  farmLists,
+  selectedListIds,
+  schedule,
+  tradeRoutesCropPerHour = 0,
+) {
   if (!Number.isFinite(cropBalancePerHour)) {
     return { ok: false, reason: 'missing_balance' }
   }
+
+  const tradeRoutes = Math.max(0, tradeRoutesCropPerHour || 0)
+  const baseCropPerHour = cropBalancePerHour + tradeRoutes
 
   const { totals, slots } = aggregateSelectedLists(farmLists, selectedListIds)
   const projection = projectFarmLoot(totals, schedule)
 
   const raidCropPerActiveHour = projection.perHour.crop
   const raidCropPerDay = projection.perDay.crop
-  const netActiveHour = cropBalancePerHour + raidCropPerActiveHour
-  const netDay = cropBalancePerHour * 24 + raidCropPerDay
+  const netActiveHour = baseCropPerHour + raidCropPerActiveHour
+  const netDay = baseCropPerHour * 24 + raidCropPerDay
 
   const slotsWithCrop = slots.filter((s) => s.raidedResources && s.raidedResources.crop > 0)
   const avgCropPerSlotPerClick =
@@ -249,6 +267,8 @@ export function computeFeedingBalance(cropBalancePerHour, farmLists, selectedLis
   return {
     ok: true,
     cropBalancePerHour,
+    tradeRoutesPerHour: tradeRoutes,
+    baseCropPerHour,
     cropPerClick: totals.crop,
     raidCropPerActiveHour,
     raidCropPerDay,

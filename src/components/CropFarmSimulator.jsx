@@ -17,6 +17,7 @@ import {
   formatPercent,
   resourceTotal,
   cropBalancePerHour,
+  tradeRoutesPerHour,
   aggregateSelectedLists,
   computeFeedingBalance,
   buildSlotRecommendations,
@@ -137,9 +138,29 @@ function FeedingBalancePanel({ feeding, schedule }) {
           <p style={{ color: C.text }}>
             Village balance:{' '}
             <strong className="tabular-nums">{formatSignedNum(feeding.cropBalancePerHour)}</strong>{' '}
-            crop/h · Selected lists:{' '}
+            crop/h
+            {feeding.tradeRoutesPerHour > 0 && (
+              <>
+                {' '}
+                · Trade routes:{' '}
+                <strong className="tabular-nums" style={{ color: C.ok }}>
+                  +{formatNum(feeding.tradeRoutesPerHour)}
+                </strong>{' '}
+                crop/h
+              </>
+            )}
+            {feeding.tradeRoutesPerHour > 0 && (
+              <>
+                {' '}
+                → base{' '}
+                <strong className="tabular-nums">{formatSignedNum(feeding.baseCropPerHour)}</strong>{' '}
+                crop/h
+              </>
+            )}
+            {' · '}
+            Raids:{' '}
             <strong className="tabular-nums">{formatNum(feeding.raidCropPerActiveHour)}</strong>{' '}
-            crop/h from raids ({feeding.selectedListCount} list
+            crop/h ({feeding.selectedListCount} list
             {feeding.selectedListCount !== 1 ? 's' : ''}, {feeding.selectedSlotCount} slots)
           </p>
         </div>
@@ -187,7 +208,7 @@ function FeedingBalancePanel({ feeding, schedule }) {
           style={{ background: C.surface, borderColor: C.border }}
         >
           <div className="text-xs uppercase tracking-wide mb-1" style={{ color: C.muted }}>
-            Net over full day (balance × 24 + raids)
+            Net over full day (base × 24 + raids)
           </div>
           <div
             className="text-xl font-bold tabular-nums"
@@ -197,7 +218,8 @@ function FeedingBalancePanel({ feeding, schedule }) {
           </div>
           {feeding.netDay >= 0 ? (
             <p className="text-xs mt-2" style={{ color: C.muted }}>
-              Full-day surplus — village production + farming nets{' '}
+              Full-day surplus — village production
+              {feeding.tradeRoutesPerHour > 0 ? ', trade routes,' : ''} and farming nets{' '}
               <strong style={{ color: C.ok }}>{formatNum(feeding.netDay)}</strong> crop/day (raids
               only run in your active window; production runs 24h).
             </p>
@@ -465,6 +487,7 @@ export default function CropFarmSimulator() {
   const [advanceMode, setAdvanceMode] = useState(false)
   const [cropBalanceSign, setCropBalanceSign] = useState('-')
   const [cropBalanceDigits, setCropBalanceDigits] = useState('')
+  const [tradeRoutesDigits, setTradeRoutesDigits] = useState('')
   const [selectedVillageId, setSelectedVillageId] = useState('')
   const [selectedListIds, setSelectedListIds] = useState(() => new Set())
   const [listSelectionTouched, setListSelectionTouched] = useState(false)
@@ -540,6 +563,11 @@ export default function CropFarmSimulator() {
     [cropBalanceSign, cropBalanceDigits],
   )
 
+  const tradeRoutesCropPerHour = useMemo(
+    () => tradeRoutesPerHour(tradeRoutesDigits),
+    [tradeRoutesDigits],
+  )
+
   const feeding = useMemo(() => {
     if (!advanceMode || !parsed?.farmLists.length || selectedListIds.size === 0) return null
     return computeFeedingBalance(
@@ -547,8 +575,9 @@ export default function CropFarmSimulator() {
       parsed.farmLists,
       selectedListIds,
       schedule,
+      tradeRoutesCropPerHour,
     )
-  }, [advanceMode, parsed, selectedListIds, balancePerHour, schedule])
+  }, [advanceMode, parsed, selectedListIds, balancePerHour, schedule, tradeRoutesCropPerHour])
 
   const recommendations = useMemo(() => {
     if (!advanceMode || !parsed?.farmLists.length) return []
@@ -591,6 +620,12 @@ export default function CropFarmSimulator() {
       lines.push(
         '',
         `Feeding balance: village ${formatSignedNum(feeding.cropBalancePerHour)} crop/h`,
+      )
+      if (feeding.tradeRoutesPerHour > 0) {
+        lines.push(`  Trade routes: +${formatNum(feeding.tradeRoutesPerHour)} crop/h`)
+        lines.push(`  Base (village + routes): ${formatSignedNum(feeding.baseCropPerHour)} crop/h`)
+      }
+      lines.push(
         `  Net active hour: ${formatSignedNum(feeding.netActiveHour)} crop/h`,
         `  Net full day: ${formatSignedNum(feeding.netDay)} crop/day`,
       )
@@ -800,44 +835,71 @@ export default function CropFarmSimulator() {
             Advance — crop feeding
           </h2>
 
-          <div>
-            <label className="block text-xs mb-2" style={{ color: C.muted }}>
-              Net crop/h from village stock bar (production − upkeep)
-            </label>
-            <div className="flex gap-2 max-w-md">
-              <select
-                value={cropBalanceSign}
-                onChange={(e) => setCropBalanceSign(e.target.value)}
-                aria-label="Surplus or deficit"
-                className="rounded-lg border px-3 py-2 text-sm"
-                style={{
-                  background: C.bg,
-                  borderColor: cropBalanceDigits ? C.goldDim : C.border,
-                  color: C.text,
-                }}
-              >
-                <option value="-">−</option>
-                <option value="+">+</option>
-              </select>
+          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl">
+            <div>
+              <label className="block text-xs mb-2" style={{ color: C.muted }}>
+                Net crop/h from village stock bar (production − upkeep)
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={cropBalanceSign}
+                  onChange={(e) => setCropBalanceSign(e.target.value)}
+                  aria-label="Surplus or deficit"
+                  className="rounded-lg border px-3 py-2 text-sm"
+                  style={{
+                    background: C.bg,
+                    borderColor: cropBalanceDigits ? C.goldDim : C.border,
+                    color: C.text,
+                  }}
+                >
+                  <option value="-">−</option>
+                  <option value="+">+</option>
+                </select>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={cropBalanceDigits}
+                  onChange={(e) => setCropBalanceDigits(e.target.value.replace(/\D/g, ''))}
+                  placeholder="e.g. 5299"
+                  aria-label="Crop balance per hour"
+                  className="flex-1 rounded-lg border px-3 py-2 text-sm tabular-nums"
+                  style={{
+                    background: C.bg,
+                    borderColor: cropBalanceDigits ? C.goldDim : C.border,
+                    color: C.text,
+                  }}
+                />
+              </div>
+              <span className="text-xs mt-1 block" style={{ color: C.muted }}>
+                Use − for deficit (red number in Travian). Auto-filled from paste when available.
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs mb-2" style={{ color: C.muted }}>
+                Trade routes crop/h (from other villages)
+              </label>
               <input
                 type="text"
                 inputMode="numeric"
                 autoComplete="off"
-                value={cropBalanceDigits}
-                onChange={(e) => setCropBalanceDigits(e.target.value.replace(/\D/g, ''))}
-                placeholder="e.g. 5299"
-                aria-label="Crop balance per hour"
-                className="flex-1 rounded-lg border px-3 py-2 text-sm tabular-nums"
+                value={tradeRoutesDigits}
+                onChange={(e) => setTradeRoutesDigits(e.target.value.replace(/\D/g, ''))}
+                placeholder="e.g. 15000"
+                aria-label="Trade routes crop per hour"
+                className="w-full rounded-lg border px-3 py-2 text-sm tabular-nums"
                 style={{
                   background: C.bg,
-                  borderColor: cropBalanceDigits ? C.goldDim : C.border,
+                  borderColor: tradeRoutesDigits ? C.goldDim : C.border,
                   color: C.text,
                 }}
               />
+              <span className="text-xs mt-1 block" style={{ color: C.muted }}>
+                Sum of automated merchant deliveries to this village, expressed as crop/h (runs
+                24/7).
+              </span>
             </div>
-            <span className="text-xs mt-1 block" style={{ color: C.muted }}>
-              Use − for deficit (red number in Travian). Auto-filled from paste when available.
-            </span>
           </div>
 
           {parsed.villages.length > 0 && (

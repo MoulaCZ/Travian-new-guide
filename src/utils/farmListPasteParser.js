@@ -9,6 +9,10 @@ import {
   getCropFarmStrings,
   normalizeCropFarmLocale,
 } from '../i18n/cropFarmSimulator.js'
+import { TRIBE_UNIT_COLUMNS, getUnitLabel } from '../data/travelUnits.js'
+
+/** Travian viewData tribeId → travelUnits tribe key */
+const TRIBE_ID_TO_KEY = { 1: 'roman', 2: 'teuton', 3: 'gaul' }
 
 const FARM_LIST_PAGE_RE =
   /FarmList\.render|farmLists|rallyPointFarmList|Pillages|Listes de pillage|listes de pillage/i
@@ -71,25 +75,24 @@ function scaleResources(r, factor) {
 
 const EMPTY_RESOURCES = { lumber: 0, clay: 0, iron: 0, crop: 0 }
 
-const TEUTON_SHORT = ['', 'Leg', 'Praet', 'Imp', 'EL', 'EI', 'EC', 'Ram', 'Cat', 'Sen', 'Set']
-const GAUL_SHORT = ['', 'P', 'S', 'Path', 'TT', 'Druid', 'Hae', 'Ram', 'Tre', 'Chieft', 'Set']
-const ROMAN_SHORT = ['', 'Leg', 'Praet', 'Imp', 'EL', 'EI', 'EC', 'Ram', 'Cat', 'Sen', 'Set']
-
-/** @param {number|null} tribeId */
-function unitShortNames(tribeId) {
-  if (tribeId === 2) return TEUTON_SHORT
-  if (tribeId === 3) return GAUL_SHORT
-  return ROMAN_SHORT
-}
-
-/** @param {Record<string, number>|null|undefined} troop @param {number|null} tribeId */
-export function formatTroopShort(troop, tribeId) {
+/**
+ * Farm list slot.troop uses t1–t10 matching TRIBE_UNIT_COLUMNS order (same as Travian API).
+ * @param {Record<string, number>|null|undefined} troop
+ * @param {number|null} tribeId — 1 Roman, 2 Teuton, 3 Gaul
+ * @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en']
+ */
+export function formatTroopShort(troop, tribeId, locale = 'en') {
   if (!troop) return '—'
-  const names = unitShortNames(tribeId)
+  const tribe = TRIBE_ID_TO_KEY[tribeId] ?? 'teuton'
+  const columns = TRIBE_UNIT_COLUMNS[tribe]
+  const loc = normalizeCropFarmLocale(locale)
   const parts = []
   for (let i = 1; i <= 10; i++) {
     const n = troop[`t${i}`] ?? 0
-    if (n > 0) parts.push(`${n}× ${names[i] || `T${i}`}`)
+    if (n <= 0) continue
+    const unitId = columns[i - 1]
+    if (!unitId || unitId === 'hero') continue
+    parts.push(`${n}× ${getUnitLabel(tribe, unitId, loc)}`)
   }
   return parts.length ? parts.join(', ') : '—'
 }
@@ -435,7 +438,7 @@ export function parseFarmListPaste(text, locale = 'en') {
         distance: slot.distance ?? null,
         isActive: Boolean(slot.isActive),
         troop,
-        troopLabel: formatTroopShort(troop, tribeId),
+        troopLabel: formatTroopShort(troop, tribeId, loc),
         raidedResources: slot.lastRaid?.raidedResources
           ? { ...slot.lastRaid.raidedResources }
           : null,

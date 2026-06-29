@@ -167,40 +167,38 @@ function FeedingBalancePanel({ feeding, schedule, t, lang }) {
           <p className="font-semibold" style={{ color: ok ? C.ok : C.bad }}>
             {ok ? t.feedingOk : t.feedingBad}
           </p>
-          <p style={{ color: C.text }}>
-            {t.villageBalance}:{' '}
-            <strong className="tabular-nums">
-              {formatSignedNum(feeding.cropBalancePerHour, lang)}
-            </strong>{' '}
-            {t.cropPerHour}
+          <div className="space-y-1 text-sm" style={{ color: C.text }}>
+            <p>
+              {t.villageBalance}:{' '}
+              <strong className="tabular-nums">
+                {formatSignedNum(feeding.cropBalancePerHour, lang)}
+              </strong>{' '}
+              {t.cropPerHour}
+            </p>
             {feeding.tradeRoutesPerHour > 0 && (
-              <>
-                {' · '}
+              <p>
                 {t.tradeRoutes}:{' '}
                 <strong className="tabular-nums" style={{ color: C.ok }}>
                   +{formatNum(feeding.tradeRoutesPerHour, lang)}
                 </strong>{' '}
                 {t.cropPerHour}
-              </>
-            )}
-            {feeding.tradeRoutesPerHour > 0 && (
-              <>
                 {' → '}
                 {t.base}{' '}
                 <strong className="tabular-nums">
                   {formatSignedNum(feeding.baseCropPerHour, lang)}
                 </strong>{' '}
                 {t.cropPerHour}
-              </>
+              </p>
             )}
-            {' · '}
-            {t.raids}:{' '}
-            <strong className="tabular-nums">
-              {formatNum(feeding.raidCropPerActiveHour, lang)}
-            </strong>{' '}
-            {t.cropPerHour} ({feeding.selectedListCount} {listWord},{' '}
-            {feeding.selectedSlotCount} {t.slots})
-          </p>
+            <p>
+              {t.raids}:{' '}
+              <strong className="tabular-nums">
+                {formatNum(feeding.raidCropPerActiveHour, lang)}
+              </strong>{' '}
+              {t.cropPerHour} ({feeding.selectedListCount} {listWord},{' '}
+              {feeding.selectedSlotCount} {t.slots})
+            </p>
+          </div>
         </div>
       </div>
 
@@ -898,7 +896,7 @@ export default function CropFarmSimulator() {
             {t.advanceFeeding}
           </h2>
 
-          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl">
+          <div className="flex flex-col gap-4 max-w-md">
             <div>
               <label className="block text-xs mb-2" style={{ color: C.muted }}>
                 {t.cropBalanceLabel}

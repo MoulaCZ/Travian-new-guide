@@ -518,12 +518,66 @@ export function parseGranaryFromPaste(text) {
 
 const DEFAULT_SERVER_BASE = 'https://ts10.x1.europe.travian.com'
 
-/** Try to read server host from paste (rare); alliance default otherwise. */
+const GAME_SERVER_HOST_RE =
+  /^ts\d+\.x\d+\.(europe|america|asia|arabics|international)\.travian\.com$/i
+
+const NON_GAME_HOST_RE =
+  /^(cdn\.|www\.|support\.|lobby\.|api\.|help\.|m\.|static\.)/i
+
+function normalizeTravianHost(host) {
+  return String(host ?? '')
+    .replace(/^https?:\/\//i, '')
+    .replace(/\/.*$/, '')
+    .toLowerCase()
+}
+
+function isNonGameHost(host) {
+  const h = normalizeTravianHost(host)
+  return !h || NON_GAME_HOST_RE.test(h) || h === 'cdn.legends.travian.com'
+}
+
+function isGameServerHost(host) {
+  return GAME_SERVER_HOST_RE.test(normalizeTravianHost(host))
+}
+
+function toServerBase(host) {
+  const h = normalizeTravianHost(host)
+  return h ? `https://${h}` : null
+}
+
+/** Infer game server from page title, e.g. "Europe 10" → ts10.x1.europe.travian.com */
+function parseServerBaseFromTitle(text) {
+  const m = text.match(/<title>\s*([^<]+?)\s*<\/title>/i)
+  if (!m) return null
+  const world = m[1].trim().match(/^(Europe|America|Asia|Arabics|International)\s+(\d+)/i)
+  if (!world) return null
+  const region = world[1].toLowerCase()
+  const num = world[2]
+  return `https://ts${num}.x1.${region}.travian.com`
+}
+
+/** Try to read server host from paste; alliance default otherwise. */
 export function parseServerBaseFromPaste(text) {
   const norm = normalizeTravianText(text)
-  const m = norm.match(/https?:\/\/([a-z0-9.-]+\.travian\.com)/i)
-    ?? norm.match(/\b(ts\d+\.[a-z0-9.-]+\.travian\.com)\b/i)
-  if (m) return `https://${m[1].replace(/^https?:\/\//i, '')}`
+
+  const mapUrl = norm.match(
+    /https?:\/\/([a-z0-9.-]+\.travian\.com)\/(?:karte|position_details|build|dorf\d|raid_list|farmList)\.php/i,
+  )
+  if (mapUrl && !isNonGameHost(mapUrl[1]) && isGameServerHost(mapUrl[1])) {
+    return toServerBase(mapUrl[1])
+  }
+
+  for (const m of norm.matchAll(/\b(ts\d+\.x\d+\.[a-z0-9.-]+\.travian\.com)\b/gi)) {
+    if (!isNonGameHost(m[1]) && isGameServerHost(m[1])) return toServerBase(m[1])
+  }
+
+  for (const m of norm.matchAll(/https?:\/\/([a-z0-9.-]+\.travian\.com)/gi)) {
+    if (!isNonGameHost(m[1]) && isGameServerHost(m[1])) return toServerBase(m[1])
+  }
+
+  const fromTitle = parseServerBaseFromTitle(norm)
+  if (fromTitle) return fromTitle
+
   return DEFAULT_SERVER_BASE
 }
 

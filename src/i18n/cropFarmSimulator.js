@@ -122,6 +122,7 @@ const en = {
   feedingCoverageStep3: '3. Raid crop/day = crop per click × clicks per day',
   feedingCoverageStep4: '4. Coverage % = raid crop/day ÷ daily burn × 100',
   feedingCoverageNoDeficit: 'No crop deficit — coverage applies when base crop/h is negative.',
+  openOnMap: 'Open on map',
   switchToEn: 'Switch to English',
   switchToFr: 'Switch to French',
   parserNotes: {
@@ -266,6 +267,7 @@ const fr = {
   feedingCoverageStep4: '4. Couverture % = pillages/jour ÷ besoin journalier × 100',
   feedingCoverageNoDeficit:
     'Pas de déficit — la couverture s\'applique quand la base céréales/h est négative.',
+  openOnMap: 'Ouvrir sur la carte',
   switchToEn: 'Passer en anglais',
   switchToFr: 'Passer en français',
   parserNotes: {

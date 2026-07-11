@@ -10,6 +10,7 @@ import {
   normalizeCropFarmLocale,
 } from '../i18n/cropFarmSimulator.js'
 import { TRIBE_UNIT_COLUMNS, getUnitLabel } from '../data/travelUnits.js'
+import { buildMapUrl, parseServerBaseFromPaste } from './cropPasteParser.js'
 
 /** Travian viewData tribeId → travelUnits tribe key */
 const TRIBE_ID_TO_KEY = { 1: 'roman', 2: 'teuton', 3: 'gaul' }
@@ -217,8 +218,9 @@ export function getRecommendationPriority(rec) {
 /**
  * @param {import('./farmListPasteParser').FarmListSlotSummary[]} slots
  * @param {import('../i18n/cropFarmSimulator.js').CropFarmLocale} [locale='en']
+ * @param {string|null} [serverBase=null]
  */
-export function buildSlotRecommendations(slots, locale = 'en') {
+export function buildSlotRecommendations(slots, locale = 'en', serverBase = null) {
   const loc = normalizeCropFarmLocale(locale)
   const t = getCropFarmStrings(loc)
   return slots
@@ -238,6 +240,11 @@ export function buildSlotRecommendations(slots, locale = 'en') {
         slotId: slot.id,
         targetName: slot.targetName,
         coords,
+        slotCoords: slot.coords,
+        mapUrl:
+          slot.coords != null
+            ? buildMapUrl(serverBase, slot.coords.x, slot.coords.y)
+            : null,
         isNatar: slot.isNatar,
         troopLabel: slot.troopLabel,
         utilization,
@@ -357,7 +364,7 @@ export function parseCropBalanceFromPaste(text) {
  * @typedef {{ id: number, targetName: string, coords: { x: number, y: number }|null, targetType: number|null, isNatar: boolean, distance: number, isActive: boolean, troop: TroopCounts|null, troopLabel: string, raidedResources: RaidedResources|null, bootyMax: number|null, lastRaidTime: number|null }} FarmListSlotSummary
  * @typedef {{ id: number, name: string, ownerVillageId: number|null, ownerVillageName: string|null, slotsAmount: number, runningRaidsAmount: number, isExpanded: boolean, slotsWithLoot: number, slotsMissingLoot: number, perRaidTotals: RaidedResources, slots: FarmListSlotSummary[] }} FarmListSummary
  * @typedef {{ id: number, name: string }} VillageSummary
- * @typedef {{ timestamp: number|null, tribeId: number|null, currentVillageId: number|null, villages: VillageSummary[], farmLists: FarmListSummary[], grandTotals: RaidedResources, cropBalanceFromPaste: ReturnType<typeof parseCropBalanceFromPaste>, notes: string[] }} FarmListParseResult
+ * @typedef {{ timestamp: number|null, tribeId: number|null, currentVillageId: number|null, serverBase: string, villages: VillageSummary[], farmLists: FarmListSummary[], grandTotals: RaidedResources, cropBalanceFromPaste: ReturnType<typeof parseCropBalanceFromPaste>, notes: string[] }} FarmListParseResult
  */
 
 /**
@@ -382,6 +389,7 @@ export function parseFarmListPaste(text, locale = 'en') {
     extractJsonObjectAfterMarker(raw, '"viewData":')
 
   const cropBalanceFromPaste = parseCropBalanceFromPaste(raw)
+  const serverBase = parseServerBaseFromPaste(raw)
 
   if (!viewDataJson) {
     notes.push(t.parserNotes.noViewData)
@@ -389,6 +397,7 @@ export function parseFarmListPaste(text, locale = 'en') {
       timestamp: null,
       tribeId: null,
       currentVillageId: null,
+      serverBase,
       villages: [],
       farmLists: [],
       grandTotals: { ...EMPTY_RESOURCES },
@@ -406,6 +415,7 @@ export function parseFarmListPaste(text, locale = 'en') {
       timestamp: null,
       tribeId: null,
       currentVillageId: null,
+      serverBase,
       villages: [],
       farmLists: [],
       grandTotals: { ...EMPTY_RESOURCES },
@@ -493,6 +503,7 @@ export function parseFarmListPaste(text, locale = 'en') {
     timestamp,
     tribeId,
     currentVillageId,
+    serverBase,
     villages,
     farmLists,
     grandTotals,

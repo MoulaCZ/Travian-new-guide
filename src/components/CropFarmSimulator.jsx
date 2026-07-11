@@ -9,6 +9,7 @@ import {
   TrendingUp,
   TrendingDown,
   HelpCircle,
+  ExternalLink,
 } from 'lucide-react'
 import {
   parseFarmListPaste,
@@ -740,7 +741,7 @@ export default function CropFarmSimulator() {
       parsed.farmLists,
       selectedListIds.size > 0 ? selectedListIds : new Set(parsed.farmLists.map((l) => l.id)),
     )
-    return buildSlotRecommendations(slots, lang)
+    return buildSlotRecommendations(slots, lang, parsed?.serverBase ?? null)
   }, [advanceMode, parsed, selectedListIds, lang])
 
   const toggleList = useCallback((id) => {
@@ -1163,10 +1164,10 @@ export default function CropFarmSimulator() {
                 {recommendations.map((rec) => (
                   <li
                     key={rec.slotId}
-                    className="rounded-lg border px-3 py-2"
+                    className="rounded-lg border px-3 py-2 flex items-start justify-between gap-3"
                     style={{ background: C.surface2, borderColor: C.border }}
                   >
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 flex-1 min-w-0">
                       {rec.recommendation === 'increase' ? (
                         <TrendingUp className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: C.ok }} />
                       ) : (
@@ -1175,7 +1176,7 @@ export default function CropFarmSimulator() {
                           style={{ color: '#fbbf24' }}
                         />
                       )}
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <div className="font-medium" style={{ color: C.text }}>
                           {rec.targetName}{' '}
                           <span style={{ color: C.muted }}>{rec.coords}</span>
@@ -1204,6 +1205,20 @@ export default function CropFarmSimulator() {
                         )}
                       </div>
                     </div>
+                    {rec.mapUrl && (
+                      <a
+                        href={rec.mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={t.openOnMap}
+                        aria-label={`${t.openOnMap} ${rec.coords}`}
+                        className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-colors hover:bg-[#241d14]"
+                        style={{ borderColor: C.border, color: C.gold }}
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">{t.openOnMap}</span>
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>

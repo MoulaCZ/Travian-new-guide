@@ -10,11 +10,13 @@ import { pages } from './data/pages'
 import CropTimelineCalculator from './components/CropTimelineCalculator'
 import TravelCalculator from './components/TravelCalculator'
 import CropFarmSimulator from './components/CropFarmSimulator'
+import WarehouseOptimizer from './components/WarehouseOptimizer'
 
 const COMPONENTS = {
   CropTimelineCalculator,
   TravelCalculator,
   CropFarmSimulator,
+  WarehouseOptimizer,
 }
 
 export default function App() {

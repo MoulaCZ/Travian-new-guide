@@ -27,7 +27,7 @@ const en = {
     iron: 'Iron',
     crop: 'Crop',
   },
-  title: 'Crop Farm Simulator',
+  title: 'Farmlist optimizer',
   intro:
     'Paste your Farm List page. The tool sums loot from each slot\'s last raid per list, then estimates haul per click, per active hour, and per day from your raid interval and playing window. Enable Advance mode to check crop feeding balance and troop efficiency per target.',
   howTo: 'How to use',
@@ -169,7 +169,7 @@ const fr = {
     iron: 'Fer',
     crop: 'Céréales',
   },
-  title: 'Simulateur de pillage — céréales',
+  title: 'Optimiseur de farmlist',
   intro:
     'Collez la page Listes de pillage. L\'outil additionne le butin du dernier pillage de chaque emplacement par liste, puis estime le gain par clic, par heure active et par jour selon votre intervalle de pillage et votre plage horaire. Activez le mode Avancé pour vérifier l\'équilibre céréales / entretien des troupes et l\'efficacité par cible.',
   howTo: 'Mode d\'emploi',

@@ -12,6 +12,8 @@ import {
   suggestMainVillageNames,
   buildSendPlan,
   flaggedResources,
+  formatDuration,
+  formatNum,
   MAIN_CROP_LOW_PCT,
   FEEDER_HIGH_PCT,
   FEEDER_LEAVE_PCT,
@@ -122,10 +124,12 @@ export default function WarehouseOptimizer() {
       `Warehouse optimizer — leave feeders at ~${FEEDER_LEAVE_PCT}%`,
       `Mains: ${[...effectiveMains].join(', ') || '(none)'}`,
       '',
-      ...plan.map(
-        (t) =>
-          `• ${t.from} → ${t.to}: ${RES_LABEL[t.resource]} ${t.fromPct}% → ${t.leavePct}% (send ~${t.sendPctPoints}% of warehouse)${t.marketUrl ? `\n  Market: ${t.marketUrl}` : ''}`,
-      ),
+      ...plan.map((t) => {
+        const amt = t.amountIsAbsolute
+          ? `${formatNum(t.sendAmount)} ${RES_LABEL[t.resource]}`
+          : `~${t.sendPctPoints}% of capacity ${RES_LABEL[t.resource]}`
+        return `• ${t.from} → ${t.to}: ${amt} (${t.fromPct}% → ~${t.leavePct}%)${t.marketUrl ? `\n  Market: ${t.marketUrl}` : ''}`
+      }),
     ]
     try {
       await navigator.clipboard.writeText(lines.join('\n'))
@@ -167,14 +171,15 @@ export default function WarehouseOptimizer() {
           Paste warehouse overview
         </label>
         <p className="text-xs" style={{ color: C.muted }}>
-          Travian → Statistics / Village overview → <strong style={{ color: C.text }}>Resources</strong>{' '}
-          tab → Ctrl+A, Ctrl+C. For direct marketplace village links, prefer page source (Ctrl+U).
+          Travian → Village overview → <strong style={{ color: C.text }}>Resources → Warehouse</strong>.
+          Paste <strong style={{ color: C.text }}>Ctrl+U</strong> page source (best: village IDs + absolute
+          stock) or the visible table.
         </p>
         <textarea
           value={paste}
           onChange={onPaste}
           rows={8}
-          placeholder="Paste village resource % table here…"
+          placeholder="Paste Ctrl+U source of /village/statistics/resources/warehouse …"
           className="w-full rounded-lg border px-3 py-2 text-sm font-mono resize-y"
           style={{
             background: C.bg,
@@ -319,7 +324,7 @@ export default function WarehouseOptimizer() {
                           className="px-3 py-1.5 text-right text-xs tabular-nums"
                           style={{ color: v.cropDeficit ? C.bad : C.muted }}
                         >
-                          {v.granaryDuration?.label ?? '—'}
+                          {formatDuration(v.granaryDuration)}
                         </td>
                       </tr>
                     )
@@ -350,10 +355,10 @@ export default function WarehouseOptimizer() {
               </button>
             </div>
             <p className="text-xs" style={{ color: C.muted }}>
-              Overview paste only has %. Send amount = reduce feeder from current % down to ~
-              {FEEDER_LEAVE_PCT}% (≈ that many %-points of warehouse / granary capacity). Open
-              marketplace on the <strong style={{ color: C.text }}>from</strong> village, pick the{' '}
-              <strong style={{ color: C.text }}>to</strong> village manually.
+              With Ctrl+U paste, send amounts are absolute (leave ~{FEEDER_LEAVE_PCT}% in feeder).
+              Market link opens send-tab on the <strong style={{ color: C.text }}>from</strong>{' '}
+              village (<code>newdid</code>); pick <strong style={{ color: C.text }}>to</strong> as
+              destination.
             </p>
 
             {!effectiveMains.size && (
@@ -384,22 +389,35 @@ export default function WarehouseOptimizer() {
                       <span style={{ color: RES_COLOR[t.resource] }}>{RES_LABEL[t.resource]}</span>
                     </div>
                     <div className="text-xs mt-0.5" style={{ color: C.muted }}>
-                      {t.fromPct}% → leave ~{t.leavePct}% · send ≈{' '}
-                      <strong style={{ color: C.text }}>{t.sendPctPoints}%</strong> of capacity
-                      (receiver currently {t.toPct}%)
+                      {t.fromPct}% → leave ~{t.leavePct}% · send{' '}
+                      <strong style={{ color: C.text }}>
+                        {t.amountIsAbsolute
+                          ? formatNum(t.sendAmount)
+                          : `≈${t.sendPctPoints}% of capacity`}
+                      </strong>
+                      {t.amountIsAbsolute ? ` ${RES_LABEL[t.resource].toLowerCase()}` : ''}
+                      {' '}(receiver {t.toPct}%)
+                      {t.fromId != null && (
+                        <span className="ml-1 opacity-70">· id {t.fromId}</span>
+                      )}
                     </div>
                   </div>
                   <a
-                    href={t.marketUrl}
+                    href={t.marketUrl || undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={
-                      villages.find((v) => v.name === t.from)?.id
-                        ? `Open marketplace in ${t.from}`
+                      t.fromId != null
+                        ? `Open marketplace in ${t.from} (newdid=${t.fromId})`
                         : `Open marketplace — switch to ${t.from} first if needed`
                     }
                     className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium self-start"
-                    style={{ borderColor: C.border, color: C.gold }}
+                    style={{
+                      borderColor: C.border,
+                      color: t.marketUrl ? C.gold : C.muted,
+                      pointerEvents: t.marketUrl ? 'auto' : 'none',
+                      opacity: t.marketUrl ? 1 : 0.5,
+                    }}
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     Market ({t.from})
@@ -408,11 +426,10 @@ export default function WarehouseOptimizer() {
               ))}
             </ul>
 
-            {plan.length > 0 && plan.every((t) => !villages.find((v) => v.name === t.from)?.id) && (
+            {plan.length > 0 && plan.every((t) => t.fromId == null) && (
               <p className="text-xs" style={{ color: C.muted }}>
-                Tip: marketplace links lack <code>newdid</code> — switch to the listed village in
-                Travian before clicking, or re-paste with Ctrl+U page source for auto-switch.
-                Fallback URL shape:{' '}
+                Tip: marketplace links lack <code>newdid</code> — re-paste with Ctrl+U page source.
+                Fallback:{' '}
                 <code className="text-[10px]" style={{ color: C.text }}>
                   {buildMarketplaceUrl(serverBase, null)}
                 </code>

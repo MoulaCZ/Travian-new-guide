@@ -19,7 +19,8 @@ export const pages = [
   { id: 'gold-and-premium',title: 'Gold & Premium',        icon: 'Coins',      content: goldPremiumMd   },
   { id: 'good-to-know',    title: 'Good to Know',          icon: 'Lightbulb',  content: goodToKnowMd    },
   { id: 'crop-timeline',   title: 'Crop Timeline',         icon: 'LineChart',  component: 'CropTimelineCalculator' },
-  { id: 'defense-travel',  title: 'Defense Travel',        icon: 'Route',      component: 'TravelCalculator' },
-  { id: 'crop-farm',       title: 'Crop Farm Simulator', icon: 'Sprout',     component: 'CropFarmSimulator' },
+  // Defense Travel hidden from nav (component kept for later)
+  // { id: 'defense-travel',  title: 'Defense Travel',        icon: 'Route',      component: 'TravelCalculator' },
+  { id: 'crop-farm',       title: 'Farmlist optimizer',    icon: 'Sprout',     component: 'CropFarmSimulator' },
   { id: 'warehouse-optimizer', title: 'Warehouse Optimizer', icon: 'Warehouse', component: 'WarehouseOptimizer' },
 ]
